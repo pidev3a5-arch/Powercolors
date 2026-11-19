@@ -4,6 +4,7 @@ import { VisualContainer } from './VisualContainer';
 interface LineTrendChartProps {
   dataColors: string[];
   isDarkCanvas: boolean;
+  fontFamily?: string;
 }
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
@@ -13,6 +14,7 @@ const BENCHMARK = [280, 340, 390, 460, 520, 610];
 export const LineTrendChart: React.FC<LineTrendChartProps> = ({
   dataColors,
   isDarkCanvas,
+  fontFamily,
 }) => {
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
 
@@ -33,7 +35,6 @@ export const LineTrendChart: React.FC<LineTrendChartProps> = ({
   const getX = (idx: number) => padding.left + (idx / (MONTHS.length - 1)) * innerWidth;
   const getY = (val: number) => padding.top + innerHeight - (val / maxVal) * innerHeight;
 
-  // Build SVG path curve string
   const createSmoothPath = (values: number[]) => {
     return values.reduce((acc, val, idx) => {
       const x = getX(idx);
@@ -58,19 +59,20 @@ export const LineTrendChart: React.FC<LineTrendChartProps> = ({
       title="Monthly Sales Trajectory vs LY"
       subtitle="Multi-Line Trend (Series 1 & 5)"
       isDarkCanvas={isDarkCanvas}
+      fontFamily={fontFamily}
     >
-      <div className="flex flex-col h-full space-y-2">
+      <div className="flex flex-col h-full space-y-2" style={{ fontFamily }}>
         {/* Legend */}
         <div className="flex items-center justify-center space-x-6 text-xs">
           <div className="flex items-center space-x-1.5">
             <span className="w-3.5 h-1 rounded-full" style={{ backgroundColor: seriesColor1 }} />
-            <span className={`font-medium text-[11px] ${isDarkCanvas ? 'text-slate-300' : 'text-slate-600'}`}>
+            <span className={`font-medium text-[11px] ${isDarkCanvas ? 'text-slate-300' : 'text-slate-600'}`} style={{ fontFamily }}>
               2026 Actuals
             </span>
           </div>
           <div className="flex items-center space-x-1.5">
             <span className="w-3.5 h-1 border-t-2 border-dashed" style={{ borderColor: seriesColor2 }} />
-            <span className={`font-medium text-[11px] ${isDarkCanvas ? 'text-slate-300' : 'text-slate-600'}`}>
+            <span className={`font-medium text-[11px] ${isDarkCanvas ? 'text-slate-300' : 'text-slate-600'}`} style={{ fontFamily }}>
               2025 Benchmark
             </span>
           </div>
@@ -110,7 +112,7 @@ export const LineTrendChart: React.FC<LineTrendChartProps> = ({
                     textAnchor="end"
                     fontSize="9"
                     fill={labelColor}
-                    fontFamily="Segoe UI, sans-serif"
+                    style={{ fontFamily }}
                   >
                     ${val}k
                   </text>
@@ -189,7 +191,7 @@ export const LineTrendChart: React.FC<LineTrendChartProps> = ({
                     fontSize="10"
                     fill={labelColor}
                     fontWeight={isHovered ? 'bold' : 'normal'}
-                    fontFamily="Segoe UI, sans-serif"
+                    style={{ fontFamily }}
                   >
                     {month}
                   </text>
@@ -201,6 +203,7 @@ export const LineTrendChart: React.FC<LineTrendChartProps> = ({
           {/* Interactive Tooltip Callout */}
           {hoveredIdx !== null && (
             <div
+              style={{ fontFamily }}
               className={`absolute top-2 right-2 px-2.5 py-1.5 rounded-lg text-xs border shadow-lg backdrop-blur-md pointer-events-none transition-all ${
                 isDarkCanvas
                   ? 'bg-slate-950/90 border-slate-700 text-white'

@@ -7,6 +7,7 @@ interface VisualContainerProps {
   children: React.ReactNode;
   className?: string;
   isDarkCanvas: boolean;
+  fontFamily?: string;
 }
 
 export const VisualContainer: React.FC<VisualContainerProps> = ({
@@ -15,13 +16,15 @@ export const VisualContainer: React.FC<VisualContainerProps> = ({
   children,
   className = '',
   isDarkCanvas,
+  fontFamily,
 }) => {
   return (
     <div
+      style={{ fontFamily }}
       className={`rounded-xl border transition-all duration-200 overflow-hidden flex flex-col ${
         isDarkCanvas
           ? 'bg-slate-900 border-slate-800 text-slate-100 shadow-lg'
-          : 'bg-white border-slate-200/90 text-slate-900 shadow-sm'
+          : 'bg-white border-slate-200/90 text-slate-900 shadow-xs'
       } ${className}`}
     >
       {/* Power BI Visual Header */}
@@ -29,15 +32,21 @@ export const VisualContainer: React.FC<VisualContainerProps> = ({
         isDarkCanvas ? 'border-slate-800/60' : 'border-slate-100'
       }`}>
         <div className="min-w-0 pr-2">
-          <h3 className={`text-xs font-bold tracking-tight truncate ${
-            isDarkCanvas ? 'text-slate-100' : 'text-slate-800'
-          }`}>
+          <h3
+            style={{ fontFamily }}
+            className={`text-xs font-bold tracking-tight truncate ${
+              isDarkCanvas ? 'text-slate-100' : 'text-slate-800'
+            }`}
+          >
             {title}
           </h3>
           {subtitle && (
-            <p className={`text-[11px] truncate mt-0.5 ${
-              isDarkCanvas ? 'text-slate-400' : 'text-slate-500'
-            }`}>
+            <p
+              style={{ fontFamily }}
+              className={`text-[11px] truncate mt-0.5 ${
+                isDarkCanvas ? 'text-slate-400' : 'text-slate-500'
+              }`}
+            >
               {subtitle}
             </p>
           )}
@@ -72,7 +81,7 @@ export const VisualContainer: React.FC<VisualContainerProps> = ({
       </div>
 
       {/* Visual Content Body */}
-      <div className="p-4 flex-1 flex flex-col justify-between">
+      <div className="p-4 flex-1 flex flex-col justify-between" style={{ fontFamily }}>
         {children}
       </div>
     </div>

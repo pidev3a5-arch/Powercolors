@@ -4,6 +4,7 @@ import { VisualContainer } from './VisualContainer';
 interface ClusteredBarChartProps {
   dataColors: string[];
   isDarkCanvas: boolean;
+  fontFamily?: string;
 }
 
 interface DataSeries {
@@ -13,7 +14,7 @@ interface DataSeries {
 
 interface CategoryGroup {
   category: string;
-  values: number[]; // [Enterprise, Mid-Market, SMB, Consumer] in thousands
+  values: number[];
 }
 
 const CATEGORIES: CategoryGroup[] = [
@@ -33,6 +34,7 @@ const SERIES: DataSeries[] = [
 export const ClusteredBarChart: React.FC<ClusteredBarChartProps> = ({
   dataColors,
   isDarkCanvas,
+  fontFamily,
 }) => {
   const [hoveredPoint, setHoveredPoint] = useState<{
     category: string;
@@ -60,8 +62,9 @@ export const ClusteredBarChart: React.FC<ClusteredBarChartProps> = ({
       title="Revenue by Region & Segment"
       subtitle="Clustered Column Chart (Series 1–4)"
       isDarkCanvas={isDarkCanvas}
+      fontFamily={fontFamily}
     >
-      <div className="flex flex-col h-full space-y-2">
+      <div className="flex flex-col h-full space-y-2" style={{ fontFamily }}>
         {/* Interactive Legend */}
         <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs">
           {SERIES.map((s) => {
@@ -72,7 +75,7 @@ export const ClusteredBarChart: React.FC<ClusteredBarChartProps> = ({
                   className="w-2.5 h-2.5 rounded-xs transition-colors"
                   style={{ backgroundColor: color }}
                 />
-                <span className={`font-medium text-[11px] ${isDarkCanvas ? 'text-slate-300' : 'text-slate-600'}`}>
+                <span className={`font-medium text-[11px] ${isDarkCanvas ? 'text-slate-300' : 'text-slate-600'}`} style={{ fontFamily }}>
                   {s.name}
                 </span>
               </div>
@@ -107,7 +110,7 @@ export const ClusteredBarChart: React.FC<ClusteredBarChartProps> = ({
                     textAnchor="end"
                     fontSize="9"
                     fill={labelColor}
-                    fontFamily="Segoe UI, sans-serif"
+                    style={{ fontFamily }}
                   >
                     ${val}k
                   </text>
@@ -128,8 +131,8 @@ export const ClusteredBarChart: React.FC<ClusteredBarChartProps> = ({
                     textAnchor="middle"
                     fontSize="10"
                     fill={labelColor}
-                    fontWeight="500"
-                    fontFamily="Segoe UI, sans-serif"
+                    fontWeight="600"
+                    style={{ fontFamily }}
                   >
                     {cat.category}
                   </text>
@@ -171,6 +174,7 @@ export const ClusteredBarChart: React.FC<ClusteredBarChartProps> = ({
           {/* Interactive Tooltip Callout */}
           {hoveredPoint && (
             <div
+              style={{ fontFamily }}
               className={`absolute top-2 right-2 px-2.5 py-1.5 rounded-lg text-xs border shadow-lg backdrop-blur-md pointer-events-none transition-all ${
                 isDarkCanvas
                   ? 'bg-slate-950/90 border-slate-700 text-white'

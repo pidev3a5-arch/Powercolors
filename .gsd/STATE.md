@@ -1,5 +1,5 @@
 ---
-updated: 2026-11-19T15:20:00+01:00
+updated: 2026-11-19T15:37:00+01:00
 ---
 
 # Project State
@@ -8,22 +8,22 @@ updated: 2026-11-19T15:20:00+01:00
 
 **Milestone:** v1.0  
 **Phase:** 5 - Polish, Verification & Production Readiness  
-**Status:** ready_for_execution  
-**Plan:** All functional phases complete  
+**Status:** complete  
+**Plan:** All phases and user design enhancements complete  
 
 ## Last Action
 
-Completed Phase 4 and all user-specified enhancements:
-1. Added `LOGO3008 - POWERBI.png` (`/logo.png`) as the official site logo and favicon.
-2. Added creator and reviewer attribution in the footer for "Rachwen Mosbehi" linking to `https://www.linkedin.com/in/rachwen-mosbehi-792440120/`.
-3. Implemented site-wide Light and Dark mode with Light Mode as the default mode.
-4. Implemented `JsonThemeModal` with syntax-highlighted code viewer, Microsoft Schema Validation checklist (`SchemaValidationCard`), typography options (Segoe UI, Aptos, DIN, Arial, Calibri), visual container settings (borders and shadows), and 1-click download/copy.
-5. All 27 Vitest unit tests passing; production build verified in 1.65s.
+Completed all user-specified design and functional adjustments:
+1. Removed grey border contour and white box background from the logo, rendering a clean transparent logo.
+2. Set title brand color for "Colors" to `#EC9700`.
+3. Connected font family selection (Segoe UI, Aptos, DIN, Arial, Calibri) to the live Power BI Report Canvas and all child visuals (KPI cards, bar chart, line chart, donut, table), updating the canvas typography dynamically in real time.
+4. Set Google Font Urbanist as the official website font.
+5. Fully optimized mobile responsiveness across header actions, navigation, image dropzone, palette strip, and report canvas.
+6. 28/28 Vitest unit tests passing; production build verified in 1.67s.
 
 ## Next Steps
 
-1. End-to-end user verification.
-2. Provide instructions for starting the dev server or deploying to GitHub Pages/Vercel/Netlify.
+1. Launch development server with `npm run dev` or build for production with `npm run build`.
 
 ## Active Decisions
 
@@ -36,6 +36,7 @@ Completed Phase 4 and all user-specified enhancements:
 | DECISION-005 | Pure SVG Power BI Visuals (no bloated external charting libraries) for instant rendering | 2026-11-19 | Phase 3 |
 | DECISION-006 | Client-side Blob download + interactive modal inspector with syntax highlighting | 2026-11-19 | Phase 4 |
 | DECISION-007 | Site-wide Light and Dark mode with Light Mode as default | 2026-11-19 | UI Layout |
+| DECISION-008 | Urbanist font as website typography; brand accent `#EC9700` | 2026-11-19 | Design & Typography |
 
 ## Blockers
 
@@ -43,4 +44,4 @@ None.
 
 ## Concerns
 
-None. All 14 requirements satisfied and verified with 27 unit tests.
+None. All 28 unit tests pass with 100% pass rate.

@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { deriveStructuralColors } from '../core/colorHarmonics';
+import { getFontFamilyCss } from '../components/ReportCanvas';
 
 describe('Report Canvas & Visual Color Binding', () => {
   const sampleDataColors = [
@@ -25,7 +26,6 @@ describe('Report Canvas & Visual Color Binding', () => {
   });
 
   it('binds comparison benchmark series to distinct dataColors index', () => {
-    // Benchmark series in line trend uses dataColors[4] or dataColors[1]
     const benchmarkColor = sampleDataColors[4];
     expect(benchmarkColor).toBe('#D97706');
     expect(benchmarkColor).not.toBe(sampleDataColors[0]);
@@ -35,7 +35,6 @@ describe('Report Canvas & Visual Color Binding', () => {
     const lightStructural = deriveStructuralColors(sampleDataColors[0], false);
     expect(lightStructural.tableAccent).toBe('#2563EB');
 
-    // If dominant color changes, tableAccent follows
     const customAccent = '#047857';
     const updatedStructural = deriveStructuralColors(customAccent, false);
     expect(updatedStructural.tableAccent).toBe('#047857');
@@ -53,11 +52,16 @@ describe('Report Canvas & Visual Color Binding', () => {
 
   it('applies standard Power BI KPI status colors', () => {
     const structural = deriveStructuralColors('#2563EB', false);
-    // Good / Positive indicator
     expect(structural.good).toBe('#16A34A');
-    // Bad / Negative indicator
     expect(structural.bad).toBe('#DC2626');
-    // Neutral indicator
     expect(structural.neutral).toBe('#EAB308');
+  });
+
+  it('correctly converts Power BI font families to CSS font stack', () => {
+    expect(getFontFamilyCss('Segoe UI')).toContain('Segoe UI');
+    expect(getFontFamilyCss('Aptos')).toContain('Aptos');
+    expect(getFontFamilyCss('DIN')).toContain('DIN');
+    expect(getFontFamilyCss('Arial')).toContain('Arial');
+    expect(getFontFamilyCss('Calibri')).toContain('Calibri');
   });
 });

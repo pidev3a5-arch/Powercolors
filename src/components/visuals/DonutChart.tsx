@@ -4,6 +4,7 @@ import { VisualContainer } from './VisualContainer';
 interface DonutChartProps {
   dataColors: string[];
   isDarkCanvas: boolean;
+  fontFamily?: string;
 }
 
 interface SliceData {
@@ -22,6 +23,7 @@ const SLICES: SliceData[] = [
 export const DonutChart: React.FC<DonutChartProps> = ({
   dataColors,
   isDarkCanvas,
+  fontFamily,
 }) => {
   const [hoveredSlice, setHoveredSlice] = useState<SliceData | null>(null);
 
@@ -30,8 +32,7 @@ export const DonutChart: React.FC<DonutChartProps> = ({
   const outerRadius = 80;
   const innerRadius = 52;
 
-  // Convert percentages into SVG donut arcs
-  let accumulatedAngle = -90; // Start at 12 o'clock
+  let accumulatedAngle = -90;
 
   const arcs = SLICES.map((slice, idx) => {
     const angle = (slice.percentage / 100) * 360;
@@ -74,8 +75,9 @@ export const DonutChart: React.FC<DonutChartProps> = ({
       title="Sales Distribution by Channel"
       subtitle="Donut Breakdown (Series 1–5)"
       isDarkCanvas={isDarkCanvas}
+      fontFamily={fontFamily}
     >
-      <div className="flex flex-col sm:flex-row items-center justify-around h-full gap-4">
+      <div className="flex flex-col sm:flex-row items-center justify-around h-full gap-4" style={{ fontFamily }}>
         {/* SVG Donut */}
         <div className="relative w-44 h-44 flex-shrink-0 flex items-center justify-center">
           <svg viewBox={`0 0 ${size} ${size}`} className="w-full h-full overflow-visible">
@@ -101,14 +103,20 @@ export const DonutChart: React.FC<DonutChartProps> = ({
 
           {/* Center Callout */}
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center">
-            <span className={`text-[10px] uppercase font-bold tracking-wider ${
-              isDarkCanvas ? 'text-slate-400' : 'text-slate-500'
-            }`}>
+            <span
+              style={{ fontFamily }}
+              className={`text-[10px] uppercase font-bold tracking-wider ${
+                isDarkCanvas ? 'text-slate-400' : 'text-slate-500'
+              }`}
+            >
               {hoveredSlice ? hoveredSlice.label : 'Total'}
             </span>
-            <span className={`text-base font-extrabold ${
-              isDarkCanvas ? 'text-white' : 'text-slate-900'
-            }`}>
+            <span
+              style={{ fontFamily }}
+              className={`text-base font-extrabold ${
+                isDarkCanvas ? 'text-white' : 'text-slate-900'
+              }`}
+            >
               {hoveredSlice ? `${hoveredSlice.percentage}%` : '100%'}
             </span>
           </div>
@@ -134,15 +142,21 @@ export const DonutChart: React.FC<DonutChartProps> = ({
                     className="w-2.5 h-2.5 rounded-full flex-shrink-0 transition-colors"
                     style={{ backgroundColor: color }}
                   />
-                  <span className={`text-[11px] font-medium ${
-                    isDarkCanvas ? 'text-slate-300' : 'text-slate-700'
-                  }`}>
+                  <span
+                    style={{ fontFamily }}
+                    className={`text-[11px] font-medium ${
+                      isDarkCanvas ? 'text-slate-300' : 'text-slate-700'
+                    }`}
+                  >
                     {slice.label}
                   </span>
                 </div>
-                <span className={`text-[11px] font-mono font-bold ${
-                  isDarkCanvas ? 'text-slate-400' : 'text-slate-500'
-                }`}>
+                <span
+                  style={{ fontFamily }}
+                  className={`text-[11px] font-mono font-bold ${
+                    isDarkCanvas ? 'text-slate-400' : 'text-slate-500'
+                  }`}
+                >
                   {slice.percentage}%
                 </span>
               </div>

@@ -6,12 +6,14 @@ interface KpiCardRowProps {
   dataColors: string[];
   structural: StructuralColors;
   isDarkCanvas: boolean;
+  fontFamily?: string;
 }
 
 export const KpiCardRow: React.FC<KpiCardRowProps> = ({
   dataColors,
   structural,
   isDarkCanvas,
+  fontFamily,
 }) => {
   const primaryColor = dataColors[0] || '#2563EB';
   const secondaryColor = dataColors[1] || '#7C3AED';
@@ -23,7 +25,7 @@ export const KpiCardRow: React.FC<KpiCardRowProps> = ({
   const subtextClass = isDarkCanvas ? 'text-slate-400' : 'text-slate-500';
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 w-full">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 w-full" style={{ fontFamily }}>
       {/* KPI 1: Total Revenue */}
       <div className={`p-4 rounded-xl border flex flex-col justify-between transition-all ${cardBgClass}`}>
         <div className="flex items-center justify-between">
@@ -38,7 +40,7 @@ export const KpiCardRow: React.FC<KpiCardRowProps> = ({
           </div>
         </div>
         <div className="mt-2">
-          <div className="text-2xl font-bold tracking-tight font-sans">
+          <div className="text-2xl font-bold tracking-tight" style={{ fontFamily }}>
             $4,285,900
           </div>
           <div className="flex items-center gap-1.5 mt-1">
@@ -83,7 +85,7 @@ export const KpiCardRow: React.FC<KpiCardRowProps> = ({
           </div>
         </div>
         <div className="mt-2">
-          <div className="text-2xl font-bold tracking-tight font-sans">
+          <div className="text-2xl font-bold tracking-tight" style={{ fontFamily }}>
             +18.6%
           </div>
           <div className="flex items-center gap-1.5 mt-1">
@@ -122,7 +124,7 @@ export const KpiCardRow: React.FC<KpiCardRowProps> = ({
           </div>
         </div>
         <div className="mt-2">
-          <div className="text-2xl font-bold tracking-tight font-sans">
+          <div className="text-2xl font-bold tracking-tight" style={{ fontFamily }}>
             142,850
           </div>
           <div className="flex items-center gap-1.5 mt-1">
@@ -161,7 +163,7 @@ export const KpiCardRow: React.FC<KpiCardRowProps> = ({
           </div>
         </div>
         <div className="mt-2">
-          <div className="text-2xl font-bold tracking-tight font-sans">
+          <div className="text-2xl font-bold tracking-tight" style={{ fontFamily }}>
             42.3%
           </div>
           <div className="flex items-center gap-1.5 mt-1">

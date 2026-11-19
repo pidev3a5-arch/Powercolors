@@ -256,33 +256,29 @@ export default function App() {
   }, []);
 
   return (
-    <div className={`min-h-screen flex flex-col antialiased transition-colors duration-200 ${
+    <div className={`min-h-screen flex flex-col transition-colors duration-200 ${
       isDarkSite ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'
     }`}>
-      {/* Top Navigation Bar with Logo & Site Theme Switcher */}
+      {/* Top Navigation Bar with Borderless Logo & Site Theme Switcher */}
       <header className={`border-b sticky top-0 z-40 transition-colors backdrop-blur-md ${
-        isDarkSite ? 'border-slate-800/80 bg-slate-900/80' : 'border-slate-200/90 bg-white/85 shadow-2xs'
+        isDarkSite ? 'border-slate-800/80 bg-slate-900/85' : 'border-slate-200/90 bg-white/90 shadow-2xs'
       }`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          {/* Logo & Site Title */}
-          <div className="flex items-center space-x-3">
-            <div className="relative w-9 h-9 rounded-xl overflow-hidden shadow-xs flex-shrink-0 flex items-center justify-center bg-white border border-slate-200 p-0.5">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
+          {/* Logo without grey border or white box & Site Title with #EC9700 */}
+          <div className="flex items-center space-x-2.5 sm:space-x-3 min-w-0">
+            <div className="flex-shrink-0 flex items-center justify-center">
               <img
                 src="/logo.png"
                 alt="PowerColors Logo"
-                className="w-full h-full object-contain"
-                onError={(e) => {
-                  // Fallback if image fails to load
-                  (e.target as HTMLElement).style.display = 'none';
-                }}
+                className="w-8 h-8 sm:w-9 sm:h-9 object-contain"
               />
             </div>
-            <div>
+            <div className="min-w-0">
               <div className="flex items-center space-x-2">
-                <span className={`font-extrabold text-lg tracking-tight ${isDarkSite ? 'text-white' : 'text-slate-900'}`}>
-                  Power<span className="text-amber-500">Colors</span>
+                <span className={`font-extrabold text-base sm:text-lg tracking-tight truncate ${isDarkSite ? 'text-white' : 'text-slate-900'}`}>
+                  Power<span style={{ color: '#EC9700' }}>Colors</span>
                 </span>
-                <span className={`text-[10px] uppercase font-mono font-bold tracking-wider px-2 py-0.5 rounded-full border ${
+                <span className={`hidden md:inline-block text-[10px] uppercase font-mono font-bold tracking-wider px-2 py-0.5 rounded-full border ${
                   isDarkSite ? 'bg-slate-800 text-amber-400 border-slate-700' : 'bg-amber-50 text-amber-800 border-amber-200'
                 }`}>
                   Power BI Theme Lab
@@ -291,8 +287,8 @@ export default function App() {
             </div>
           </div>
 
-          {/* Action Buttons: Site Theme Toggle + JSON Modal + Export */}
-          <div className="flex items-center space-x-2 sm:space-x-3">
+          {/* Action Buttons: Site Theme Toggle + JSON Modal + Export (Mobile Optimized) */}
+          <div className="flex items-center space-x-1.5 sm:space-x-2.5 flex-shrink-0">
             {/* Site Light/Dark Mode Switcher */}
             <button
               type="button"
@@ -311,14 +307,14 @@ export default function App() {
             <button
               type="button"
               onClick={() => setIsModalOpen(true)}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-colors cursor-pointer shadow-xs ${
+              className={`inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold border transition-colors cursor-pointer shadow-xs ${
                 isDarkSite
                   ? 'bg-slate-900 hover:bg-slate-800 text-slate-200 border-slate-800'
                   : 'bg-white hover:bg-slate-100 text-slate-700 border-slate-200'
               }`}
               title="Inspect Theme JSON with Schema Verification"
             >
-              <Code2 className="w-3.5 h-3.5 text-amber-500" />
+              <Code2 className="w-3.5 h-3.5 text-[#EC9700]" />
               <span className="hidden sm:inline">Inspect JSON</span>
             </button>
 
@@ -326,7 +322,7 @@ export default function App() {
             <button
               type="button"
               onClick={handleCopyJson}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-colors cursor-pointer shadow-xs ${
+              className={`inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold border transition-colors cursor-pointer shadow-xs ${
                 isDarkSite
                   ? 'bg-slate-900 hover:bg-slate-800 text-slate-200 border-slate-800'
                   : 'bg-white hover:bg-slate-100 text-slate-700 border-slate-200'
@@ -341,28 +337,29 @@ export default function App() {
             <button
               type="button"
               onClick={handleDownloadJson}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-md hover:shadow-lg transition-all cursor-pointer font-sans"
+              className="inline-flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-bold bg-[#EC9700] hover:bg-[#d68800] text-slate-950 shadow-md hover:shadow-lg transition-all cursor-pointer font-sans"
               title="Download theme JSON file for Power BI Desktop"
             >
               <Download className="w-3.5 h-3.5" />
-              <span>Download Theme</span>
+              <span className="hidden sm:inline">Download Theme</span>
+              <span className="sm:hidden">Theme</span>
             </button>
           </div>
         </div>
       </header>
 
-      {/* Main Workspace Area */}
-      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full space-y-8">
+      {/* Main Workspace Area (Mobile Responsive Layout) */}
+      <main className="flex-1 max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-8 w-full space-y-6 sm:space-y-8">
         {/* Banner Section */}
         <div className="space-y-1.5">
-          <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-full border border-amber-500/20">
+          <div className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full border bg-amber-500/10 border-amber-500/20 text-[#EC9700]">
             <span>Client-Side Palette Extractor & Power BI Themer</span>
           </div>
-          <h1 className={`text-2xl sm:text-3xl font-extrabold tracking-tight ${isDarkSite ? 'text-white' : 'text-slate-900'}`}>
+          <h1 className={`text-xl sm:text-3xl font-extrabold tracking-tight ${isDarkSite ? 'text-white' : 'text-slate-900'}`}>
             Generate 10-Color Power BI Palettes from Any Image
           </h1>
-          <p className={`text-sm max-w-2xl ${isDarkSite ? 'text-slate-400' : 'text-slate-600'}`}>
-            Drop a brand guideline, logo, or paste a screenshot (<kbd className="font-mono font-bold">Ctrl+V</kbd>). We quantize 10 distinct data colors, derive structural colors, and format an official Power BI theme file.
+          <p className={`text-xs sm:text-sm max-w-2xl leading-relaxed ${isDarkSite ? 'text-slate-400' : 'text-slate-600'}`}>
+            Drop a brand guideline, logo, or paste a screenshot (<kbd className="font-mono font-bold">Ctrl+V</kbd>). We quantize 10 distinct data colors, derive structural styles, and format an official Power BI theme file.
           </p>
         </div>
 
@@ -394,7 +391,7 @@ export default function App() {
         </section>
 
         {/* Section 3: Interactive 10-Swatch Palette Strip */}
-        <section className={`border rounded-2xl p-4 sm:p-6 shadow-xs space-y-4 transition-colors ${
+        <section className={`border rounded-2xl p-3.5 sm:p-6 shadow-xs space-y-4 transition-colors ${
           isDarkSite ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-slate-200'
         }`}>
           <PaletteStrip
@@ -411,13 +408,14 @@ export default function App() {
           />
         </section>
 
-        {/* Section 4: Live Power BI Visuals Mock Canvas */}
+        {/* Section 4: Live Power BI Visuals Mock Canvas (Wired with Font Family!) */}
         <section>
           <ReportCanvas
             swatches={swatches}
             structural={structural}
             isDarkCanvas={isDarkCanvas}
             themeName={themeName}
+            fontFamily={customizationOptions.fontFamily}
           />
         </section>
       </main>
@@ -431,15 +429,17 @@ export default function App() {
         isDarkCanvas={isDarkCanvas}
       />
 
-      {/* Footer with Creator & Reviewer Attribution */}
-      <footer className={`border-t py-8 transition-colors ${
+      {/* Footer with Creator & Reviewer Attribution (Responsive) */}
+      <footer className={`border-t py-6 sm:py-8 transition-colors ${
         isDarkSite ? 'border-slate-800/80 bg-slate-950 text-slate-400' : 'border-slate-200 bg-white text-slate-600'
       }`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-center sm:text-left">
           <div className="flex items-center space-x-2">
-            <img src="/logo.png" alt="PowerColors" className="w-5 h-5 object-contain" />
-            <span className="font-bold text-slate-700 dark:text-slate-300">PowerColors</span>
-            <span>• 100% In-Browser Privacy • Official Power BI Theme JSON</span>
+            <img src="/logo.png" alt="PowerColors Logo" className="w-5 h-5 object-contain" />
+            <span className="font-bold text-slate-800 dark:text-slate-200">
+              Power<span style={{ color: '#EC9700' }}>Colors</span>
+            </span>
+            <span>• 100% In-Browser Privacy • Power BI JSON</span>
           </div>
 
           <div className="flex items-center space-x-1.5">
@@ -448,7 +448,7 @@ export default function App() {
               href="https://www.linkedin.com/in/rachwen-mosbehi-792440120/"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 font-semibold text-amber-600 dark:text-amber-400 hover:underline"
+              className="inline-flex items-center gap-1 font-semibold text-[#EC9700] hover:underline"
             >
               <span>Rachwen Mosbehi</span>
               <ExternalLink className="w-3 h-3" />

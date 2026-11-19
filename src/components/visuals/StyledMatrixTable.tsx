@@ -6,14 +6,15 @@ interface StyledMatrixTableProps {
   dataColors: string[];
   structural: StructuralColors;
   isDarkCanvas: boolean;
+  fontFamily?: string;
 }
 
 interface TableRowData {
   rep: string;
   region: string;
   deals: number;
-  revenue: number; // in thousands
-  margin: number; // percentage
+  revenue: number;
+  margin: number;
   status: 'good' | 'bad' | 'neutral';
 }
 
@@ -29,6 +30,7 @@ export const StyledMatrixTable: React.FC<StyledMatrixTableProps> = ({
   dataColors,
   structural,
   isDarkCanvas,
+  fontFamily,
 }) => {
   const primaryBarColor = dataColors[0] || '#2563EB';
   const maxRevenue = 1000;
@@ -60,26 +62,27 @@ export const StyledMatrixTable: React.FC<StyledMatrixTableProps> = ({
       title="Top Sales Reps & Regional Performance"
       subtitle="Matrix Visual (Headers styled by tableAccent)"
       isDarkCanvas={isDarkCanvas}
+      fontFamily={fontFamily}
     >
-      <div className="w-full overflow-x-auto">
-        <table className="w-full text-left text-xs border-collapse">
+      <div className="w-full overflow-x-auto" style={{ fontFamily }}>
+        <table className="w-full text-left text-xs border-collapse min-w-[500px]">
           {/* Table Header Styled by TableAccent */}
           <thead>
             <tr
-              style={{ backgroundColor: structural.tableAccent }}
+              style={{ backgroundColor: structural.tableAccent, fontFamily }}
               className="text-white font-semibold transition-colors"
             >
-              <th className="py-2.5 px-3 rounded-l-md font-sans">Representative</th>
-              <th className="py-2.5 px-3 font-sans">Region</th>
-              <th className="py-2.5 px-3 text-right font-sans">Deals</th>
-              <th className="py-2.5 px-3 text-left font-sans min-w-[140px]">Revenue Volume</th>
-              <th className="py-2.5 px-3 text-right font-sans">Margin</th>
-              <th className="py-2.5 px-3 text-center rounded-r-md font-sans">Status</th>
+              <th className="py-2.5 px-3 rounded-l-md">Representative</th>
+              <th className="py-2.5 px-3">Region</th>
+              <th className="py-2.5 px-3 text-right">Deals</th>
+              <th className="py-2.5 px-3 text-left min-w-[140px]">Revenue Volume</th>
+              <th className="py-2.5 px-3 text-right">Margin</th>
+              <th className="py-2.5 px-3 text-center rounded-r-md">Status</th>
             </tr>
           </thead>
 
           {/* Table Rows with Alternating Striping */}
-          <tbody className="divide-y divide-slate-800/20">
+          <tbody className="divide-y divide-slate-800/20" style={{ fontFamily }}>
             {TABLE_ROWS.map((row, idx) => {
               const isEven = idx % 2 === 0;
               const rowBg = isEven
@@ -97,8 +100,9 @@ export const StyledMatrixTable: React.FC<StyledMatrixTableProps> = ({
                 <tr
                   key={row.rep}
                   className={`transition-colors hover:bg-slate-500/10 ${rowBg}`}
+                  style={{ fontFamily }}
                 >
-                  <td className="py-2.5 px-3 font-medium">{row.rep}</td>
+                  <td className="py-2.5 px-3 font-semibold">{row.rep}</td>
                   <td className={`py-2.5 px-3 ${isDarkCanvas ? 'text-slate-400' : 'text-slate-600'}`}>
                     {row.region}
                   </td>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { LayoutGrid, MonitorPlay, Layers } from 'lucide-react';
-import { ColorSwatch, StructuralColors } from '../core/types';
+import { ColorSwatch, StructuralColors, ThemeCustomizationOptions } from '../core/types';
 import { KpiCardRow } from './visuals/KpiCardRow';
 import { ClusteredBarChart } from './visuals/ClusteredBarChart';
 import { LineTrendChart } from './visuals/LineTrendChart';
@@ -12,6 +12,23 @@ interface ReportCanvasProps {
   structural: StructuralColors;
   isDarkCanvas: boolean;
   themeName: string;
+  fontFamily?: ThemeCustomizationOptions['fontFamily'];
+}
+
+export function getFontFamilyCss(font?: ThemeCustomizationOptions['fontFamily']): string {
+  switch (font) {
+    case 'Aptos':
+      return "'Aptos', 'Segoe UI', system-ui, -apple-system, sans-serif";
+    case 'DIN':
+      return "'DIN Alternate', 'DIN', 'Barlow', 'Arial Narrow', sans-serif";
+    case 'Arial':
+      return "Arial, Helvetica, sans-serif";
+    case 'Calibri':
+      return "'Calibri', 'Carlito', 'Gill Sans', sans-serif";
+    case 'Segoe UI':
+    default:
+      return "'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif";
+  }
 }
 
 export const ReportCanvas: React.FC<ReportCanvasProps> = ({
@@ -19,10 +36,12 @@ export const ReportCanvas: React.FC<ReportCanvasProps> = ({
   structural,
   isDarkCanvas,
   themeName,
+  fontFamily = 'Segoe UI',
 }) => {
   const [aspectRatioMode, setAspectRatioMode] = useState<'16-9' | 'fluid'>('fluid');
 
   const dataColors = swatches.map((s) => s.hex);
+  const fontCss = getFontFamilyCss(fontFamily);
 
   return (
     <div className="w-full space-y-3">
@@ -30,28 +49,28 @@ export const ReportCanvas: React.FC<ReportCanvasProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
         <div>
           <div className="flex items-center space-x-2">
-            <MonitorPlay className="w-4 h-4 text-amber-400" />
-            <h2 className="text-base font-bold text-white tracking-tight">
+            <MonitorPlay className="w-4 h-4 text-[#EC9700]" />
+            <h2 className="text-base font-bold tracking-tight">
               Live Power BI Report Canvas
             </h2>
-            <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-[11px] font-mono text-emerald-400 border border-emerald-500/20">
-              Live Theme Sync
+            <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-[11px] font-mono text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+              Font: {fontFamily}
             </span>
           </div>
-          <p className="text-xs text-slate-400 mt-0.5">
-            Real-time preview of Power BI visuals formatted with your custom 10-color palette and structural styles.
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            Real-time preview of Power BI visuals dynamically formatted with your custom 10-color palette, structural styles, and typography.
           </p>
         </div>
 
         {/* View Mode Toggle */}
-        <div className="inline-flex p-1 rounded-xl bg-slate-900 border border-slate-800 self-start sm:self-auto">
+        <div className="inline-flex p-1 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 self-start sm:self-auto">
           <button
             type="button"
             onClick={() => setAspectRatioMode('fluid')}
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
               aspectRatioMode === 'fluid'
-                ? 'bg-slate-800 text-amber-300 shadow-xs'
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'bg-amber-500 text-slate-950 font-bold shadow-xs'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
             }`}
           >
             <LayoutGrid className="w-3.5 h-3.5" />
@@ -60,10 +79,10 @@ export const ReportCanvas: React.FC<ReportCanvasProps> = ({
           <button
             type="button"
             onClick={() => setAspectRatioMode('16-9')}
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
               aspectRatioMode === '16-9'
-                ? 'bg-slate-800 text-amber-300 shadow-xs'
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'bg-amber-500 text-slate-950 font-bold shadow-xs'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
             }`}
           >
             <MonitorPlay className="w-3.5 h-3.5" />
@@ -74,10 +93,11 @@ export const ReportCanvas: React.FC<ReportCanvasProps> = ({
 
       {/* Power BI Canvas Frame */}
       <div
-        className={`w-full rounded-2xl border transition-all duration-300 overflow-hidden shadow-2xl ${
+        style={{ fontFamily: fontCss }}
+        className={`w-full rounded-2xl border transition-all duration-300 overflow-hidden shadow-xl ${
           isDarkCanvas
-            ? 'border-slate-800 bg-[#0F172A]'
-            : 'border-slate-200 bg-[#FFFFFF]'
+            ? 'border-slate-800 bg-[#0F172A] text-slate-100'
+            : 'border-slate-200 bg-[#FFFFFF] text-slate-900'
         } ${
           aspectRatioMode === '16-9' ? 'aspect-[16/10] overflow-y-auto' : ''
         }`}
@@ -92,9 +112,12 @@ export const ReportCanvas: React.FC<ReportCanvasProps> = ({
               style={{ backgroundColor: structural.tableAccent }}
             />
             <div>
-              <h1 className={`text-sm font-bold tracking-tight font-sans ${
-                isDarkCanvas ? 'text-white' : 'text-slate-900'
-              }`}>
+              <h1
+                style={{ fontFamily: fontCss }}
+                className={`text-sm font-bold tracking-tight ${
+                  isDarkCanvas ? 'text-white' : 'text-slate-900'
+                }`}
+              >
                 {themeName} — Executive Dashboard
               </h1>
               <div className="flex items-center gap-2 mt-0.5">
@@ -128,12 +151,13 @@ export const ReportCanvas: React.FC<ReportCanvasProps> = ({
         </div>
 
         {/* Canvas Body Content */}
-        <div className="p-4 sm:p-6 space-y-4">
+        <div className="p-4 sm:p-6 space-y-4" style={{ fontFamily: fontCss }}>
           {/* Row 1: KPI Summary Cards */}
           <KpiCardRow
             dataColors={dataColors}
             structural={structural}
             isDarkCanvas={isDarkCanvas}
+            fontFamily={fontCss}
           />
 
           {/* Row 2: Clustered Bar Chart & Line Trend Chart */}
@@ -141,10 +165,12 @@ export const ReportCanvas: React.FC<ReportCanvasProps> = ({
             <ClusteredBarChart
               dataColors={dataColors}
               isDarkCanvas={isDarkCanvas}
+              fontFamily={fontCss}
             />
             <LineTrendChart
               dataColors={dataColors}
               isDarkCanvas={isDarkCanvas}
+              fontFamily={fontCss}
             />
           </div>
 
@@ -154,6 +180,7 @@ export const ReportCanvas: React.FC<ReportCanvasProps> = ({
               <DonutChart
                 dataColors={dataColors}
                 isDarkCanvas={isDarkCanvas}
+                fontFamily={fontCss}
               />
             </div>
             <div className="lg:col-span-7">
@@ -161,6 +188,7 @@ export const ReportCanvas: React.FC<ReportCanvasProps> = ({
                 dataColors={dataColors}
                 structural={structural}
                 isDarkCanvas={isDarkCanvas}
+                fontFamily={fontCss}
               />
             </div>
           </div>
