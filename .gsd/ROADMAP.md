@@ -1,6 +1,6 @@
 # ROADMAP.md
 
-> **Current Phase**: Phase 4 (Theme JSON Inspector & Advanced Customization)
+> **Current Phase**: Phase 5 (Final Polish & Production Verification)
 > **Milestone**: v1.0
 
 ## Must-Haves (from SPEC)
@@ -10,7 +10,10 @@
 - [x] Auto-derived structural colors (background, foreground, tableAccent, KPI good/bad/neutral)
 - [x] Interactive palette toolbar: swatch editing, reordering, lock, and contrast indicators
 - [x] Realistic Power BI mock canvas with KPI cards, bar chart, line chart, donut chart, and matrix
-- [x] Schema-compliant Power BI Theme JSON generation function and 1-click download
+- [x] Schema-compliant Power BI Theme JSON generation function, modal inspector, and 1-click download
+- [x] Site logo added (`LOGO3008 - POWERBI.png`)
+- [x] Creator & reviewer attribution in footer with LinkedIn link (Rachwen Mosbehi)
+- [x] Site-wide Light and Dark mode with Light Mode as default
 
 ## Phases
 
@@ -29,12 +32,12 @@
 **Objective**: Create an interactive Power BI report canvas preview simulating real visuals (KPI metric cards, clustered bar chart, line trend, donut breakdown, styled table) with Light/Dark canvas theme toggling.  
 **Requirements**: REQ-09, REQ-10  
 
-### Phase 4: Theme JSON Generator & Export
-**Status**: ⬜ Ready to Plan  
-**Objective**: Modal JSON viewer with syntax highlighting, schema validation status, format options, and advanced visualContainer customizations.  
+### Phase 4: Theme JSON Generator & Export (and Inspector)
+**Status**: 🟩 Completed  
+**Objective**: Modal JSON viewer with syntax highlighting, schema validation status, typography/visualContainer customizations, official site logo, creator attribution, and site light/dark mode.  
 **Requirements**: REQ-11, REQ-12, REQ-13, REQ-14  
 
-### Phase 5: Polish, Sample Presets & Production Build
-**Status**: ⬜ Not Started  
-**Objective**: Comprehensive verification, responsive styling refinements, accessibility audits, and production build checks.  
+### Phase 5: Polish, Verification & Production Readiness
+**Status**: ⬜ Ready to Finalize  
+**Objective**: Comprehensive end-to-end verification across all features and test suites.  
 **Requirements**: Full verification across all REQ items  

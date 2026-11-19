@@ -6,6 +6,7 @@ import { ArrowLeftRight, Lock, Unlock, Shuffle, Palette } from 'lucide-react';
 interface PaletteStripProps {
   swatches: ColorSwatch[];
   isDarkCanvas: boolean;
+  isDarkSite?: boolean;
   onUpdateHex: (index: number, newHex: string) => void;
   onToggleLock: (index: number) => void;
   onMoveLeft: (index: number) => void;
@@ -18,6 +19,7 @@ interface PaletteStripProps {
 export const PaletteStrip: React.FC<PaletteStripProps> = ({
   swatches,
   isDarkCanvas,
+  isDarkSite = false,
   onUpdateHex,
   onToggleLock,
   onMoveLeft,
@@ -28,21 +30,27 @@ export const PaletteStrip: React.FC<PaletteStripProps> = ({
 }) => {
   const allLocked = swatches.length > 0 && swatches.every((s) => s.isLocked);
 
+  const btnClass = isDarkSite
+    ? 'bg-slate-900 hover:bg-slate-800 text-slate-300 border-slate-800 hover:border-slate-700'
+    : 'bg-white hover:bg-slate-100 text-slate-700 border-slate-200 hover:border-slate-300 shadow-xs';
+
   return (
     <div className="w-full space-y-3">
       {/* Palette Header & Bulk Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <div className="flex items-center space-x-2">
-            <Palette className="w-4 h-4 text-amber-400" />
-            <h2 className="text-base font-bold text-white tracking-tight">
+            <Palette className="w-4 h-4 text-amber-500" />
+            <h2 className={`text-base font-bold tracking-tight ${isDarkSite ? 'text-white' : 'text-slate-900'}`}>
               10-Color Data Palette
             </h2>
-            <span className="px-2 py-0.5 rounded-full bg-slate-800 text-[11px] font-mono text-slate-300 border border-slate-700">
+            <span className={`px-2 py-0.5 rounded-full text-[11px] font-mono border ${
+              isDarkSite ? 'bg-slate-800 text-slate-300 border-slate-700' : 'bg-slate-100 text-slate-700 border-slate-200'
+            }`}>
               dataColors
             </span>
           </div>
-          <p className="text-xs text-slate-400 mt-0.5">
+          <p className={`text-xs mt-0.5 ${isDarkSite ? 'text-slate-400' : 'text-slate-500'}`}>
             Power BI Desktop visuals cycle sequentially through these 10 colors for series and categories.
           </p>
         </div>
@@ -52,17 +60,17 @@ export const PaletteStrip: React.FC<PaletteStripProps> = ({
           <button
             type="button"
             onClick={onToggleLockAll}
-            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 hover:border-slate-700 transition-colors cursor-pointer"
+            className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium border transition-colors cursor-pointer ${btnClass}`}
             title={allLocked ? 'Unlock all swatches' : 'Lock all swatches'}
           >
-            {allLocked ? <Unlock className="w-3.5 h-3.5 text-amber-400" /> : <Lock className="w-3.5 h-3.5" />}
+            {allLocked ? <Unlock className="w-3.5 h-3.5 text-amber-500" /> : <Lock className="w-3.5 h-3.5" />}
             <span>{allLocked ? 'Unlock All' : 'Lock All'}</span>
           </button>
 
           <button
             type="button"
             onClick={onReversePalette}
-            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 hover:border-slate-700 transition-colors cursor-pointer"
+            className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium border transition-colors cursor-pointer ${btnClass}`}
             title="Reverse color sequence order"
           >
             <ArrowLeftRight className="w-3.5 h-3.5 text-slate-400" />
@@ -72,7 +80,7 @@ export const PaletteStrip: React.FC<PaletteStripProps> = ({
           <button
             type="button"
             onClick={onShuffleUnlocked}
-            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 hover:border-slate-700 transition-colors cursor-pointer"
+            className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium border transition-colors cursor-pointer ${btnClass}`}
             title="Shuffle order of unlocked colors"
           >
             <Shuffle className="w-3.5 h-3.5 text-slate-400" />
@@ -89,6 +97,7 @@ export const PaletteStrip: React.FC<PaletteStripProps> = ({
             index={idx}
             swatch={swatch}
             isDarkCanvas={isDarkCanvas}
+            isDarkSite={isDarkSite}
             onUpdateHex={onUpdateHex}
             onToggleLock={onToggleLock}
             onMoveLeft={onMoveLeft}

@@ -8,6 +8,7 @@ interface ColorSwatchCardProps {
   index: number;
   swatch: ColorSwatch;
   isDarkCanvas: boolean;
+  isDarkSite?: boolean;
   onUpdateHex: (index: number, newHex: string) => void;
   onToggleLock: (index: number) => void;
   onMoveLeft: (index: number) => void;
@@ -20,6 +21,7 @@ export const ColorSwatchCard: React.FC<ColorSwatchCardProps> = ({
   index,
   swatch,
   isDarkCanvas,
+  isDarkSite = false,
   onUpdateHex,
   onToggleLock,
   onMoveLeft,
@@ -68,12 +70,22 @@ export const ColorSwatchCard: React.FC<ColorSwatchCardProps> = ({
 
   const currentContrast = isDarkCanvas ? swatch.contrastOnDark : swatch.contrastOnLight;
 
+  const cardBgClass = isDarkSite
+    ? 'bg-slate-900 text-slate-100'
+    : 'bg-white text-slate-900';
+
+  const cardBorderClass = swatch.isLocked
+    ? 'border-amber-500 ring-1 ring-amber-500/20'
+    : isDarkSite
+    ? 'border-slate-800 hover:border-slate-700'
+    : 'border-slate-200 hover:border-slate-300';
+
+  const inputBgClass = isDarkSite
+    ? 'bg-slate-950 text-slate-100 border-slate-800'
+    : 'bg-slate-50 text-slate-900 border-slate-200';
+
   return (
-    <div className={`flex flex-col bg-slate-900 border rounded-xl overflow-hidden transition-all duration-200 shadow-md hover:shadow-lg ${
-      swatch.isLocked
-        ? 'border-amber-500/50 ring-1 ring-amber-500/20'
-        : 'border-slate-800 hover:border-slate-700'
-    }`}>
+    <div className={`flex flex-col border rounded-xl overflow-hidden transition-all duration-200 shadow-xs hover:shadow-md ${cardBgClass} ${cardBorderClass}`}>
       {/* Visual Color Block with Sequence and Native Color Picker */}
       <div
         onClick={() => colorPickerRef.current?.click()}
@@ -82,7 +94,7 @@ export const ColorSwatchCard: React.FC<ColorSwatchCardProps> = ({
         title="Click to open color picker"
       >
         {/* Sequence Badge */}
-        <div className="absolute top-2 left-2 px-1.5 py-0.5 rounded-md bg-slate-950/60 backdrop-blur-xs text-[11px] font-mono font-bold text-white border border-white/10 shadow-xs">
+        <div className="absolute top-2 left-2 px-1.5 py-0.5 rounded-md bg-slate-950/70 backdrop-blur-xs text-[11px] font-mono font-bold text-white border border-white/10 shadow-xs">
           #{index + 1}
         </div>
 
@@ -122,34 +134,40 @@ export const ColorSwatchCard: React.FC<ColorSwatchCardProps> = ({
               onBlur={handleHexBlur}
               onKeyDown={handleHexKeyDown}
               maxLength={7}
-              className="w-full bg-slate-950 text-slate-100 font-mono text-xs font-semibold px-2 py-1 rounded border border-slate-800 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 outline-none uppercase"
+              className={`w-full font-mono text-xs font-semibold px-2 py-1 rounded border focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none uppercase ${inputBgClass}`}
             />
           </div>
           <button
             type="button"
             onClick={handleCopy}
-            className="p-1 rounded text-slate-400 hover:text-slate-100 hover:bg-slate-800 transition-colors cursor-pointer"
+            className={`p-1 rounded transition-colors cursor-pointer ${
+              isDarkSite ? 'text-slate-400 hover:text-slate-100 hover:bg-slate-800' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
+            }`}
             title="Copy Hex Code"
           >
-            {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+            {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
           </button>
         </div>
 
         {/* Contrast indicator */}
         <div className="flex items-center justify-between pt-0.5">
-          <span className="text-[10px] text-slate-400">Contrast:</span>
+          <span className={`text-[10px] ${isDarkSite ? 'text-slate-400' : 'text-slate-500'}`}>Contrast:</span>
           <ContrastBadge contrastRatio={currentContrast} />
         </div>
 
         {/* Action Buttons: Reorder & Lock */}
-        <div className="flex items-center justify-between pt-1 border-t border-slate-800/80">
+        <div className={`flex items-center justify-between pt-1 border-t ${isDarkSite ? 'border-slate-800' : 'border-slate-100'}`}>
           <div className="flex items-center space-x-1">
             <button
               type="button"
               disabled={!canMoveLeft}
               onClick={() => onMoveLeft(index)}
-              className={`p-1 rounded text-slate-400 hover:text-slate-200 transition-colors ${
-                canMoveLeft ? 'hover:bg-slate-800 cursor-pointer' : 'opacity-30 cursor-not-allowed'
+              className={`p-1 rounded transition-colors ${
+                canMoveLeft
+                  ? isDarkSite
+                    ? 'text-slate-400 hover:text-slate-200 hover:bg-slate-800 cursor-pointer'
+                    : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100 cursor-pointer'
+                  : 'opacity-30 cursor-not-allowed'
               }`}
               title="Move color earlier in sequence"
             >
@@ -159,8 +177,12 @@ export const ColorSwatchCard: React.FC<ColorSwatchCardProps> = ({
               type="button"
               disabled={!canMoveRight}
               onClick={() => onMoveRight(index)}
-              className={`p-1 rounded text-slate-400 hover:text-slate-200 transition-colors ${
-                canMoveRight ? 'hover:bg-slate-800 cursor-pointer' : 'opacity-30 cursor-not-allowed'
+              className={`p-1 rounded transition-colors ${
+                canMoveRight
+                  ? isDarkSite
+                    ? 'text-slate-400 hover:text-slate-200 hover:bg-slate-800 cursor-pointer'
+                    : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100 cursor-pointer'
+                  : 'opacity-30 cursor-not-allowed'
               }`}
               title="Move color later in sequence"
             >
@@ -173,8 +195,10 @@ export const ColorSwatchCard: React.FC<ColorSwatchCardProps> = ({
             onClick={() => onToggleLock(index)}
             className={`p-1 rounded transition-colors cursor-pointer ${
               swatch.isLocked
-                ? 'text-amber-400 bg-amber-400/10 hover:bg-amber-400/20'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                ? 'text-amber-500 bg-amber-500/10'
+                : isDarkSite
+                ? 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
             }`}
             title={swatch.isLocked ? 'Unlock color' : 'Lock color (preserves across extractions)'}
           >

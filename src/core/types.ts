@@ -25,6 +25,12 @@ export interface TextClassStyle {
   color: string;
 }
 
+export interface ThemeCustomizationOptions {
+  fontFamily: 'Segoe UI' | 'Aptos' | 'DIN' | 'Arial' | 'Calibri';
+  showVisualBorders: boolean;
+  showVisualDropShadow: boolean;
+}
+
 export interface PowerBITheme {
   $schema: string;
   name: string;

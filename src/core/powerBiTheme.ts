@@ -1,4 +1,4 @@
-import { PowerBITheme, StructuralColors } from './types';
+import { PowerBITheme, StructuralColors, ThemeCustomizationOptions } from './types';
 
 export const POWER_BI_THEME_SCHEMA_URL =
   'https://raw.githubusercontent.com/microsoft/powerbi-desktop-samples/main/Report%20Theme%20JSON%20Schema/reportThemeSchema-latest.json';
@@ -9,10 +9,14 @@ export const POWER_BI_THEME_SCHEMA_URL =
 export function buildPowerBITheme(
   themeName: string,
   dataColors: string[],
-  structural: StructuralColors
+  structural: StructuralColors,
+  options?: Partial<ThemeCustomizationOptions>
 ): PowerBITheme {
   const safeName = themeName.trim() || 'PowerColors Custom Theme';
   const ensuredDataColors = dataColors.slice(0, 10);
+  const fontFamily = options?.fontFamily || 'Segoe UI';
+  const showBorders = options?.showVisualBorders ?? true;
+  const showDropShadow = options?.showVisualDropShadow ?? false;
 
   return {
     $schema: POWER_BI_THEME_SCHEMA_URL,
@@ -26,22 +30,22 @@ export function buildPowerBITheme(
     neutral: structural.neutral,
     textClasses: {
       title: {
-        fontFamily: 'Segoe UI',
+        fontFamily,
         fontSize: 12,
         color: structural.foreground,
       },
       label: {
-        fontFamily: 'Segoe UI',
+        fontFamily,
         fontSize: 10,
         color: structural.foreground,
       },
       callout: {
-        fontFamily: 'Segoe UI',
+        fontFamily,
         fontSize: 24,
         color: structural.foreground,
       },
       header: {
-        fontFamily: 'Segoe UI Semibold',
+        fontFamily: fontFamily.includes('Segoe UI') ? 'Segoe UI Semibold' : fontFamily,
         fontSize: 11,
         color: structural.foreground,
       },
@@ -51,9 +55,9 @@ export function buildPowerBITheme(
         '*': {
           visualContainer: [
             {
-              dropShadow: { show: false },
+              dropShadow: { show: showDropShadow },
               border: {
-                show: true,
+                show: showBorders,
                 color: { solid: { color: structural.background === '#FFFFFF' ? '#E2E8F0' : '#334155' } },
               },
             },
