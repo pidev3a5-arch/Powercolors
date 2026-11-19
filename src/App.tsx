@@ -21,12 +21,12 @@ const DEFAULT_PALETTE_HEXES = [
 export default function App() {
   // 1. Site Theme: Light mode by default!
   const [isDarkSite, setIsDarkSite] = useState<boolean>(() => {
-    const saved = localStorage.getItem('powercolors_site_theme');
+    const saved = localStorage.getItem('powerlab_site_theme') || localStorage.getItem('powercolors_site_theme');
     return saved === 'dark'; // Defaults to false (Light Mode)
   });
 
   // Power BI Canvas theme & Report settings
-  const [themeName, setThemeName] = useState('PowerColors Corporate Theme');
+  const [themeName, setThemeName] = useState('PowerLab Corporate Theme');
   const [isDarkCanvas, setIsDarkCanvas] = useState(false);
   const [currentImagePreview, setCurrentImagePreview] = useState<string | null>(null);
   const [currentImageName, setCurrentImageName] = useState<string | null>(null);
@@ -45,10 +45,10 @@ export default function App() {
   useEffect(() => {
     if (isDarkSite) {
       document.documentElement.classList.add('dark');
-      localStorage.setItem('powercolors_site_theme', 'dark');
+      localStorage.setItem('powerlab_site_theme', 'dark');
     } else {
       document.documentElement.classList.remove('dark');
-      localStorage.setItem('powercolors_site_theme', 'light');
+      localStorage.setItem('powerlab_site_theme', 'light');
     }
   }, [isDarkSite]);
 
@@ -270,19 +270,19 @@ export default function App() {
             <div className="flex-shrink-0 flex items-center justify-center">
               <img
                 src="/logo.png"
-                alt="PowerColors Logo"
+                alt="PowerLab Logo"
                 className="w-8 h-8 sm:w-9 sm:h-9 object-contain"
               />
             </div>
             <div className="min-w-0">
               <div className="flex items-center space-x-2">
                 <span className={`font-extrabold text-base sm:text-lg tracking-tight truncate ${isDarkSite ? 'text-white' : 'text-slate-900'}`}>
-                  Power<span style={{ color: '#EC9700' }}>Colors</span>
+                  Power<span style={{ color: '#EC9700' }}>Lab</span>
                 </span>
                 <span className={`hidden md:inline-block text-[10px] uppercase font-mono font-bold tracking-wider px-2 py-0.5 rounded-full border ${
                   isDarkSite ? 'bg-slate-800 text-amber-400 border-slate-700' : 'bg-amber-50 text-amber-800 border-amber-200'
                 }`}>
-                  Power BI Theme Lab
+                  Power BI Suite
                 </span>
               </div>
             </div>
@@ -436,17 +436,22 @@ export default function App() {
       }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-center sm:text-left">
           <div className="flex items-center space-x-2">
-            <img src="/logo.png" alt="PowerColors Logo" className="w-5 h-5 object-contain" />
+            <img src="/logo.png" alt="PowerLab Logo" className="w-5 h-5 object-contain" />
             <span className="font-bold text-slate-800 dark:text-slate-200">
-              Power<span style={{ color: '#EC9700' }}>Colors</span>
+              Power<span style={{ color: '#EC9700' }}>Lab</span>
             </span>
             <span>• 100% In-Browser Privacy • Power BI JSON</span>
           </div>
 
           <div className="flex flex-wrap items-center justify-center sm:justify-end gap-3 sm:gap-4">
             <div className="flex items-center space-x-1.5">
-              <span>Created and reviewed by</span>
-              <span className="font-bold text-slate-900 dark:text-slate-100">Rachwen Mosbehi</span>
+              <span className="text-slate-600 dark:text-slate-400 font-medium">Created and reviewed by</span>
+              <span
+                className="font-extrabold text-slate-950 dark:text-white tracking-wide"
+                style={{ color: isDarkSite ? '#FFFFFF' : '#090D16' }}
+              >
+                Rachwen Mosbehi
+              </span>
             </div>
 
             {/* Social Media Icons */}

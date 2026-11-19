@@ -18,7 +18,7 @@ import { buildPowerBITheme } from './powerBiTheme';
  */
 export function extractPaletteFromPixels(
   pixels: RGB[],
-  themeName = 'PowerColors Custom Theme',
+  themeName = 'PowerLab Custom Theme',
   isDarkCanvas = false
 ): { result: ExtractionResult; theme: PowerBITheme } {
   const startTime = performance.now();
@@ -64,7 +64,7 @@ export function extractPaletteFromPixels(
  */
 export async function extractThemeFromImage(
   source: File | Blob | string,
-  themeName = 'PowerColors Custom Theme',
+  themeName = 'PowerLab Custom Theme',
   isDarkCanvas = false
 ): Promise<{ result: ExtractionResult; theme: PowerBITheme }> {
   const { img, cleanup } = await loadHtmlImage(source);

@@ -12,7 +12,7 @@ export function buildPowerBITheme(
   structural: StructuralColors,
   options?: Partial<ThemeCustomizationOptions>
 ): PowerBITheme {
-  const safeName = themeName.trim() || 'PowerColors Custom Theme';
+  const safeName = themeName.trim() || 'PowerLab Custom Theme';
   const ensuredDataColors = dataColors.slice(0, 10);
   const fontFamily = options?.fontFamily || 'Segoe UI';
   const showBorders = options?.showVisualBorders ?? true;
