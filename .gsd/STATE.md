@@ -1,5 +1,5 @@
 ---
-updated: 2026-11-19T15:37:00+01:00
+updated: 2026-11-19T15:52:00+01:00
 ---
 
 # Project State
@@ -9,21 +9,20 @@ updated: 2026-11-19T15:37:00+01:00
 **Milestone:** v1.0  
 **Phase:** 5 - Polish, Verification & Production Readiness  
 **Status:** complete  
-**Plan:** All phases and user design enhancements complete  
+**Plan:** All phases, social footer icons, and Poppins font enhancements complete  
 
 ## Last Action
 
-Completed all user-specified design and functional adjustments:
-1. Removed grey border contour and white box background from the logo, rendering a clean transparent logo.
-2. Set title brand color for "Colors" to `#EC9700`.
-3. Connected font family selection (Segoe UI, Aptos, DIN, Arial, Calibri) to the live Power BI Report Canvas and all child visuals (KPI cards, bar chart, line chart, donut, table), updating the canvas typography dynamically in real time.
-4. Set Google Font Urbanist as the official website font.
-5. Fully optimized mobile responsiveness across header actions, navigation, image dropzone, palette strip, and report canvas.
-6. 28/28 Vitest unit tests passing; production build verified in 1.67s.
+Completed user requests:
+1. Removed hyperlink from the name "Rachwen Mosbehi" in the footer, making it styled text.
+2. Added dedicated LinkedIn icon linked to `https://www.linkedin.com/in/rachwen-mosbehi-792440120/`.
+3. Added icons for Facebook, YouTube, and GitHub in the footer without active links.
+4. Set Google Font **Poppins** as the website base font stack in `index.html` and `src/index.css`.
+5. 28/28 Vitest unit tests pass; production build verified in 1.79s.
 
 ## Next Steps
 
-1. Launch development server with `npm run dev` or build for production with `npm run build`.
+1. Launch development server with `npm run dev` or deploy to hosting.
 
 ## Active Decisions
 
@@ -36,7 +35,8 @@ Completed all user-specified design and functional adjustments:
 | DECISION-005 | Pure SVG Power BI Visuals (no bloated external charting libraries) for instant rendering | 2026-11-19 | Phase 3 |
 | DECISION-006 | Client-side Blob download + interactive modal inspector with syntax highlighting | 2026-11-19 | Phase 4 |
 | DECISION-007 | Site-wide Light and Dark mode with Light Mode as default | 2026-11-19 | UI Layout |
-| DECISION-008 | Urbanist font as website typography; brand accent `#EC9700` | 2026-11-19 | Design & Typography |
+| DECISION-008 | Poppins font as website typography; brand accent `#EC9700` | 2026-11-19 | Design & Typography |
+| DECISION-009 | Social icons in footer (LinkedIn active link, Facebook/YouTube/GitHub placeholders) | 2026-11-19 | Footer |
 
 ## Blockers
 
@@ -44,4 +44,4 @@ None.
 
 ## Concerns
 
-None. All 28 unit tests pass with 100% pass rate.
+None. 28/28 unit tests pass with 100% pass rate.

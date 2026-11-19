@@ -1,11 +1,12 @@
 import { useState, useCallback, useEffect } from 'react';
-import { Sun, Moon, Download, Copy, Check, Code2, ExternalLink } from 'lucide-react';
+import { Sun, Moon, Download, Copy, Check, Code2 } from 'lucide-react';
 import { ColorSwatch, StructuralColors, PowerBITheme, ThemeCustomizationOptions } from './core/types';
 import { ImageUploader } from './components/ImageUploader';
 import { PaletteStrip } from './components/PaletteStrip';
 import { ThemeControls } from './components/ThemeControls';
 import { ReportCanvas } from './components/ReportCanvas';
 import { JsonThemeModal } from './components/JsonThemeModal';
+import { LinkedInIcon, FacebookIcon, YouTubeIcon, GitHubIcon } from './components/SocialIcons';
 import { extractThemeFromImage } from './core/colorEngine';
 import { createColorSwatch, deriveStructuralColors } from './core/colorHarmonics';
 import { buildPowerBITheme, serializePowerBITheme } from './core/powerBiTheme';
@@ -429,7 +430,7 @@ export default function App() {
         isDarkCanvas={isDarkCanvas}
       />
 
-      {/* Footer with Creator & Reviewer Attribution (Responsive) */}
+      {/* Footer with Creator & Reviewer Attribution and Social Icons */}
       <footer className={`border-t py-6 sm:py-8 transition-colors ${
         isDarkSite ? 'border-slate-800/80 bg-slate-950 text-slate-400' : 'border-slate-200 bg-white text-slate-600'
       }`}>
@@ -442,17 +443,49 @@ export default function App() {
             <span>• 100% In-Browser Privacy • Power BI JSON</span>
           </div>
 
-          <div className="flex items-center space-x-1.5">
-            <span>Created and reviewed by</span>
-            <a
-              href="https://www.linkedin.com/in/rachwen-mosbehi-792440120/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 font-semibold text-[#EC9700] hover:underline"
-            >
-              <span>Rachwen Mosbehi</span>
-              <ExternalLink className="w-3 h-3" />
-            </a>
+          <div className="flex flex-wrap items-center justify-center sm:justify-end gap-3 sm:gap-4">
+            <div className="flex items-center space-x-1.5">
+              <span>Created and reviewed by</span>
+              <span className="font-bold text-slate-900 dark:text-slate-100">Rachwen Mosbehi</span>
+            </div>
+
+            {/* Social Media Icons */}
+            <div className="flex items-center space-x-1.5 pl-2 sm:border-l border-slate-300 dark:border-slate-800">
+              {/* LinkedIn with link */}
+              <a
+                href="https://www.linkedin.com/in/rachwen-mosbehi-792440120/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-1.5 rounded-lg text-slate-500 hover:text-[#0A66C2] hover:bg-[#0A66C2]/10 transition-colors cursor-pointer"
+                title="LinkedIn (Rachwen Mosbehi)"
+              >
+                <LinkedInIcon size={16} />
+              </a>
+
+              {/* Facebook (without link) */}
+              <span
+                className="p-1.5 rounded-lg text-slate-400 hover:text-[#1877F2] hover:bg-[#1877F2]/10 transition-colors cursor-default"
+                title="Facebook"
+              >
+                <FacebookIcon size={16} />
+              </span>
+
+              {/* YouTube (without link) */}
+              <span
+                className="p-1.5 rounded-lg text-slate-400 hover:text-[#FF0000] hover:bg-[#FF0000]/10 transition-colors cursor-default"
+                title="YouTube"
+              >
+                <YouTubeIcon size={16} />
+              </span>
+
+              {/* GitHub (without link) */}
+              <span
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-500/10 transition-colors cursor-default"
+                title="GitHub"
+              >
+                <GitHubIcon size={16} />
+              </span>
+            </div>
           </div>
         </div>
       </footer>
