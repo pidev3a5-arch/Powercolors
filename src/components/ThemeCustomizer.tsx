@@ -14,6 +14,10 @@ const FONT_OPTIONS: Array<ThemeCustomizationOptions['fontFamily']> = [
   'DIN',
   'Arial',
   'Calibri',
+  'Verdana',
+  'Tahoma',
+  'Trebuchet MS',
+  'Georgia',
 ];
 
 export const ThemeCustomizer: React.FC<ThemeCustomizerProps> = ({

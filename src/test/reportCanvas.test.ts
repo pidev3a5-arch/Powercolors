@@ -63,5 +63,9 @@ describe('Report Canvas & Visual Color Binding', () => {
     expect(getFontFamilyCss('DIN')).toContain('DIN');
     expect(getFontFamilyCss('Arial')).toContain('Arial');
     expect(getFontFamilyCss('Calibri')).toContain('Calibri');
+    expect(getFontFamilyCss('Verdana')).toContain('Verdana');
+    expect(getFontFamilyCss('Tahoma')).toContain('Tahoma');
+    expect(getFontFamilyCss('Trebuchet MS')).toContain('Trebuchet MS');
+    expect(getFontFamilyCss('Georgia')).toContain('Georgia');
   });
 });

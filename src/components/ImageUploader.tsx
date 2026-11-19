@@ -106,9 +106,9 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
     <div className="w-full space-y-4">
       {/* Upload Dropzone or Current Image View */}
       {currentImagePreview ? (
-        <div className={`relative flex items-center justify-between p-4 rounded-2xl border shadow-md overflow-hidden group ${activeCardBg}`}>
-          <div className="flex items-center space-x-4 min-w-0">
-            <div className={`relative w-16 h-16 rounded-xl overflow-hidden border flex-shrink-0 flex items-center justify-center ${
+        <div className={`relative flex flex-col sm:flex-row sm:items-center justify-between p-3.5 sm:p-4 rounded-2xl border shadow-sm overflow-hidden gap-3.5 sm:gap-4 ${activeCardBg}`}>
+          <div className="flex items-center space-x-3.5 sm:space-x-4 min-w-0 flex-1">
+            <div className={`relative w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden border flex-shrink-0 flex items-center justify-center ${
               isDarkSite ? 'bg-slate-950 border-slate-800' : 'bg-slate-100 border-slate-200'
             }`}>
               <img
@@ -122,23 +122,26 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
                 </div>
               )}
             </div>
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <div className="flex items-center space-x-2">
-                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] sm:text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                   Active Image
                 </span>
                 {isLoading && (
                   <span className="text-xs text-amber-500 animate-pulse font-medium">
-                    Extracting palette...
+                    Extracting...
                   </span>
                 )}
               </div>
-              <h3 className={`text-sm font-bold truncate max-w-xs sm:max-w-md mt-1 ${
-                isDarkSite ? 'text-white' : 'text-slate-800'
-              }`}>
+              <h3
+                className={`text-xs sm:text-sm font-bold truncate mt-1 ${
+                  isDarkSite ? 'text-white' : 'text-slate-800'
+                }`}
+                title={currentImageName || 'Custom Upload'}
+              >
                 {currentImageName || 'Custom Upload'}
               </h3>
-              <p className={`text-xs flex items-center gap-1.5 mt-0.5 ${
+              <p className={`text-[11px] sm:text-xs flex flex-wrap items-center gap-1.5 mt-0.5 ${
                 isDarkSite ? 'text-slate-400' : 'text-slate-500'
               }`}>
                 <span>Press</span>
@@ -152,7 +155,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
             </div>
           </div>
 
-          <div className="flex items-center space-x-2 flex-shrink-0">
+          <div className="flex items-center justify-end space-x-2 flex-shrink-0 pt-2.5 sm:pt-0 border-t sm:border-t-0 border-slate-200/60 dark:border-slate-800/80">
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}

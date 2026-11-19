@@ -26,7 +26,16 @@ export interface TextClassStyle {
 }
 
 export interface ThemeCustomizationOptions {
-  fontFamily: 'Segoe UI' | 'Aptos' | 'DIN' | 'Arial' | 'Calibri';
+  fontFamily:
+    | 'Segoe UI'
+    | 'Aptos'
+    | 'DIN'
+    | 'Arial'
+    | 'Calibri'
+    | 'Verdana'
+    | 'Tahoma'
+    | 'Trebuchet MS'
+    | 'Georgia';
   showVisualBorders: boolean;
   showVisualDropShadow: boolean;
 }

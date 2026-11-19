@@ -25,6 +25,14 @@ export function getFontFamilyCss(font?: ThemeCustomizationOptions['fontFamily'])
       return "Arial, Helvetica, sans-serif";
     case 'Calibri':
       return "'Calibri', 'Carlito', 'Gill Sans', sans-serif";
+    case 'Verdana':
+      return "Verdana, Geneva, Tahoma, sans-serif";
+    case 'Tahoma':
+      return "Tahoma, Verdana, Segoe, sans-serif";
+    case 'Trebuchet MS':
+      return "'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', sans-serif";
+    case 'Georgia':
+      return "Georgia, 'Times New Roman', Times, serif";
     case 'Segoe UI':
     default:
       return "'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif";

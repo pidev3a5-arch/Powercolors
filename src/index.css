@@ -26,3 +26,19 @@
 .pbi-font-calibri {
   font-family: 'Calibri', 'Carlito', 'Gill Sans', sans-serif;
 }
+
+.pbi-font-verdana {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.pbi-font-tahoma {
+  font-family: Tahoma, Verdana, Segoe, sans-serif;
+}
+
+.pbi-font-trebuchet {
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', sans-serif;
+}
+
+.pbi-font-georgia {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+}

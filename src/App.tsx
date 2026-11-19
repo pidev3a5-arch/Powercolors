@@ -443,19 +443,9 @@ export default function App() {
             <span>• 100% In-Browser Privacy • Power BI JSON</span>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center sm:justify-end gap-3 sm:gap-4">
-            <div className="flex items-center space-x-1.5">
-              <span className="text-slate-600 dark:text-slate-400 font-medium">Created and reviewed by</span>
-              <span
-                className="font-extrabold text-slate-950 dark:text-white tracking-wide"
-                style={{ color: isDarkSite ? '#FFFFFF' : '#090D16' }}
-              >
-                Rachwen Mosbehi
-              </span>
-            </div>
-
+          <div className="flex items-center justify-center sm:justify-end gap-3 sm:gap-4">
             {/* Social Media Icons */}
-            <div className="flex items-center space-x-1.5 pl-2 sm:border-l border-slate-300 dark:border-slate-800">
+            <div className="flex items-center space-x-1.5">
               {/* LinkedIn with link */}
               <a
                 href="https://www.linkedin.com/in/rachwen-mosbehi-792440120/"
