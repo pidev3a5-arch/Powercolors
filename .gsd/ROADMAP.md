@@ -1,6 +1,6 @@
 # ROADMAP.md
 
-> **Current Phase**: Phase 3 (Live Power BI Visuals Mock Canvas)
+> **Current Phase**: Phase 4 (Theme JSON Inspector & Advanced Customization)
 > **Milestone**: v1.0
 
 ## Must-Haves (from SPEC)
@@ -9,7 +9,7 @@
 - [x] Intelligent color harmonics fallback when source images have fewer than 10 colors
 - [x] Auto-derived structural colors (background, foreground, tableAccent, KPI good/bad/neutral)
 - [x] Interactive palette toolbar: swatch editing, reordering, lock, and contrast indicators
-- [ ] Realistic Power BI mock canvas with KPI cards, bar chart, line chart, donut chart, and matrix
+- [x] Realistic Power BI mock canvas with KPI cards, bar chart, line chart, donut chart, and matrix
 - [x] Schema-compliant Power BI Theme JSON generation function and 1-click download
 
 ## Phases
@@ -25,14 +25,14 @@
 **Requirements**: REQ-01, REQ-06, REQ-07, REQ-08, REQ-10, REQ-11, REQ-13, REQ-14  
 
 ### Phase 3: Live Power BI Visuals Mock Canvas
-**Status**: ⬜ Not Started  
+**Status**: 🟩 Completed  
 **Objective**: Create an interactive Power BI report canvas preview simulating real visuals (KPI metric cards, clustered bar chart, line trend, donut breakdown, styled table) with Light/Dark canvas theme toggling.  
-**Requirements**: REQ-09  
+**Requirements**: REQ-09, REQ-10  
 
 ### Phase 4: Theme JSON Generator & Export
-**Status**: ⬜ Ready to Streamline / Verify  
-**Objective**: Enhance Power BI theme JSON builder with interactive modal inspector, syntax highlighting, and visual styles customization.  
-**Requirements**: REQ-12, REQ-13, REQ-14 (Advanced inspection)  
+**Status**: ⬜ Ready to Plan  
+**Objective**: Modal JSON viewer with syntax highlighting, schema validation status, format options, and advanced visualContainer customizations.  
+**Requirements**: REQ-11, REQ-12, REQ-13, REQ-14  
 
 ### Phase 5: Polish, Sample Presets & Production Build
 **Status**: ⬜ Not Started  

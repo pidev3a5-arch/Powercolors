@@ -1,9 +1,10 @@
 import { useState, useCallback, useEffect } from 'react';
-import { Palette, Sparkles, BarChart3, Download, Copy, Check } from 'lucide-react';
+import { Palette, Sparkles, Download, Copy, Check } from 'lucide-react';
 import { ColorSwatch, StructuralColors, PowerBITheme } from './core/types';
 import { ImageUploader } from './components/ImageUploader';
 import { PaletteStrip } from './components/PaletteStrip';
 import { ThemeControls } from './components/ThemeControls';
+import { ReportCanvas } from './components/ReportCanvas';
 import { extractThemeFromImage } from './core/colorEngine';
 import { createColorSwatch, deriveStructuralColors } from './core/colorHarmonics';
 import { buildPowerBITheme, serializePowerBITheme } from './core/powerBiTheme';
@@ -326,17 +327,14 @@ export default function App() {
           />
         </section>
 
-        {/* Placeholder for Phase 3 (Live Power BI Mock Canvas Preview) */}
-        <section className="p-8 rounded-2xl border border-dashed border-slate-800 bg-slate-900/20 text-center space-y-2">
-          <div className="inline-flex p-3 rounded-2xl bg-slate-900 text-slate-400 border border-slate-800">
-            <BarChart3 className="w-6 h-6 text-amber-400" />
-          </div>
-          <h3 className="text-sm font-semibold text-slate-200">
-            Phase 3: Live Power BI Visuals Mock Canvas
-          </h3>
-          <p className="text-xs text-slate-400 max-w-md mx-auto">
-            Interactive mock report canvas with KPI cards, clustered bar charts, line trends, donut charts, and styled tables will be connected here in Phase 3.
-          </p>
+        {/* Section 4: Live Power BI Visuals Mock Canvas */}
+        <section>
+          <ReportCanvas
+            swatches={swatches}
+            structural={structural}
+            isDarkCanvas={isDarkCanvas}
+            themeName={themeName}
+          />
         </section>
       </main>
 
