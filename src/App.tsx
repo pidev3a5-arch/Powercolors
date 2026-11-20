@@ -1,11 +1,9 @@
 import { useState, useCallback, useEffect } from 'react';
-import { Sun, Moon, Download, Copy, Check, Code2, Sparkles } from 'lucide-react';
-import { ColorSwatch, StructuralColors, PowerBITheme, ThemeCustomizationOptions } from './core/types';
-import { ImageUploader } from './components/ImageUploader';
-import { PaletteStrip } from './components/PaletteStrip';
-import { ThemeControls } from './components/ThemeControls';
-import { ReportCanvas } from './components/ReportCanvas';
-import { JsonThemeModal } from './components/JsonThemeModal';
+import { ColorSwatch, StructuralColors, PowerBITheme, ThemeCustomizationOptions, AppPage } from './core/types';
+import { NavigationHeader } from './components/NavigationHeader';
+import { LandingPage } from './pages/LandingPage';
+import { ThemeGeneratorPage } from './pages/ThemeGeneratorPage';
+import { DashGeneratorPage } from './pages/DashGeneratorPage';
 import { LinkedInIcon, FacebookIcon, YouTubeIcon, GitHubIcon } from './components/SocialIcons';
 import { extractThemeFromImage } from './core/colorEngine';
 import { createColorSwatch, deriveStructuralColors } from './core/colorHarmonics';
@@ -19,6 +17,21 @@ const DEFAULT_PALETTE_HEXES = [
 ];
 
 export default function App() {
+  // Navigation Page State ('landing' | 'theme-generator' | 'dash-generator')
+  const [currentPage, setCurrentPage] = useState<AppPage>(() => {
+    const saved = localStorage.getItem('powerlab_current_page');
+    if (saved === 'theme-generator' || saved === 'dash-generator' || saved === 'landing') {
+      return saved;
+    }
+    return 'landing';
+  });
+
+  const handleNavigate = useCallback((page: AppPage) => {
+    setCurrentPage(page);
+    localStorage.setItem('powerlab_current_page', page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
   // Site Theme: Light mode by default (Warm Cream Paper Feel)
   const [isDarkSite, setIsDarkSite] = useState<boolean>(() => {
     const saved = localStorage.getItem('powerlab_site_theme');
@@ -73,6 +86,10 @@ export default function App() {
       setStructural((curr) => deriveStructuralColors(curr.tableAccent, nextMode));
       return nextMode;
     });
+  }, []);
+
+  const handleUpdateStructuralColor = useCallback((key: keyof StructuralColors, hex: string) => {
+    setStructural((prev) => ({ ...prev, [key]: hex }));
   }, []);
 
   // Update single swatch hex
@@ -140,30 +157,25 @@ export default function App() {
         .map((s, idx) => (!s.isLocked ? idx : -1))
         .filter((idx) => idx !== -1);
 
-      const unlockedValues = unlockedIndices.map((idx) => prev[idx]);
-      for (let i = unlockedValues.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [unlockedValues[i], unlockedValues[j]] = [unlockedValues[j], unlockedValues[i]];
-      }
+      if (unlockedIndices.length <= 1) return prev;
+
+      const shuffledValues = unlockedIndices
+        .map((idx) => prev[idx])
+        .sort(() => Math.random() - 0.5);
 
       const next = [...prev];
       unlockedIndices.forEach((origIdx, i) => {
-        next[origIdx] = unlockedValues[i];
+        next[origIdx] = shuffledValues[i];
       });
       return next;
     });
   }, []);
 
-  // Handle custom structural color change
-  const handleUpdateStructuralColor = useCallback((key: keyof StructuralColors, hex: string) => {
-    setStructural((prev) => ({ ...prev, [key]: hex }));
-  }, []);
-
-  // Extract from image, respecting locked swatches
-  const handleImageSelected = useCallback(async (source: File | string, displayName: string) => {
+  // Handle image selected for extraction
+  const handleImageSelected = useCallback(async (source: string | File, fileName?: string) => {
     setIsLoading(true);
-
     try {
+      const displayName = fileName || (typeof source === 'string' ? 'Imported Preset' : source.name);
       if (typeof source === 'string') {
         setCurrentImagePreview(source);
       } else {
@@ -260,189 +272,58 @@ export default function App() {
     <div className={`min-h-screen flex flex-col transition-colors duration-200 bg-dot-grid ${
       isDarkSite ? 'bg-[#0F172A] text-slate-100' : 'bg-[#FFFDF5] text-[#1E293B]'
     }`}>
-      {/* Top Navigation Bar: Chunky 2px Border, Responsive Mobile Layout */}
-      <header className={`border-b-2 border-[#1E293B] dark:border-slate-800 sticky top-0 z-40 backdrop-blur-md transition-colors duration-200 ${
-        isDarkSite ? 'bg-[#0F172A]/90' : 'bg-[#FFFDF5]/90'
-      }`}>
-        <div className="max-w-[1280px] mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-18 flex items-center justify-between gap-2 sm:gap-4">
-          {/* Logo, Wordmark & Playful Pill Badge */}
-          <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-shrink">
-            <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-[#FBBF24] border-2 border-[#1E293B] shadow-[2px_2px_0px_0px_#1E293B] flex items-center justify-center p-1 sm:p-1.5 hover-wiggle cursor-pointer">
-              <img
-                src="/logo.png"
-                alt="PowerLab Logo"
-                className="w-full h-full object-contain"
-              />
-            </div>
-            <div className="flex items-center space-x-1.5 sm:space-x-2.5 min-w-0">
-              <span className="font-heading font-black text-base sm:text-2xl tracking-tight text-[#1E293B] dark:text-white truncate">
-                Power<span className="text-[#8B5CF6]">Lab</span>
-              </span>
-              {/* Playful Geometric Pill Badge (hidden on mobile, visible on desktop) */}
-              <span className="hidden md:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#8B5CF6] text-white text-xs font-heading font-extrabold border-2 border-[#1E293B] shadow-[2.5px_2.5px_0px_0px_#1E293B] hover:-translate-y-0.5 transition-transform">
-                <Sparkles className="w-3.5 h-3.5 fill-white stroke-none" />
-                <span>Design System</span>
-              </span>
-            </div>
-          </div>
-
-          {/* Action Toolbar with Responsive Candy Buttons */}
-          <div className="flex items-center space-x-1 sm:space-x-2.5 flex-shrink-0">
-            {/* Theme Switcher Button */}
-            <button
-              type="button"
-              onClick={toggleSiteTheme}
-              className="pop-btn p-1.5 sm:p-2 rounded-full bg-white dark:bg-slate-800 text-[#1E293B] dark:text-[#FBBF24] hover:bg-[#FBBF24] hover:text-[#1E293B] transition-all cursor-pointer"
-              title={isDarkSite ? 'Switch to Warm Cream Paper Mode' : 'Switch to Playful Dark Mode'}
-            >
-              {isDarkSite ? <Sun className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2.5]" /> : <Moon className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2.5]" />}
-            </button>
-
-            {/* Inspect JSON Modal Button */}
-            <button
-              type="button"
-              onClick={() => setIsModalOpen(true)}
-              className="pop-btn inline-flex items-center gap-1.5 p-1.5 sm:px-3.5 sm:py-2 rounded-full text-xs font-heading font-extrabold bg-white dark:bg-slate-800 text-[#1E293B] dark:text-white hover:bg-[#F472B6] hover:text-white transition-all cursor-pointer"
-              title="Inspect Theme JSON with Schema Verification"
-            >
-              <Code2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2.5]" />
-              <span className="hidden sm:inline">Inspect JSON</span>
-            </button>
-
-            {/* Copy JSON Button */}
-            <button
-              type="button"
-              onClick={handleCopyJson}
-              className="pop-btn inline-flex items-center gap-1.5 p-1.5 sm:px-3.5 sm:py-2 rounded-full text-xs font-heading font-extrabold bg-white dark:bg-slate-800 text-[#1E293B] dark:text-white hover:bg-[#34D399] hover:text-[#1E293B] transition-all cursor-pointer"
-              title="Copy theme JSON to clipboard"
-            >
-              {jsonCopied ? <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600 stroke-[3]" /> : <Copy className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2.5]" />}
-              <span className="hidden sm:inline">{jsonCopied ? 'Copied!' : 'Copy'}</span>
-            </button>
-
-            {/* Download Theme (Primary Candy Button in Vivid Violet, Compact on Mobile) */}
-            <button
-              type="button"
-              onClick={handleDownloadJson}
-              className="pop-btn inline-flex items-center gap-1.5 px-2.5 sm:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-heading font-black bg-[#8B5CF6] hover:bg-[#7C3AED] text-white transition-all cursor-pointer shadow-[2.5px_2.5px_0px_0px_#1E293B]"
-              title="Download theme JSON file for Power BI Desktop"
-            >
-              <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2.5]" />
-              <span className="hidden sm:inline">Download Theme</span>
-              <span className="sm:hidden font-extrabold">Theme</span>
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Workspace Area */}
-      <main className="flex-1 max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 w-full space-y-10 sm:space-y-14">
-        {/* Playful Geometric Hero Section */}
-        <div className="relative space-y-3">
-          {/* Decorative Background Shapes */}
-          <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full bg-[#FBBF24]/20 -z-10 blur-xl pointer-events-none" />
-          <div className="absolute top-12 -left-8 w-20 h-20 rounded-full bg-[#F472B6]/20 -z-10 blur-xl pointer-events-none" />
-
-          {/* Section Pill */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#FBBF24] text-[#1E293B] text-xs font-heading font-black border-2 border-[#1E293B] shadow-[2.5px_2.5px_0px_0px_#1E293B]">
-            <Sparkles className="w-3.5 h-3.5 fill-[#1E293B] stroke-none" />
-            <span>Stable Grid, Wild Decoration</span>
-          </div>
-
-          <h1 className="text-3xl sm:text-5xl font-heading font-black tracking-tight text-[#1E293B] dark:text-white leading-[1.15]">
-            Playful Geometric <span className="text-[#8B5CF6]">Theme Studio</span>
-          </h1>
-          <p className="text-sm sm:text-base max-w-2xl text-slate-600 dark:text-slate-300 font-medium leading-relaxed">
-            A friendly, tactile, and energetic palette generator for Microsoft Power BI. Drop a brand logo or paste a screenshot (<kbd className="font-mono font-bold bg-[#FBBF24] text-[#1E293B] px-1.5 py-0.5 rounded border border-[#1E293B]">Ctrl+V</kbd>) to quantize 10 vivid data colors with official schema compliance.
-          </p>
-        </div>
-
-        {/* Section 1: Image Ingestion Dropzone */}
-        <section className="space-y-4">
-          <ImageUploader
-            onImageSelected={handleImageSelected}
-            isLoading={isLoading}
-            currentImagePreview={currentImagePreview}
-            currentImageName={currentImageName}
-            onClearImage={handleClearImage}
-            isDarkSite={isDarkSite}
-          />
-        </section>
-
-        {/* Section 2: Interactive 10-Swatch Palette Strip */}
-        <section className="space-y-4">
-          <PaletteStrip
-            swatches={swatches}
-            isDarkCanvas={isDarkCanvas}
-            isDarkSite={isDarkSite}
-            onUpdateHex={handleUpdateHex}
-            onToggleLock={handleToggleLock}
-            onMoveLeft={handleMoveLeft}
-            onMoveRight={handleMoveRight}
-            onReversePalette={handleReversePalette}
-            onToggleLockAll={handleToggleLockAll}
-            onShuffleUnlocked={handleShuffleUnlocked}
-          />
-        </section>
-
-        {/* Section 3: Theme Settings & Typography Controls */}
-        <section className="space-y-4">
-          <ThemeControls
-            themeName={themeName}
-            onThemeNameChange={setThemeName}
-            isDarkCanvas={isDarkCanvas}
-            onToggleCanvasMode={handleToggleCanvasMode}
-            structural={structural}
-            onUpdateStructuralColor={handleUpdateStructuralColor}
-            customizationOptions={customizationOptions}
-            onCustomizationOptionsChange={setCustomizationOptions}
-            isDarkSite={isDarkSite}
-          />
-        </section>
-
-        {/* Section 4: Live Power BI Visuals Mock Canvas */}
-        <section className="space-y-6">
-          <ReportCanvas
-            swatches={swatches}
-            structural={structural}
-            isDarkCanvas={isDarkCanvas}
-            themeName={themeName}
-            fontFamily={customizationOptions.fontFamily}
-          />
-
-          {/* Download Theme Action Bar with Different Color (Hot Pink Pop) */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-5 sm:p-6 rounded-3xl border-2 border-[#1E293B] dark:border-slate-700 bg-white dark:bg-slate-900 shadow-[6px_6px_0px_0px_#1E293B] dark:shadow-[6px_6px_0px_0px_#020617]">
-            <div className="space-y-1 text-center sm:text-left">
-              <h3 className="text-base sm:text-lg font-heading font-black text-[#1E293B] dark:text-white flex items-center justify-center sm:justify-start gap-2">
-                <Sparkles className="w-4 h-4 text-[#FBBF24] stroke-[2.5]" />
-                <span>Ready to apply this theme in Power BI?</span>
-              </h3>
-              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">
-                Download the verified JSON theme and import it directly into Power BI Desktop under <em>View → Themes → Browse for themes</em>.
-              </p>
-            </div>
-
-            <button
-              type="button"
-              onClick={handleDownloadJson}
-              className="pop-btn w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-full text-sm sm:text-base font-heading font-black bg-[#F472B6] hover:bg-[#EC4899] text-white shadow-[4px_4px_0px_0px_#1E293B] transition-all cursor-pointer flex-shrink-0"
-              title="Download theme JSON file for Power BI Desktop"
-            >
-              <Download className="w-5 h-5 stroke-[3]" />
-              <span>Download Theme</span>
-            </button>
-          </div>
-        </section>
-      </main>
-
-      {/* JSON Inspection Modal */}
-      <JsonThemeModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        theme={currentTheme}
-        themeName={themeName}
-        isDarkCanvas={isDarkCanvas}
+      {/* Top Navigation Bar: Multi-Page Tabs & Contextual Actions */}
+      <NavigationHeader
+        currentPage={currentPage}
+        onNavigate={handleNavigate}
+        isDarkSite={isDarkSite}
+        onToggleSiteTheme={toggleSiteTheme}
+        onOpenModal={() => setIsModalOpen(true)}
+        onCopyJson={handleCopyJson}
+        jsonCopied={jsonCopied}
+        onDownloadJson={handleDownloadJson}
       />
+
+      {/* Main Dynamic View */}
+      {currentPage === 'landing' && (
+        <LandingPage onNavigate={handleNavigate} />
+      )}
+
+      {currentPage === 'theme-generator' && (
+        <ThemeGeneratorPage
+          onNavigate={handleNavigate}
+          swatches={swatches}
+          structural={structural}
+          themeName={themeName}
+          setThemeName={setThemeName}
+          isDarkCanvas={isDarkCanvas}
+          isDarkSite={isDarkSite}
+          customizationOptions={customizationOptions}
+          onCustomizationOptionsChange={setCustomizationOptions}
+          handleUpdateStructuralColor={handleUpdateStructuralColor}
+          handleUpdateHex={handleUpdateHex}
+          handleToggleLock={handleToggleLock}
+          handleMoveLeft={handleMoveLeft}
+          handleMoveRight={handleMoveRight}
+          handleReversePalette={handleReversePalette}
+          handleToggleLockAll={handleToggleLockAll}
+          handleShuffleUnlocked={handleShuffleUnlocked}
+          handleImageSelected={handleImageSelected}
+          handleClearImage={handleClearImage}
+          currentImagePreview={currentImagePreview}
+          currentImageName={currentImageName}
+          isLoading={isLoading}
+          handleToggleCanvasMode={handleToggleCanvasMode}
+          handleDownloadJson={handleDownloadJson}
+          isModalOpen={isModalOpen}
+          setIsModalOpen={setIsModalOpen}
+          currentTheme={currentTheme}
+        />
+      )}
+
+      {currentPage === 'dash-generator' && (
+        <DashGeneratorPage onNavigate={handleNavigate} />
+      )}
 
       {/* Playful Footer */}
       <footer className={`border-t-2 border-[#1E293B] dark:border-slate-800 py-8 transition-colors ${
