@@ -16,22 +16,29 @@ export function escapeXml(str: string): string {
 /**
  * Generates standalone, valid XML SVG markup for Power BI canvas wallpaper background.
  */
-export function generateDashSvg(state: DashCanvasState): string {
+export function generateDashSvg(state: DashCanvasState, forPreview = false): string {
   const { width, height } = state.dimensions;
-  const { navBar, containerStyle, containers } = state;
+  const { navBar, containerStyle, containers, typography, pageTitles } = state;
+
+  const font = typography?.fontFamily || 'Segoe UI';
+  const defaultTitleSize = typography?.titleSize || 13;
+  const defaultTitleColor = typography?.titleColor || '#1E293B';
+  const defaultSubtitleSize = typography?.subtitleSize || 10.5;
+  const defaultSubtitleColor = typography?.subtitleColor || '#64748B';
 
   const parts: string[] = [];
 
   // SVG Root with XML namespace and dimensions
+  const styleAttr = forPreview ? ` style="width: 100%; height: 100%; display: block;"` : '';
   parts.push(
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">`
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}"${styleAttr}>`
   );
 
   // Embedded Typography and CSS Styles
   parts.push(`  <defs>
     <style>
       text {
-        font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', sans-serif;
+        font-family: '${font}', -apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', sans-serif;
         user-select: none;
       }
     </style>
@@ -43,12 +50,64 @@ export function generateDashSvg(state: DashCanvasState): string {
     `  <rect width="${width}" height="${height}" fill="${state.backgroundColor}" />`
   );
 
-  // 2. Visual Container Slots
+  // 2. Page Titles (if configured)
+  if (pageTitles && pageTitles.length > 0) {
+    parts.push(`  <!-- Page Titles -->`);
+    for (const pt of pageTitles) {
+      if (!pt.title && !pt.subtitle) continue;
+
+      let titleX = width - 32;
+      let titleY = 36;
+      let anchor = 'end';
+
+      if (pt.position === 'top-left') {
+        titleX = navBar.show && navBar.orientation === 'left' ? navBar.size + 32 : 32;
+        titleY = navBar.show && navBar.orientation === 'top' ? navBar.size + 36 : 36;
+        anchor = 'start';
+      } else if (pt.position === 'top-right') {
+        titleX = width - 32;
+        titleY = navBar.show && navBar.orientation === 'top' ? navBar.size + 36 : 36;
+        anchor = 'end';
+      } else if (pt.position === 'bottom-left') {
+        titleX = navBar.show && navBar.orientation === 'left' ? navBar.size + 32 : 32;
+        titleY = height - 28;
+        anchor = 'start';
+      } else if (pt.position === 'bottom-right') {
+        titleX = width - 32;
+        titleY = height - 28;
+        anchor = 'end';
+      }
+
+      const pTitleSize = pt.titleSize || 15;
+      const pTitleColor = pt.titleColor || defaultTitleColor;
+      const pSubtitleSize = pt.subtitleSize || 11;
+      const pSubtitleColor = pt.subtitleColor || defaultSubtitleColor;
+
+      if (pt.title) {
+        parts.push(
+          `  <text x="${titleX}" y="${titleY}" font-size="${pTitleSize}" font-weight="800" text-anchor="${anchor}" fill="${pTitleColor}">${escapeXml(
+            pt.title
+          )}</text>`
+        );
+      }
+      if (pt.subtitle) {
+        const subY = pt.position.startsWith('bottom') ? titleY - pTitleSize - 2 : titleY + pSubtitleSize + 5;
+        parts.push(
+          `  <text x="${titleX}" y="${subY}" font-size="${pSubtitleSize}" font-weight="500" text-anchor="${anchor}" fill="${pSubtitleColor}">${escapeXml(
+            pt.subtitle
+          )}</text>`
+        );
+      }
+    }
+  }
+
+  // 3. Visual Container Slots
   parts.push(`  <!-- Visual Container Slots -->`);
   for (const c of containers) {
     const rx = containerStyle.cornerRadius;
-    const strokeW = containerStyle.borderWidth;
-    const strokeColor = containerStyle.borderColor;
+    const showBorder = c.showBorder !== undefined ? c.showBorder : containerStyle.showBorder !== false;
+    const strokeW = showBorder ? (c.borderWidth ?? containerStyle.borderWidth ?? 2) : 0;
+    const strokeColor = showBorder ? (c.borderColor ?? containerStyle.borderColor ?? '#1E293B') : 'none';
     const fill = c.backgroundColor || containerStyle.backgroundColor;
 
     // Hard offset shadow if enabled
@@ -78,20 +137,20 @@ export function generateDashSvg(state: DashCanvasState): string {
 
       if (hasTitle) {
         parts.push(
-          `  <text x="${Math.round(c.x + 16)}" y="${textY}" font-size="13" font-weight="700" fill="#1E293B">${escapeXml(
+          `  <text x="${Math.round(c.x + 16)}" y="${textY}" font-size="${defaultTitleSize}" font-weight="700" fill="${defaultTitleColor}">${escapeXml(
             c.title
           )}</text>`
         );
-        textY += 16;
+        textY += defaultTitleSize + 4;
       }
 
       if (hasSubtitle) {
         parts.push(
-          `  <text x="${Math.round(c.x + 16)}" y="${textY}" font-size="10.5" font-weight="500" fill="#64748B">${escapeXml(
+          `  <text x="${Math.round(c.x + 16)}" y="${textY}" font-size="${defaultSubtitleSize}" font-weight="500" fill="${defaultSubtitleColor}">${escapeXml(
             c.subtitle
           )}</text>`
         );
-        textY += 10;
+        textY += defaultSubtitleSize + 2;
       }
 
       // Subtle Divider
@@ -106,9 +165,12 @@ export function generateDashSvg(state: DashCanvasState): string {
     }
   }
 
-  // 3. Navigation Ribbon (if enabled)
+  // 4. Navigation Ribbon (if enabled)
   if (navBar.show) {
     parts.push(`  <!-- Navigation Bar (${navBar.orientation}) -->`);
+
+    const menuButtons = navBar.buttons.filter((b) => b.section !== 'general');
+    const generalButtons = navBar.buttons.filter((b) => b.section === 'general');
 
     if (navBar.orientation === 'left') {
       // Left Sidebar Background
@@ -145,40 +207,83 @@ export function generateDashSvg(state: DashCanvasState): string {
         }" opacity="0.15" stroke-width="1" />`
       );
 
-      // Navigation Buttons
-      let btnY = 88;
       const btnH = 38;
       const btnW = navBar.size - 28;
 
-      for (const btn of navBar.buttons) {
-        const isActive = !!btn.isActive;
-        const iconPath = getNavIconPath(btn.icon);
+      // Section 1: MENU
+      let btnY = 94;
+      if (menuButtons.length > 0) {
+        parts.push(
+          `  <text x="18" y="${btnY - 8}" font-size="9" font-weight="800" letter-spacing="1" fill="${
+            navBar.textColor
+          }" opacity="0.5">MENU</text>`
+        );
 
-        if (isActive) {
+        for (const btn of menuButtons) {
+          const isActive = !!btn.isActive;
+          const iconPath = getNavIconPath(btn.icon);
+
+          if (isActive) {
+            parts.push(
+              `  <rect x="14" y="${btnY}" width="${btnW}" height="${btnH}" rx="8" fill="${navBar.accentColor}" />`
+            );
+          }
+
+          const textColor = isActive ? '#FFFFFF' : navBar.textColor;
+          const iconColor = isActive ? '#FFFFFF' : navBar.textColor;
+          const textOpacity = isActive ? '1' : '0.85';
+
           parts.push(
-            `  <rect x="14" y="${btnY}" width="${btnW}" height="${btnH}" rx="8" fill="${navBar.accentColor}" />`
+            `  <g transform="translate(24, ${btnY + 9}) scale(0.83)" fill="none" stroke="${iconColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="${textOpacity}">`,
+            `    <path d="${iconPath}" />`,
+            `  </g>`,
+            `  <text x="52" y="${btnY + 24}" font-size="12" font-weight="${
+              isActive ? '700' : '600'
+            }" fill="${textColor}" opacity="${textOpacity}">${escapeXml(btn.label)}</text>`
           );
+
+          btnY += btnH + 6;
         }
+      }
 
-        const textColor = isActive ? '#FFFFFF' : navBar.textColor;
-        const iconColor = isActive ? '#FFFFFF' : navBar.textColor;
-        const textOpacity = isActive ? '1' : '0.85';
-
-        // Render Vector Icon
+      // Section 2: GENERAL
+      if (generalButtons.length > 0) {
+        btnY += 12;
         parts.push(
-          `  <g transform="translate(24, ${btnY + 9}) scale(0.83)" fill="none" stroke="${iconColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="${textOpacity}">`,
-          `    <path d="${iconPath}" />`,
-          `  </g>`
+          `  <line x1="16" y1="${btnY - 8}" x2="${navBar.size - 16}" y2="${btnY - 8}" stroke="${
+            navBar.textColor
+          }" opacity="0.15" stroke-width="1" />`,
+          `  <text x="18" y="${btnY + 4}" font-size="9" font-weight="800" letter-spacing="1" fill="${
+            navBar.textColor
+          }" opacity="0.5">GENERAL</text>`
         );
+        btnY += 14;
 
-        // Render Button Label
-        parts.push(
-          `  <text x="52" y="${btnY + 24}" font-size="12" font-weight="${
-            isActive ? '700' : '600'
-          }" fill="${textColor}" opacity="${textOpacity}">${escapeXml(btn.label)}</text>`
-        );
+        for (const btn of generalButtons) {
+          const isActive = !!btn.isActive;
+          const iconPath = getNavIconPath(btn.icon);
 
-        btnY += btnH + 8;
+          if (isActive) {
+            parts.push(
+              `  <rect x="14" y="${btnY}" width="${btnW}" height="${btnH}" rx="8" fill="${navBar.accentColor}" />`
+            );
+          }
+
+          const textColor = isActive ? '#FFFFFF' : navBar.textColor;
+          const iconColor = isActive ? '#FFFFFF' : navBar.textColor;
+          const textOpacity = isActive ? '1' : '0.85';
+
+          parts.push(
+            `  <g transform="translate(24, ${btnY + 9}) scale(0.83)" fill="none" stroke="${iconColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="${textOpacity}">`,
+            `    <path d="${iconPath}" />`,
+            `  </g>`,
+            `  <text x="52" y="${btnY + 24}" font-size="12" font-weight="${
+              isActive ? '700' : '600'
+            }" fill="${textColor}" opacity="${textOpacity}">${escapeXml(btn.label)}</text>`
+          );
+
+          btnY += btnH + 6;
+        }
       }
     } else {
       // Top Header Background
@@ -209,15 +314,18 @@ export function generateDashSvg(state: DashCanvasState): string {
         );
       }
 
-      // Navigation Buttons horizontally placed on the right
+      // Buttons horizontally placed on the right
       const btnH = 34;
-      const btnW = 120;
+      const btnW = 115;
       const btnGap = 8;
-      const totalBtnsW = navBar.buttons.length * (btnW + btnGap);
-      let btnX = width - totalBtnsW - 24;
+      const totalBtnsCount = navBar.buttons.length;
+      const hasGeneral = generalButtons.length > 0;
+      const totalWidthNeeded = totalBtnsCount * (btnW + btnGap) + (hasGeneral ? 16 : 0);
+      let btnX = width - totalWidthNeeded - 24;
       const btnY = centerY - btnH / 2;
 
-      for (const btn of navBar.buttons) {
+      // Menu Buttons
+      for (const btn of menuButtons) {
         const isActive = !!btn.isActive;
         const iconPath = getNavIconPath(btn.icon);
 
@@ -231,21 +339,52 @@ export function generateDashSvg(state: DashCanvasState): string {
         const iconColor = isActive ? '#FFFFFF' : navBar.textColor;
         const textOpacity = isActive ? '1' : '0.85';
 
-        // Render Vector Icon
         parts.push(
           `  <g transform="translate(${btnX + 10}, ${btnY + 8}) scale(0.75)" fill="none" stroke="${iconColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="${textOpacity}">`,
           `    <path d="${iconPath}" />`,
-          `  </g>`
-        );
-
-        // Render Button Label
-        parts.push(
+          `  </g>`,
           `  <text x="${btnX + 34}" y="${btnY + 22}" font-size="11.5" font-weight="${
             isActive ? '700' : '600'
           }" fill="${textColor}" opacity="${textOpacity}">${escapeXml(btn.label)}</text>`
         );
 
         btnX += btnW + btnGap;
+      }
+
+      // General Buttons
+      if (hasGeneral) {
+        parts.push(
+          `  <line x1="${btnX}" y1="${centerY - 12}" x2="${btnX}" y2="${centerY + 12}" stroke="${
+            navBar.textColor
+          }" opacity="0.3" stroke-width="1.5" />`
+        );
+        btnX += 14;
+
+        for (const btn of generalButtons) {
+          const isActive = !!btn.isActive;
+          const iconPath = getNavIconPath(btn.icon);
+
+          if (isActive) {
+            parts.push(
+              `  <rect x="${btnX}" y="${btnY}" width="${btnW}" height="${btnH}" rx="7" fill="${navBar.accentColor}" />`
+            );
+          }
+
+          const textColor = isActive ? '#FFFFFF' : navBar.textColor;
+          const iconColor = isActive ? '#FFFFFF' : navBar.textColor;
+          const textOpacity = isActive ? '1' : '0.85';
+
+          parts.push(
+            `  <g transform="translate(${btnX + 10}, ${btnY + 8}) scale(0.75)" fill="none" stroke="${iconColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="${textOpacity}">`,
+            `    <path d="${iconPath}" />`,
+            `  </g>`,
+            `  <text x="${btnX + 34}" y="${btnY + 22}" font-size="11.5" font-weight="${
+              isActive ? '700' : '600'
+            }" fill="${textColor}" opacity="${textOpacity}">${escapeXml(btn.label)}</text>`
+          );
+
+          btnX += btnW + btnGap;
+        }
       }
     }
   }
@@ -259,7 +398,7 @@ export function generateDashSvg(state: DashCanvasState): string {
  * Downloads generated SVG as a file in the browser
  */
 export function downloadDashSvg(state: DashCanvasState, filename?: string): void {
-  const svg = generateDashSvg(state);
+  const svg = generateDashSvg(state, false);
   const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
   const url = URL.createObjectURL(blob);
 

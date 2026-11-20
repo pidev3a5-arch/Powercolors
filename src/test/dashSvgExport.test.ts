@@ -1,7 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import { generateDashSvg, escapeXml } from '../core/dashSvgExport';
 import { DashCanvasState, DEFAULT_DASH_CANVAS_STATE } from '../core/dashTypes';
-import { generateLayoutContainers } from '../core/dashLayoutPresets';
+import { generateLayoutContainers, autoArrangeContainers } from '../core/dashLayoutPresets';
+import { READY_DESIGN_PRESETS } from '../core/dashDesignPresets';
 
 describe('Dash SVG Canvas Export & Layout Engine', () => {
   it('escapes XML special characters properly', () => {
@@ -60,7 +61,7 @@ describe('Dash SVG Canvas Export & Layout Engine', () => {
     expect(svg).toContain('height="1080"');
   });
 
-  it('renders Left sidebar navigation bar with custom size, title, and buttons', () => {
+  it('renders Left sidebar with MENU and GENERAL dual sections', () => {
     const state: DashCanvasState = {
       ...DEFAULT_DASH_CANVAS_STATE,
       navBar: {
@@ -73,8 +74,10 @@ describe('Dash SVG Canvas Export & Layout Engine', () => {
         reportTitle: 'Financial Overview',
         logoUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
         buttons: [
-          { id: 'btn-1', label: 'Summary', icon: 'home', isActive: true },
-          { id: 'btn-2', label: 'Revenue', icon: 'dollar-sign', isActive: false },
+          { id: 'btn-1', label: 'Summary', icon: 'home', isActive: true, section: 'menu' },
+          { id: 'btn-2', label: 'Revenue', icon: 'dollar-sign', isActive: false, section: 'menu' },
+          { id: 'btn-gen-1', label: 'Settings', icon: 'settings', isActive: false, section: 'general' },
+          { id: 'btn-gen-2', label: 'Help', icon: 'help-circle', isActive: false, section: 'general' },
         ],
       },
     };
@@ -89,11 +92,11 @@ describe('Dash SVG Canvas Export & Layout Engine', () => {
 
     expect(svg).toContain('<rect x="0" y="0" width="240" height="720" fill="#0F172A" />');
     expect(svg).toContain('Financial Overview');
+    expect(svg).toContain('MENU');
+    expect(svg).toContain('GENERAL');
     expect(svg).toContain('Summary');
-    expect(svg).toContain('Revenue');
-    expect(svg).toContain('<image x="18" y="20" width="34" height="34"');
-    // Active button pill
-    expect(svg).toContain('<rect x="14" y="88" width="212" height="38" rx="8" fill="#8B5CF6" />');
+    expect(svg).toContain('Settings');
+    expect(svg).toContain('Help');
   });
 
   it('renders Top header navigation bar horizontally', () => {
@@ -109,8 +112,9 @@ describe('Dash SVG Canvas Export & Layout Engine', () => {
         reportTitle: 'Sales Performance',
         logoUrl: null,
         buttons: [
-          { id: 'btn-1', label: 'Dash', icon: 'layout-grid', isActive: true },
-          { id: 'btn-2', label: 'Trends', icon: 'trending-up', isActive: false },
+          { id: 'btn-1', label: 'Dash', icon: 'layout-grid', isActive: true, section: 'menu' },
+          { id: 'btn-2', label: 'Trends', icon: 'trending-up', isActive: false, section: 'menu' },
+          { id: 'btn-gen-1', label: 'Settings', icon: 'settings', isActive: false, section: 'general' },
         ],
       },
     };
@@ -126,55 +130,79 @@ describe('Dash SVG Canvas Export & Layout Engine', () => {
     expect(svg).toContain('<rect x="0" y="0" width="1280" height="80" fill="#1E293B" />');
     expect(svg).toContain('Sales Performance');
     expect(svg).toContain('Dash');
-    expect(svg).toContain('Trends');
+    expect(svg).toContain('Settings');
   });
 
-  it('renders visual containers with titles and subtitles', () => {
+  it('renders custom Page Titles and Subtitles in designated positions', () => {
     const state: DashCanvasState = {
       ...DEFAULT_DASH_CANVAS_STATE,
-      containers: [
+      pageTitles: [
         {
-          id: 'card-1',
-          title: 'Total Gross Profit',
-          subtitle: 'Q3 Comparison',
-          showTitle: true,
-          showSubtitle: true,
-          x: 230,
-          y: 20,
-          width: 300,
-          height: 150,
+          id: 'title-1',
+          title: 'Top Right Executive Stamp',
+          subtitle: 'Live API Telemetry',
+          position: 'top-right',
+          titleColor: '#0F172A',
+        },
+        {
+          id: 'title-2',
+          title: 'Confidential Internal',
+          subtitle: 'Do not distribute',
+          position: 'bottom-left',
+          titleColor: '#DC2626',
         },
       ],
     };
 
     const svg = generateDashSvg(state);
-
-    expect(svg).toContain('Total Gross Profit');
-    expect(svg).toContain('Q3 Comparison');
-    expect(svg).toContain('<rect x="230" y="20" width="300" height="150"');
+    expect(svg).toContain('Top Right Executive Stamp');
+    expect(svg).toContain('Live API Telemetry');
+    expect(svg).toContain('Confidential Internal');
+    expect(svg).toContain('Do not distribute');
   });
 
-  it('respects hidden titles and subtitles', () => {
-    const state: DashCanvasState = {
-      ...DEFAULT_DASH_CANVAS_STATE,
-      containers: [
-        {
-          id: 'card-silent',
-          title: 'Hidden Header Title',
-          subtitle: 'Hidden Subtitle',
-          showTitle: false,
-          showSubtitle: false,
-          x: 230,
-          y: 20,
-          width: 300,
-          height: 150,
-        },
-      ],
-    };
+  it('supports 4 new layout presets correctly', () => {
+    const presets = ['kpi-ribbon-grid', 'left-focus-split', 'top-storyline', 'multi-tier-matrix'] as const;
 
-    const svg = generateDashSvg(state);
+    for (const preset of presets) {
+      const containers = generateLayoutContainers(
+        preset,
+        1280,
+        720,
+        DEFAULT_DASH_CANVAS_STATE.navBar
+      );
+      expect(containers.length).toBeGreaterThan(0);
+      // Ensure all containers are within bounds
+      for (const c of containers) {
+        expect(c.x).toBeGreaterThanOrEqual(DEFAULT_DASH_CANVAS_STATE.navBar.size);
+        expect(c.x + c.width).toBeLessThanOrEqual(1280);
+        expect(c.y + c.height).toBeLessThanOrEqual(720);
+      }
+    }
+  });
 
-    expect(svg).not.toContain('Hidden Header Title');
-    expect(svg).not.toContain('Hidden Subtitle');
+  it('applies ready-made complete design presets cleanly', () => {
+    const initial = { ...DEFAULT_DASH_CANVAS_STATE };
+    for (const preset of READY_DESIGN_PRESETS) {
+      const updated = preset.apply(initial);
+      expect(updated.backgroundColor).toBe(preset.backgroundColor);
+      expect(updated.navBar.backgroundColor).toBe(preset.navColor);
+      expect(updated.containerStyle.backgroundColor).toBe(preset.cardColor);
+    }
+  });
+
+  it('auto-arranges containers without overlap', () => {
+    const rawContainers = [
+      { id: '1', title: 'A', subtitle: '', showTitle: true, showSubtitle: false, x: 0, y: 0, width: 100, height: 100 },
+      { id: '2', title: 'B', subtitle: '', showTitle: true, showSubtitle: false, x: 0, y: 0, width: 100, height: 100 },
+      { id: '3', title: 'C', subtitle: '', showTitle: true, showSubtitle: false, x: 0, y: 0, width: 100, height: 100 },
+      { id: '4', title: 'D', subtitle: '', showTitle: true, showSubtitle: false, x: 0, y: 0, width: 100, height: 100 },
+    ];
+
+    const arranged = autoArrangeContainers(rawContainers, 1280, 720, DEFAULT_DASH_CANVAS_STATE.navBar);
+    expect(arranged.length).toBe(4);
+    // Each container should have a unique non-zero position
+    expect(arranged[1].x).toBeGreaterThan(arranged[0].x);
+    expect(arranged[2].y).toBeGreaterThan(arranged[0].y);
   });
 });

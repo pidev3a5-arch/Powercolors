@@ -14,13 +14,18 @@ import {
   DashCanvasState,
   CanvasDimension,
   DashCanvasContainerStyle,
+  DashTypographyConfig,
   LayoutPresetType,
   NavBarConfig,
   NavButtonConfig,
+  NavButtonSection,
+  PageTitleItem,
+  PageTitlePosition,
   VisualContainerConfig,
   DEFAULT_DASH_CANVAS_STATE,
 } from '../core/dashTypes';
-import { generateLayoutContainers } from '../core/dashLayoutPresets';
+import { generateLayoutContainers, autoArrangeContainers } from '../core/dashLayoutPresets';
+import { READY_DESIGN_PRESETS } from '../core/dashDesignPresets';
 import { generateDashSvg, downloadDashSvg } from '../core/dashSvgExport';
 import { DashNavControls } from '../components/dash/DashNavControls';
 import { DashCanvasControls } from '../components/dash/DashCanvasControls';
@@ -88,7 +93,59 @@ export const DashGeneratorPage: React.FC<DashGeneratorPageProps> = ({ onNavigate
     }));
   };
 
-  // 4. Layout Preset
+  // 4. Typography
+  const handleUpdateTypography = (updates: Partial<DashTypographyConfig>) => {
+    setDashState((prev) => ({
+      ...prev,
+      typography: { ...prev.typography, ...updates },
+    }));
+  };
+
+  // 5. Page Titles
+  const handleUpdatePageTitle = (id: string, updates: Partial<PageTitleItem>) => {
+    setDashState((prev) => ({
+      ...prev,
+      pageTitles: prev.pageTitles.map((t) => (t.id === id ? { ...t, ...updates } : t)),
+    }));
+  };
+
+  const handleAddPageTitle = () => {
+    setDashState((prev) => {
+      const newId = `title-${Date.now()}`;
+      const usedPositions = prev.pageTitles.map((t) => t.position);
+      const allPositions: PageTitlePosition[] = ['top-right', 'top-left', 'bottom-right', 'bottom-left'];
+      const nextPos = allPositions.find((p) => !usedPositions.includes(p)) || 'bottom-left';
+      const newTitle: PageTitleItem = {
+        id: newId,
+        title: 'New Page Stamp',
+        subtitle: 'Secondary Metadata',
+        position: nextPos,
+        titleSize: 13,
+        subtitleSize: 10,
+      };
+      return {
+        ...prev,
+        pageTitles: [...prev.pageTitles, newTitle],
+      };
+    });
+  };
+
+  const handleRemovePageTitle = (id: string) => {
+    setDashState((prev) => ({
+      ...prev,
+      pageTitles: prev.pageTitles.filter((t) => t.id !== id),
+    }));
+  };
+
+  // 6. Ready Designs
+  const handleApplyReadyDesign = (presetId: string) => {
+    const found = READY_DESIGN_PRESETS.find((p) => p.id === presetId);
+    if (found) {
+      setDashState((curr) => found.apply(curr));
+    }
+  };
+
+  // 7. Layout Preset
   const handleSelectLayoutPreset = (layoutPreset: LayoutPresetType) => {
     setDashState((prev) => {
       const nextContainers = syncContainersWithLayout(
@@ -105,11 +162,10 @@ export const DashGeneratorPage: React.FC<DashGeneratorPageProps> = ({ onNavigate
     });
   };
 
-  // 5. Navigation Bar Updates
+  // 8. Navigation Bar Updates
   const handleUpdateNavBar = (updates: Partial<NavBarConfig>) => {
     setDashState((prev) => {
       const nextNavBar = { ...prev.navBar, ...updates };
-      // If orientation or size or show changed, update container positions
       const shouldRecalc =
         updates.orientation !== undefined ||
         updates.size !== undefined ||
@@ -132,15 +188,17 @@ export const DashGeneratorPage: React.FC<DashGeneratorPageProps> = ({ onNavigate
     });
   };
 
-  // 6. Navigation Buttons
-  const handleAddNavButton = () => {
+  // 9. Navigation Buttons
+  const handleAddNavButton = (section: NavButtonSection = 'menu') => {
     setDashState((prev) => {
       const newId = `btn-${Date.now()}`;
+      const count = prev.navBar.buttons.filter((b) => (b.section || 'menu') === section).length + 1;
       const newButton: NavButtonConfig = {
         id: newId,
-        label: `Tab ${prev.navBar.buttons.length + 1}`,
-        icon: 'bar-chart',
+        label: section === 'general' ? `Tool ${count}` : `Page ${count}`,
+        icon: section === 'general' ? 'settings' : 'bar-chart',
         isActive: false,
+        section,
       };
       return {
         ...prev,
@@ -190,7 +248,7 @@ export const DashGeneratorPage: React.FC<DashGeneratorPageProps> = ({ onNavigate
     });
   };
 
-  // 7. Visual Containers Customization
+  // 10. Visual Containers Customization & Auto-Arrange
   const handleUpdateContainer = (id: string, updates: Partial<VisualContainerConfig>) => {
     setDashState((prev) => ({
       ...prev,
@@ -221,9 +279,17 @@ export const DashGeneratorPage: React.FC<DashGeneratorPageProps> = ({ onNavigate
         width: 320,
         height: 200,
       };
+      // Auto-arrange all including new container
+      const all = [...prev.containers, newContainer];
+      const arranged = autoArrangeContainers(
+        all,
+        prev.dimensions.width,
+        prev.dimensions.height,
+        prev.navBar
+      );
       return {
         ...prev,
-        containers: [...prev.containers, newContainer],
+        containers: arranged,
       };
     });
   };
@@ -240,10 +306,22 @@ export const DashGeneratorPage: React.FC<DashGeneratorPageProps> = ({ onNavigate
     }));
   };
 
+  const handleAutoArrangeContainers = () => {
+    setDashState((prev) => ({
+      ...prev,
+      containers: autoArrangeContainers(
+        prev.containers,
+        prev.dimensions.width,
+        prev.dimensions.height,
+        prev.navBar
+      ),
+    }));
+  };
+
   // Copy SVG Code
   const handleCopySvg = async () => {
     try {
-      const markup = generateDashSvg(dashState);
+      const markup = generateDashSvg(dashState, false);
       await navigator.clipboard.writeText(markup);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
@@ -317,7 +395,7 @@ export const DashGeneratorPage: React.FC<DashGeneratorPageProps> = ({ onNavigate
               }`}
             >
               <Monitor className="w-3.5 h-3.5" />
-              <span>Canvas</span>
+              <span>Canvas & Style</span>
             </button>
 
             <button
@@ -353,11 +431,18 @@ export const DashGeneratorPage: React.FC<DashGeneratorPageProps> = ({ onNavigate
               dimensions={dashState.dimensions}
               backgroundColor={dashState.backgroundColor}
               containerStyle={dashState.containerStyle}
+              typography={dashState.typography}
+              pageTitles={dashState.pageTitles}
               layoutPreset={dashState.layoutPreset}
               onChangeDimensions={handleUpdateDimensions}
               onChangeBackgroundColor={handleUpdateBackgroundColor}
               onChangeContainerStyle={handleUpdateContainerStyle}
+              onChangeTypography={handleUpdateTypography}
+              onUpdatePageTitle={handleUpdatePageTitle}
+              onAddPageTitle={handleAddPageTitle}
+              onRemovePageTitle={handleRemovePageTitle}
               onSelectLayoutPreset={handleSelectLayoutPreset}
+              onApplyReadyDesign={handleApplyReadyDesign}
             />
           )}
 
@@ -379,6 +464,7 @@ export const DashGeneratorPage: React.FC<DashGeneratorPageProps> = ({ onNavigate
               onRemoveContainer={handleRemoveContainer}
               onAddContainer={handleAddContainer}
               onResetLayout={handleResetContainers}
+              onAutoArrange={handleAutoArrangeContainers}
             />
           )}
         </div>

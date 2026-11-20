@@ -8,11 +8,14 @@ export interface CanvasDimension {
 
 export type NavBarOrientation = 'left' | 'top';
 
+export type NavButtonSection = 'menu' | 'general';
+
 export interface NavButtonConfig {
   id: string;
   label: string;
   icon: string;
   isActive?: boolean;
+  section?: NavButtonSection;
 }
 
 export interface NavBarConfig {
@@ -38,10 +41,14 @@ export interface VisualContainerConfig {
   width: number;
   height: number;
   backgroundColor?: string;
+  borderColor?: string;
+  borderWidth?: number;
+  showBorder?: boolean;
 }
 
 export interface DashCanvasContainerStyle {
   cornerRadius: number;
+  showBorder: boolean;
   borderWidth: number;
   borderColor: string;
   backgroundColor: string;
@@ -49,18 +56,46 @@ export interface DashCanvasContainerStyle {
   shadowColor: string;
 }
 
+export interface DashTypographyConfig {
+  fontFamily: string; // 'Segoe UI' | 'Aptos' | 'DIN' | 'Arial' | 'Calibri' | 'Plus Jakarta Sans' | 'Outfit' | 'Inter'
+  titleSize: number; // e.g. 13
+  titleColor: string; // e.g. '#1E293B'
+  subtitleSize: number; // e.g. 10.5
+  subtitleColor: string; // e.g. '#64748B'
+}
+
+export type PageTitlePosition = 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';
+
+export interface PageTitleItem {
+  id: string;
+  title: string;
+  subtitle: string;
+  position: PageTitlePosition;
+  fontFamily?: string;
+  titleSize?: number;
+  titleColor?: string;
+  subtitleSize?: number;
+  subtitleColor?: string;
+}
+
 export type LayoutPresetType =
   | 'executive-overview'
   | 'grid-2x2'
   | 'three-column'
   | 'dense-analytics'
-  | 'single-hero';
+  | 'single-hero'
+  | 'kpi-ribbon-grid'
+  | 'left-focus-split'
+  | 'top-storyline'
+  | 'multi-tier-matrix';
 
 export interface DashCanvasState {
   dimensions: CanvasDimension;
   backgroundColor: string;
   navBar: NavBarConfig;
   containerStyle: DashCanvasContainerStyle;
+  typography: DashTypographyConfig;
+  pageTitles: PageTitleItem[];
   layoutPreset: LayoutPresetType;
   containers: VisualContainerConfig[];
 }
@@ -201,6 +236,12 @@ export const AVAILABLE_NAV_ICONS: NavIconDefinition[] = [
     category: 'general',
     path: 'M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z',
   },
+  {
+    name: 'help-circle',
+    label: 'Help & Docs',
+    category: 'general',
+    path: 'M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8zm-.05-4.25a.8.8 0 1 1 0-1.6.8.8 0 0 1 0 1.6zM12 6.5a2.5 2.5 0 0 0-2.45 2h1.5a1 1 0 1 1 1.9 0c0 .67-.4 1.05-.8 1.4-.48.42-.9.85-.9 1.6h1.5c0-.44.25-.7.62-1.02.43-.37.98-.85.98-1.98A2.5 2.5 0 0 0 12 6.5z',
+  },
 ];
 
 // Helper to look up an icon's SVG path
@@ -227,20 +268,42 @@ export const DEFAULT_DASH_CANVAS_STATE: DashCanvasState = {
     reportTitle: 'Executive Sales',
     logoUrl: null,
     buttons: [
-      { id: 'btn-1', label: 'Overview', icon: 'home', isActive: true },
-      { id: 'btn-2', label: 'Analytics', icon: 'bar-chart', isActive: false },
-      { id: 'btn-3', label: 'Customers', icon: 'users', isActive: false },
-      { id: 'btn-4', label: 'Revenue', icon: 'dollar-sign', isActive: false },
+      { id: 'btn-1', label: 'Overview', icon: 'home', isActive: true, section: 'menu' },
+      { id: 'btn-2', label: 'Analytics', icon: 'bar-chart', isActive: false, section: 'menu' },
+      { id: 'btn-3', label: 'Customers', icon: 'users', isActive: false, section: 'menu' },
+      { id: 'btn-4', label: 'Revenue', icon: 'dollar-sign', isActive: false, section: 'menu' },
+      { id: 'btn-gen-1', label: 'Settings', icon: 'settings', isActive: false, section: 'general' },
+      { id: 'btn-gen-2', label: 'Help & Docs', icon: 'help-circle', isActive: false, section: 'general' },
     ],
   },
   containerStyle: {
     cornerRadius: 14,
+    showBorder: true,
     borderWidth: 2,
     borderColor: '#1E293B',
     backgroundColor: '#FFFFFF',
     showDropShadow: true,
     shadowColor: '#1E293B',
   },
+  typography: {
+    fontFamily: 'Segoe UI',
+    titleSize: 13,
+    titleColor: '#1E293B',
+    subtitleSize: 10.5,
+    subtitleColor: '#64748B',
+  },
+  pageTitles: [
+    {
+      id: 'title-main',
+      title: 'Monthly Executive Overview',
+      subtitle: 'Live Fabric Data • Real-Time KPIs',
+      position: 'top-right',
+      titleSize: 15,
+      titleColor: '#1E293B',
+      subtitleSize: 11,
+      subtitleColor: '#64748B',
+    },
+  ],
   layoutPreset: 'executive-overview',
   containers: [], // calculated dynamically by layout presets
 };

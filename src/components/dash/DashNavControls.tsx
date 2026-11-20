@@ -9,13 +9,18 @@ import {
   Check,
   Compass,
 } from 'lucide-react';
-import { NavBarConfig, NavButtonConfig, getNavIconPath } from '../../core/dashTypes';
+import {
+  NavBarConfig,
+  NavButtonConfig,
+  NavButtonSection,
+  getNavIconPath,
+} from '../../core/dashTypes';
 import { IconPickerModal } from './IconPickerModal';
 
 interface DashNavControlsProps {
   navBar: NavBarConfig;
   onUpdateNavBar: (updates: Partial<NavBarConfig>) => void;
-  onAddButton: () => void;
+  onAddButton: (section?: NavButtonSection) => void;
   onRemoveButton: (id: string) => void;
   onUpdateButton: (id: string, updates: Partial<NavButtonConfig>) => void;
   onReorderButtons: (fromIndex: number, toIndex: number) => void;
@@ -58,6 +63,14 @@ export const DashNavControls: React.FC<DashNavControlsProps> = ({
   };
 
   const currentEditingButton = navBar.buttons.find((b) => b.id === editingIconBtnId);
+
+  const menuButtons = navBar.buttons
+    .map((btn, index) => ({ btn, index }))
+    .filter(({ btn }) => btn.section !== 'general');
+
+  const generalButtons = navBar.buttons
+    .map((btn, index) => ({ btn, index }))
+    .filter(({ btn }) => btn.section === 'general');
 
   return (
     <div className="space-y-6">
@@ -140,7 +153,7 @@ export const DashNavControls: React.FC<DashNavControlsProps> = ({
               </div>
               <input
                 type="range"
-                min={navBar.orientation === 'left' ? 140 : 55}
+                min={navBar.orientation === 'left' ? 150 : 55}
                 max={navBar.orientation === 'left' ? 280 : 120}
                 step={5}
                 value={navBar.size}
@@ -151,7 +164,6 @@ export const DashNavControls: React.FC<DashNavControlsProps> = ({
 
             {/* Colors Grid */}
             <div className="grid grid-cols-3 gap-2 pt-2 border-t-2 border-slate-100 dark:border-slate-800">
-              {/* Background Color */}
               <div className="space-y-1">
                 <label className="text-[10px] font-heading font-black text-slate-500 uppercase">
                   Background
@@ -169,7 +181,6 @@ export const DashNavControls: React.FC<DashNavControlsProps> = ({
                 </div>
               </div>
 
-              {/* Text / Icon Color */}
               <div className="space-y-1">
                 <label className="text-[10px] font-heading font-black text-slate-500 uppercase">
                   Text & Icon
@@ -187,7 +198,6 @@ export const DashNavControls: React.FC<DashNavControlsProps> = ({
                 </div>
               </div>
 
-              {/* Accent Color */}
               <div className="space-y-1">
                 <label className="text-[10px] font-heading font-black text-slate-500 uppercase">
                   Active Tab
@@ -276,38 +286,36 @@ export const DashNavControls: React.FC<DashNavControlsProps> = ({
             </div>
           </div>
 
-          {/* Navigation Buttons Manager */}
+          {/* Section 1: MENU Tabs */}
           <div className="pop-card bg-white dark:bg-slate-900 p-5 rounded-2xl border-2 border-[#1E293B] dark:border-slate-700 shadow-[3px_3px_0px_0px_#1E293B] space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <h4 className="text-sm font-heading font-black text-[#1E293B] dark:text-white">
-                  Navigation Tabs ({navBar.buttons.length})
+                  Menu Pages ({menuButtons.length})
                 </h4>
                 <p className="text-[11px] text-slate-500 font-medium">
-                  Configure page buttons and vector icons
+                  Primary report navigation buttons
                 </p>
               </div>
 
               <button
                 type="button"
-                onClick={onAddButton}
-                className="pop-btn inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-heading font-black bg-[#34D399] hover:bg-[#10B981] text-[#1E293B] border-2 border-[#1E293B] shadow-[2px_2px_0px_0px_#1E293B] cursor-pointer"
+                onClick={() => onAddButton('menu')}
+                className="pop-btn inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-heading font-black bg-[#8B5CF6] hover:bg-[#7C3AED] text-white border-2 border-[#1E293B] shadow-[2px_2px_0px_0px_#1E293B] cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5 stroke-[3]" />
-                <span>Add Tab</span>
+                <span>Add Menu Tab</span>
               </button>
             </div>
 
-            {/* Button List */}
             <div className="space-y-2">
-              {navBar.buttons.map((btn, idx) => {
+              {menuButtons.map(({ btn, index }) => {
                 const iconPath = getNavIconPath(btn.icon);
                 return (
                   <div
                     key={btn.id}
                     className="p-2 rounded-xl border-2 border-[#1E293B] dark:border-slate-700 bg-slate-50 dark:bg-slate-800 flex items-center gap-2"
                   >
-                    {/* Icon Selector Button */}
                     <button
                       type="button"
                       onClick={() => setEditingIconBtnId(btn.id)}
@@ -327,16 +335,14 @@ export const DashNavControls: React.FC<DashNavControlsProps> = ({
                       </svg>
                     </button>
 
-                    {/* Label Input */}
                     <input
                       type="text"
                       value={btn.label}
                       onChange={(e) => onUpdateButton(btn.id, { label: e.target.value })}
                       className="flex-1 min-w-0 px-2 py-1 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold text-[#1E293B] dark:text-white outline-none focus:border-[#8B5CF6]"
-                      placeholder="Tab label"
+                      placeholder="Page label"
                     />
 
-                    {/* Active Tab Toggle */}
                     <button
                       type="button"
                       onClick={() => {
@@ -354,12 +360,11 @@ export const DashNavControls: React.FC<DashNavControlsProps> = ({
                       <Check className="w-3.5 h-3.5 stroke-[3]" />
                     </button>
 
-                    {/* Reorder Buttons */}
                     <div className="flex items-center gap-0.5">
                       <button
                         type="button"
-                        disabled={idx === 0}
-                        onClick={() => onReorderButtons(idx, idx - 1)}
+                        disabled={index === 0}
+                        onClick={() => onReorderButtons(index, index - 1)}
                         className="p-1 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100 disabled:opacity-30 cursor-pointer"
                         title="Move Up"
                       >
@@ -367,8 +372,8 @@ export const DashNavControls: React.FC<DashNavControlsProps> = ({
                       </button>
                       <button
                         type="button"
-                        disabled={idx === navBar.buttons.length - 1}
-                        onClick={() => onReorderButtons(idx, idx + 1)}
+                        disabled={index === navBar.buttons.length - 1}
+                        onClick={() => onReorderButtons(index, index + 1)}
                         className="p-1 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100 disabled:opacity-30 cursor-pointer"
                         title="Move Down"
                       >
@@ -376,7 +381,115 @@ export const DashNavControls: React.FC<DashNavControlsProps> = ({
                       </button>
                     </div>
 
-                    {/* Delete Button */}
+                    <button
+                      type="button"
+                      onClick={() => onRemoveButton(btn.id)}
+                      className="p-1.5 rounded-lg border border-rose-300 bg-rose-50 dark:bg-rose-950/40 text-rose-600 hover:bg-rose-100 cursor-pointer flex-shrink-0"
+                      title="Delete Tab"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Section 2: GENERAL Tabs (Settings, Help, etc.) */}
+          <div className="pop-card bg-white dark:bg-slate-900 p-5 rounded-2xl border-2 border-[#1E293B] dark:border-slate-700 shadow-[3px_3px_0px_0px_#1E293B] space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="text-sm font-heading font-black text-[#1E293B] dark:text-white">
+                  General Section ({generalButtons.length})
+                </h4>
+                <p className="text-[11px] text-slate-500 font-medium">
+                  Settings, Help & utility buttons
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => onAddButton('general')}
+                className="pop-btn inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-heading font-black bg-[#34D399] hover:bg-[#10B981] text-[#1E293B] border-2 border-[#1E293B] shadow-[2px_2px_0px_0px_#1E293B] cursor-pointer"
+              >
+                <Plus className="w-3.5 h-3.5 stroke-[3]" />
+                <span>Add General Tab</span>
+              </button>
+            </div>
+
+            <div className="space-y-2">
+              {generalButtons.map(({ btn, index }) => {
+                const iconPath = getNavIconPath(btn.icon);
+                return (
+                  <div
+                    key={btn.id}
+                    className="p-2 rounded-xl border-2 border-[#1E293B] dark:border-slate-700 bg-slate-50 dark:bg-slate-800 flex items-center gap-2"
+                  >
+                    <button
+                      type="button"
+                      onClick={() => setEditingIconBtnId(btn.id)}
+                      className="p-1.5 rounded-lg border-2 border-[#1E293B] bg-white dark:bg-slate-900 text-[#1E293B] dark:text-white hover:bg-[#FBBF24] shadow-[1.5px_1.5px_0px_0px_#1E293B] cursor-pointer flex-shrink-0"
+                      title="Change Icon"
+                    >
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="w-4 h-4"
+                      >
+                        <path d={iconPath} />
+                      </svg>
+                    </button>
+
+                    <input
+                      type="text"
+                      value={btn.label}
+                      onChange={(e) => onUpdateButton(btn.id, { label: e.target.value })}
+                      className="flex-1 min-w-0 px-2 py-1 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold text-[#1E293B] dark:text-white outline-none focus:border-[#8B5CF6]"
+                      placeholder="Utility label"
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navBar.buttons.forEach((b) => {
+                          onUpdateButton(b.id, { isActive: b.id === btn.id });
+                        });
+                      }}
+                      className={`p-1.5 rounded-lg border border-[#1E293B] text-xs font-bold transition-all cursor-pointer flex-shrink-0 ${
+                        btn.isActive
+                          ? 'bg-[#8B5CF6] text-white'
+                          : 'bg-white dark:bg-slate-900 text-slate-400'
+                      }`}
+                      title={btn.isActive ? 'Active Tab' : 'Set as Active'}
+                    >
+                      <Check className="w-3.5 h-3.5 stroke-[3]" />
+                    </button>
+
+                    <div className="flex items-center gap-0.5">
+                      <button
+                        type="button"
+                        disabled={index === 0}
+                        onClick={() => onReorderButtons(index, index - 1)}
+                        className="p-1 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100 disabled:opacity-30 cursor-pointer"
+                        title="Move Up"
+                      >
+                        <ArrowUp className="w-3 h-3" />
+                      </button>
+                      <button
+                        type="button"
+                        disabled={index === navBar.buttons.length - 1}
+                        onClick={() => onReorderButtons(index, index + 1)}
+                        className="p-1 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100 disabled:opacity-30 cursor-pointer"
+                        title="Move Down"
+                      >
+                        <ArrowDown className="w-3 h-3" />
+                      </button>
+                    </div>
+
                     <button
                       type="button"
                       onClick={() => onRemoveButton(btn.id)}
