@@ -1,3 +1,5 @@
+export type AppPage = 'landing' | 'theme-generator' | 'dash-generator';
+
 export type RGB = [number, number, number];
 
 export interface ColorSwatch {
