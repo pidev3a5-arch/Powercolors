@@ -43,15 +43,15 @@ export const SchemaValidationCard: React.FC<SchemaValidationCardProps> = ({
   ];
 
   return (
-    <div className="rounded-2xl border-2 border-[#1E293B] dark:border-slate-700 p-5 bg-[#FFFDF5] dark:bg-slate-900 shadow-[4px_4px_0px_0px_#1E293B]">
+    <div className="rounded-2xl border-2 border-[#1E293B] dark:border-slate-700 p-4 sm:p-5 bg-[#FFFDF5] dark:bg-slate-900 shadow-[3px_3px_0px_0px_#1E293B] sm:shadow-[4px_4px_0px_0px_#1E293B]">
       {/* Header */}
-      <div className="flex items-center justify-between pb-3.5 border-b-2 border-dashed border-[#1E293B]/20 dark:border-slate-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-3.5 border-b-2 border-dashed border-[#1E293B]/20 dark:border-slate-800">
         <div>
-          <h4 className="text-sm font-heading font-extrabold text-[#1E293B] dark:text-white uppercase tracking-wider flex items-center gap-2">
+          <h4 className="text-xs sm:text-sm font-heading font-extrabold text-[#1E293B] dark:text-white uppercase tracking-wider flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-[#34D399] border border-[#1E293B]" />
             Official Schema Compliance
           </h4>
-          <p className="text-xs text-slate-600 dark:text-slate-400 font-medium mt-0.5">
+          <p className="text-[11px] sm:text-xs text-slate-600 dark:text-slate-400 font-medium mt-0.5">
             Guaranteed compatible with Microsoft Power BI Desktop 2024-2026
           </p>
         </div>
@@ -60,7 +60,7 @@ export const SchemaValidationCard: React.FC<SchemaValidationCardProps> = ({
           href="https://github.com/microsoft/powerbi-desktop-samples/tree/main/Report%20Theme%20JSON%20Schema"
           target="_blank"
           rel="noopener noreferrer"
-          className="pop-btn text-xs bg-white dark:bg-slate-800 text-[#8B5CF6] dark:text-[#A78BFA] px-3 py-1 rounded-full font-bold inline-flex items-center gap-1.5 transition-colors"
+          className="pop-btn self-start sm:self-auto text-xs bg-white dark:bg-slate-800 text-[#8B5CF6] dark:text-[#A78BFA] px-3 py-1 rounded-full font-bold inline-flex items-center gap-1.5 transition-colors"
         >
           <span>Official Schema</span>
           <ExternalLink className="w-3.5 h-3.5 stroke-[2.5]" />
