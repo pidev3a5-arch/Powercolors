@@ -70,12 +70,17 @@
 ---
 
 ### Phase 7: Dashboard SVG Canvas Builder (Dash Generator)
-**Status**: ⬜ Not Started  
+**Status**: 🟨 Planned  
 **Objective**: Build an interactive Power BI SVG Canvas Background Generator allowing report authors to configure canvas resolution, top/left navigation bar, logo, page navigation buttons with icon picker, visual card slots with titles/subtitles, and export a pixel-perfect .svg for Power BI page background.  
 **Depends on**: Phase 6  
 
-**Tasks**:
-- [ ] TBD (run /plan 7 to create)
+**Plans**:
+- [ ] **Plan 7.1**: Dash Generator Core State, Resolution & Navigation Bar Engine (`.gsd/phases/7/1-PLAN.md`)
+- [ ] **Plan 7.2**: Canvas Layout Presets & Visual Shapes Grid Builder (`.gsd/phases/7/2-PLAN.md`)
+- [ ] **Plan 7.3**: Real-Time Vector SVG Canvas Preview & 1-Click Power BI SVG Export (`.gsd/phases/7/3-PLAN.md`)
 
 **Verification**:
-- TBD  
+- Automated test suite passes (`npm test` including new `dashSvgExport.test.ts`)
+- Production build compiles cleanly (`npm run build`)
+- Visual verification across mobile and desktop viewports
+- Exported SVGs validate as well-formed XML and import cleanly in Power BI Desktop as canvas background  
