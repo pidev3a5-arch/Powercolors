@@ -43,8 +43,8 @@ export const ClusteredBarChart: React.FC<ClusteredBarChartProps> = ({
     color: string;
   } | null>(null);
 
-  const axisColor = isDarkCanvas ? '#475569' : '#CBD5E1';
-  const labelColor = isDarkCanvas ? '#94A3B8' : '#64748B';
+  const axisColor = isDarkCanvas ? '#334155' : '#CBD5E1';
+  const labelColor = isDarkCanvas ? '#94A3B8' : '#475569';
 
   const chartWidth = 500;
   const chartHeight = 220;
@@ -55,7 +55,7 @@ export const ClusteredBarChart: React.FC<ClusteredBarChartProps> = ({
 
   const maxValue = 1000;
   const groupWidth = innerWidth / CATEGORIES.length;
-  const barWidth = (groupWidth * 0.7) / SERIES.length;
+  const barWidth = (groupWidth * 0.72) / SERIES.length;
 
   return (
     <VisualContainer
@@ -64,18 +64,18 @@ export const ClusteredBarChart: React.FC<ClusteredBarChartProps> = ({
       isDarkCanvas={isDarkCanvas}
       fontFamily={fontFamily}
     >
-      <div className="flex flex-col h-full space-y-2" style={{ fontFamily }}>
+      <div className="flex flex-col h-full space-y-2.5" style={{ fontFamily }}>
         {/* Interactive Legend */}
         <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs">
           {SERIES.map((s) => {
-            const color = dataColors[s.colorIndex] || '#2563EB';
+            const color = dataColors[s.colorIndex] || '#8B5CF6';
             return (
               <div key={s.name} className="flex items-center space-x-1.5">
                 <span
-                  className="w-2.5 h-2.5 rounded-xs transition-colors"
+                  className="w-3 h-3 rounded-full border border-[#1E293B] shadow-[1px_1px_0px_0px_#1E293B]"
                   style={{ backgroundColor: color }}
                 />
-                <span className={`font-medium text-[11px] ${isDarkCanvas ? 'text-slate-300' : 'text-slate-600'}`} style={{ fontFamily }}>
+                <span className="font-heading font-bold text-[11px] text-slate-700 dark:text-slate-300">
                   {s.name}
                 </span>
               </div>
@@ -100,15 +100,16 @@ export const ClusteredBarChart: React.FC<ClusteredBarChartProps> = ({
                     x2={chartWidth - padding.right}
                     y2={y}
                     stroke={axisColor}
-                    strokeDasharray="3 3"
-                    strokeWidth="0.8"
-                    opacity={0.5}
+                    strokeDasharray="4 4"
+                    strokeWidth="1"
+                    opacity={0.8}
                   />
                   <text
                     x={padding.left - 6}
                     y={y + 3.5}
                     textAnchor="end"
                     fontSize="9"
+                    fontWeight="700"
                     fill={labelColor}
                     style={{ fontFamily }}
                   >
@@ -120,18 +121,18 @@ export const ClusteredBarChart: React.FC<ClusteredBarChartProps> = ({
 
             {/* Bars */}
             {CATEGORIES.map((cat, catIdx) => {
-              const groupX = padding.left + catIdx * groupWidth + (groupWidth * 0.15);
+              const groupX = padding.left + catIdx * groupWidth + (groupWidth * 0.14);
 
               return (
                 <g key={cat.category}>
                   {/* Category X-Axis Label */}
                   <text
-                    x={groupX + (groupWidth * 0.7) / 2}
+                    x={groupX + (groupWidth * 0.72) / 2}
                     y={chartHeight - 10}
                     textAnchor="middle"
-                    fontSize="10"
+                    fontSize="11"
                     fill={labelColor}
-                    fontWeight="600"
+                    fontWeight="800"
                     style={{ fontFamily }}
                   >
                     {cat.category}
@@ -142,7 +143,7 @@ export const ClusteredBarChart: React.FC<ClusteredBarChartProps> = ({
                     const barHeight = (val / maxValue) * innerHeight;
                     const barX = groupX + seriesIdx * barWidth;
                     const barY = padding.top + innerHeight - barHeight;
-                    const color = dataColors[seriesIdx] || '#2563EB';
+                    const color = dataColors[seriesIdx] || '#8B5CF6';
 
                     return (
                       <rect
@@ -151,9 +152,11 @@ export const ClusteredBarChart: React.FC<ClusteredBarChartProps> = ({
                         y={barY}
                         width={barWidth - 2}
                         height={barHeight}
-                        rx="2"
+                        rx="3"
                         fill={color}
-                        className="transition-all duration-300 hover:opacity-80 cursor-pointer"
+                        stroke="#1E293B"
+                        strokeWidth="1.5"
+                        className="transition-all duration-200 hover:brightness-110 cursor-pointer"
                         onMouseEnter={() =>
                           setHoveredPoint({
                             category: cat.category,
@@ -171,22 +174,18 @@ export const ClusteredBarChart: React.FC<ClusteredBarChartProps> = ({
             })}
           </svg>
 
-          {/* Interactive Tooltip Callout */}
+          {/* Tooltip Callout */}
           {hoveredPoint && (
             <div
               style={{ fontFamily }}
-              className={`absolute top-2 right-2 px-2.5 py-1.5 rounded-lg text-xs border shadow-lg backdrop-blur-md pointer-events-none transition-all ${
-                isDarkCanvas
-                  ? 'bg-slate-950/90 border-slate-700 text-white'
-                  : 'bg-white/95 border-slate-200 text-slate-800'
-              }`}
+              className="absolute top-2 right-2 px-3 py-2 rounded-xl text-xs border-2 border-[#1E293B] shadow-[3px_3px_0px_0px_#1E293B] bg-white dark:bg-slate-900 text-[#1E293B] dark:text-white pointer-events-none transition-all"
             >
-              <div className="flex items-center space-x-1.5 font-bold">
-                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: hoveredPoint.color }} />
+              <div className="flex items-center space-x-1.5 font-heading font-extrabold">
+                <span className="w-2.5 h-2.5 rounded-full border border-[#1E293B]" style={{ backgroundColor: hoveredPoint.color }} />
                 <span>{hoveredPoint.series}</span>
               </div>
-              <div className="text-[11px] opacity-75">
-                {hoveredPoint.category}: <span className="font-semibold">${hoveredPoint.value}k</span>
+              <div className="text-[11px] font-bold text-slate-600 dark:text-slate-400 mt-0.5">
+                {hoveredPoint.category}: <span className="font-extrabold text-[#8B5CF6]">${hoveredPoint.value}k</span>
               </div>
             </div>
           )}

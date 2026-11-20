@@ -20,7 +20,7 @@ export interface StructuralColors {
 }
 
 export interface TextClassStyle {
-  fontFamily: string;
+  fontFace: string;
   fontSize: number;
   color: string;
 }

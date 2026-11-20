@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sun, Moon, Sliders, Type, BoxSelect } from 'lucide-react';
+import { Sun, Moon, Sliders, BoxSelect } from 'lucide-react';
 import { StructuralColors, ThemeCustomizationOptions } from '../core/types';
 
 interface ThemeControlsProps {
@@ -35,56 +35,48 @@ export const ThemeControls: React.FC<ThemeControlsProps> = ({
   onUpdateStructuralColor,
   customizationOptions,
   onCustomizationOptionsChange,
-  isDarkSite,
+  isDarkSite: _isDarkSite,
 }) => {
-  const cardBgClass = isDarkSite
-    ? 'bg-slate-900 border-slate-800 text-slate-100 shadow-md'
-    : 'bg-white border-slate-200 text-slate-900 shadow-xs';
-
-  const inputBgClass = isDarkSite
-    ? 'bg-slate-950 border-slate-800 text-white'
-    : 'bg-slate-50 border-slate-300 text-slate-900';
-
-  const subtextClass = isDarkSite ? 'text-slate-400' : 'text-slate-500';
-
   return (
-    <div className={`w-full border rounded-2xl p-5 transition-all space-y-4 ${cardBgClass}`}>
-      {/* Top Row: Theme Name & Canvas Background Mode */}
+    <div className="w-full border-2 border-[#1E293B] dark:border-slate-700 rounded-3xl p-5 sm:p-7 bg-white dark:bg-slate-900 shadow-[6px_6px_0px_0px_#1E293B] dark:shadow-[6px_6px_0px_0px_#020617] space-y-6">
+      {/* Top Header & Numbered Badge */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         {/* Theme Name Input */}
-        <div className="flex-1 space-y-1">
-          <label className={`text-xs font-semibold flex items-center gap-1.5 ${isDarkSite ? 'text-slate-200' : 'text-slate-700'}`}>
-            <Type className="w-3.5 h-3.5 text-amber-500" />
+        <div className="flex-1 space-y-2">
+          <label className="text-xs font-heading font-extrabold flex items-center gap-2 text-[#1E293B] dark:text-white uppercase tracking-wider">
+            <span className="w-5 h-5 rounded-full bg-[#8B5CF6] text-white flex items-center justify-center text-[10px] font-black border border-[#1E293B]">
+              T
+            </span>
             <span>Theme Name</span>
           </label>
           <input
             type="text"
             value={themeName}
             onChange={(e) => onThemeNameChange(e.target.value)}
-            placeholder="e.g. Contoso Brand Theme"
-            className={`w-full font-medium text-sm px-3.5 py-2 rounded-xl border focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition-colors ${inputBgClass}`}
+            placeholder="e.g. Playful Pop Theme"
+            className="w-full font-heading font-bold text-sm px-4 py-2.5 rounded-2xl border-2 border-[#1E293B] dark:border-slate-700 bg-[#FFFDF5] dark:bg-slate-950 text-[#1E293B] dark:text-white outline-none focus:border-[#8B5CF6] focus:shadow-[3px_3px_0px_0px_#8B5CF6] transition-all"
           />
         </div>
 
         {/* Canvas Background Mode Switcher */}
-        <div className="space-y-1">
-          <span className={`text-xs font-semibold flex items-center gap-1.5 ${isDarkSite ? 'text-slate-200' : 'text-slate-700'}`}>
-            <Sliders className="w-3.5 h-3.5 text-amber-500" />
-            <span>Report Canvas Background</span>
+        <div className="space-y-2">
+          <span className="text-xs font-heading font-extrabold flex items-center gap-2 text-[#1E293B] dark:text-white uppercase tracking-wider">
+            <Sliders className="w-3.5 h-3.5 text-[#F472B6] stroke-[2.5]" />
+            <span>Power BI Canvas Mode</span>
           </span>
-          <div className={`inline-flex p-1 rounded-xl border ${inputBgClass}`}>
+          <div className="inline-flex p-1 rounded-2xl border-2 border-[#1E293B] dark:border-slate-700 bg-[#FFFDF5] dark:bg-slate-950 shadow-[2px_2px_0px_0px_#1E293B]">
             <button
               type="button"
               onClick={() => {
                 if (isDarkCanvas) onToggleCanvasMode();
               }}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition-all cursor-pointer ${
                 !isDarkCanvas
-                  ? 'bg-amber-500 text-slate-950 font-bold shadow-xs'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-[#FBBF24] text-[#1E293B] border-2 border-[#1E293B] shadow-[2px_2px_0px_0px_#1E293B]'
+                  : 'text-slate-500 hover:text-[#1E293B] dark:hover:text-white'
               }`}
             >
-              <Sun className="w-3.5 h-3.5" />
+              <Sun className="w-4 h-4 stroke-[2.5]" />
               <span>Light Canvas</span>
             </button>
             <button
@@ -92,38 +84,36 @@ export const ThemeControls: React.FC<ThemeControlsProps> = ({
               onClick={() => {
                 if (!isDarkCanvas) onToggleCanvasMode();
               }}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition-all cursor-pointer ${
                 isDarkCanvas
-                  ? 'bg-slate-800 text-white font-bold shadow-xs'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-[#8B5CF6] text-white border-2 border-[#1E293B] shadow-[2px_2px_0px_0px_#1E293B]'
+                  : 'text-slate-500 hover:text-[#1E293B] dark:hover:text-white'
               }`}
             >
-              <Moon className="w-3.5 h-3.5" />
+              <Moon className="w-4 h-4 stroke-[2.5]" />
               <span>Dark Canvas</span>
             </button>
           </div>
         </div>
       </div>
 
-      {/* Middle Row: Typography & Visual Container Options */}
-      <div className={`pt-3 border-t grid grid-cols-1 md:grid-cols-2 gap-4 ${isDarkSite ? 'border-slate-800' : 'border-slate-100'}`}>
+      {/* Middle Row: Typography Chips & Visual Container Options */}
+      <div className="pt-4 border-t-2 border-dashed border-slate-200 dark:border-slate-800 grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Font Selection */}
-        <div className="space-y-1.5">
-          <span className={`text-xs font-semibold flex items-center gap-1.5 ${isDarkSite ? 'text-slate-300' : 'text-slate-700'}`}>
-            <span>Power BI Font Family:</span>
+        <div className="space-y-2">
+          <span className="text-xs font-heading font-extrabold text-[#1E293B] dark:text-white flex items-center gap-2 uppercase tracking-wider">
+            <span>Power BI Font Family</span>
           </span>
-          <div className="flex flex-wrap items-center gap-1.5">
+          <div className="flex flex-wrap items-center gap-2">
             {FONT_OPTIONS.map((font) => (
               <button
                 key={font}
                 type="button"
                 onClick={() => onCustomizationOptionsChange({ ...customizationOptions, fontFamily: font })}
-                className={`px-2.5 py-1 rounded-lg text-xs font-medium border transition-all cursor-pointer ${
+                className={`pop-btn px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ${
                   customizationOptions.fontFamily === font
-                    ? 'bg-amber-500 text-slate-950 font-bold border-amber-500 shadow-xs'
-                    : isDarkSite
-                    ? 'bg-slate-950 text-slate-300 border-slate-800 hover:border-slate-700'
-                    : 'bg-slate-100 text-slate-700 border-slate-200 hover:border-slate-300'
+                    ? 'bg-[#8B5CF6] text-white border-2 border-[#1E293B] shadow-[3px_3px_0px_0px_#1E293B]'
+                    : 'bg-[#FFFDF5] dark:bg-slate-950 text-[#1E293B] dark:text-slate-300 hover:bg-[#FBBF24] hover:text-[#1E293B]'
                 }`}
                 style={{ fontFamily: font }}
               >
@@ -134,67 +124,69 @@ export const ThemeControls: React.FC<ThemeControlsProps> = ({
         </div>
 
         {/* Container Borders & Shadow Options */}
-        <div className="space-y-1.5">
-          <span className={`text-xs font-semibold flex items-center gap-1.5 ${isDarkSite ? 'text-slate-300' : 'text-slate-700'}`}>
-            <BoxSelect className="w-3.5 h-3.5 text-amber-500" />
-            <span>Visual Container Defaults:</span>
+        <div className="space-y-2">
+          <span className="text-xs font-heading font-extrabold text-[#1E293B] dark:text-white flex items-center gap-2 uppercase tracking-wider">
+            <BoxSelect className="w-3.5 h-3.5 text-[#34D399] stroke-[2.5]" />
+            <span>Visual Container Options</span>
           </span>
-          <div className="flex items-center space-x-4 text-xs pt-1">
-            <label className={`inline-flex items-center space-x-2 cursor-pointer font-medium ${isDarkSite ? 'text-slate-300' : 'text-slate-700'}`}>
+          <div className="flex items-center space-x-6 text-xs pt-1.5">
+            <label className="inline-flex items-center space-x-2.5 cursor-pointer font-bold text-[#1E293B] dark:text-slate-200 select-none">
               <input
                 type="checkbox"
                 checked={customizationOptions.showVisualBorders}
                 onChange={(e) => onCustomizationOptionsChange({ ...customizationOptions, showVisualBorders: e.target.checked })}
-                className="rounded accent-amber-500 w-4 h-4 cursor-pointer"
+                className="w-4 h-4 rounded-md border-2 border-[#1E293B] accent-[#8B5CF6] cursor-pointer"
               />
               <span>Container Borders</span>
             </label>
 
-            <label className={`inline-flex items-center space-x-2 cursor-pointer font-medium ${isDarkSite ? 'text-slate-300' : 'text-slate-700'}`}>
+            <label className="inline-flex items-center space-x-2.5 cursor-pointer font-bold text-[#1E293B] dark:text-slate-200 select-none">
               <input
                 type="checkbox"
                 checked={customizationOptions.showVisualDropShadow}
                 onChange={(e) => onCustomizationOptionsChange({ ...customizationOptions, showVisualDropShadow: e.target.checked })}
-                className="rounded accent-amber-500 w-4 h-4 cursor-pointer"
+                className="w-4 h-4 rounded-md border-2 border-[#1E293B] accent-[#8B5CF6] cursor-pointer"
               />
-              <span>Drop Shadow</span>
+              <span>Drop Shadows</span>
             </label>
           </div>
         </div>
       </div>
 
       {/* Bottom Row: Structural Colors Preview Pills */}
-      <div className={`pt-3 border-t flex flex-wrap items-center gap-3 ${isDarkSite ? 'border-slate-800' : 'border-slate-100'}`}>
-        <span className={`text-xs font-semibold ${subtextClass}`}>Theme Structural Colors:</span>
+      <div className="pt-4 border-t-2 border-dashed border-slate-200 dark:border-slate-800 flex flex-wrap items-center gap-3">
+        <span className="text-xs font-heading font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+          Structural Styles:
+        </span>
 
         {/* Canvas Background */}
-        <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs ${inputBgClass}`}>
+        <div className="flex items-center gap-2 px-3 py-1 rounded-full border-2 border-[#1E293B] dark:border-slate-700 bg-[#FFFDF5] dark:bg-slate-950 text-xs shadow-[2px_2px_0px_0px_#1E293B]">
           <span
-            className="w-3.5 h-3.5 rounded-full border border-black/10 shadow-xs"
+            className="w-3.5 h-3.5 rounded-full border border-[#1E293B]"
             style={{ backgroundColor: structural.background }}
           />
-          <span className={subtextClass}>Canvas:</span>
-          <span className="font-mono font-medium">{structural.background}</span>
+          <span className="text-slate-500 font-bold">Canvas:</span>
+          <span className="font-mono font-extrabold">{structural.background}</span>
         </div>
 
         {/* Foreground / Text */}
-        <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs ${inputBgClass}`}>
+        <div className="flex items-center gap-2 px-3 py-1 rounded-full border-2 border-[#1E293B] dark:border-slate-700 bg-[#FFFDF5] dark:bg-slate-950 text-xs shadow-[2px_2px_0px_0px_#1E293B]">
           <span
-            className="w-3.5 h-3.5 rounded-full border border-black/10 shadow-xs"
+            className="w-3.5 h-3.5 rounded-full border border-[#1E293B]"
             style={{ backgroundColor: structural.foreground }}
           />
-          <span className={subtextClass}>Text:</span>
-          <span className="font-mono font-medium">{structural.foreground}</span>
+          <span className="text-slate-500 font-bold">Text:</span>
+          <span className="font-mono font-extrabold">{structural.foreground}</span>
         </div>
 
         {/* Table Accent */}
-        <label className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs cursor-pointer transition-colors ${inputBgClass} hover:border-amber-500`}>
+        <label className="pop-btn flex items-center gap-2 px-3 py-1 rounded-full bg-[#FFFDF5] dark:bg-slate-950 text-xs cursor-pointer hover:bg-[#FBBF24] hover:text-[#1E293B]">
           <span
-            className="w-3.5 h-3.5 rounded-full border border-black/10 shadow-xs"
+            className="w-3.5 h-3.5 rounded-full border border-[#1E293B]"
             style={{ backgroundColor: structural.tableAccent }}
           />
-          <span className={subtextClass}>Table Accent:</span>
-          <span className="font-mono font-medium">{structural.tableAccent}</span>
+          <span className="text-slate-500 font-bold">Table Accent:</span>
+          <span className="font-mono font-extrabold">{structural.tableAccent}</span>
           <input
             type="color"
             value={structural.tableAccent}
@@ -204,16 +196,16 @@ export const ThemeControls: React.FC<ThemeControlsProps> = ({
         </label>
 
         {/* KPI Status Badges */}
-        <div className={`flex items-center gap-2 text-xs ml-auto ${subtextClass}`}>
-          <span className="font-medium">KPI Statuses:</span>
-          <span className="inline-flex items-center gap-1 font-mono text-[11px]">
-            <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: structural.good }} /> Good
+        <div className="flex items-center gap-3 text-xs ml-auto">
+          <span className="font-heading font-extrabold text-slate-500 dark:text-slate-400">KPI Status:</span>
+          <span className="inline-flex items-center gap-1.5 font-mono text-xs font-bold">
+            <span className="w-3 h-3 rounded-full border border-[#1E293B]" style={{ backgroundColor: structural.good }} /> Good
           </span>
-          <span className="inline-flex items-center gap-1 font-mono text-[11px]">
-            <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: structural.neutral }} /> Neutral
+          <span className="inline-flex items-center gap-1.5 font-mono text-xs font-bold">
+            <span className="w-3 h-3 rounded-full border border-[#1E293B]" style={{ backgroundColor: structural.neutral }} /> Neutral
           </span>
-          <span className="inline-flex items-center gap-1 font-mono text-[11px]">
-            <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: structural.bad }} /> Bad
+          <span className="inline-flex items-center gap-1.5 font-mono text-xs font-bold">
+            <span className="w-3 h-3 rounded-full border border-[#1E293B]" style={{ backgroundColor: structural.bad }} /> Bad
           </span>
         </div>
       </div>

@@ -18,11 +18,11 @@ export const LineTrendChart: React.FC<LineTrendChartProps> = ({
 }) => {
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
 
-  const seriesColor1 = dataColors[0] || '#2563EB';
-  const seriesColor2 = dataColors[4] || dataColors[1] || '#D97706';
+  const seriesColor1 = dataColors[0] || '#8B5CF6';
+  const seriesColor2 = dataColors[4] || dataColors[1] || '#FBBF24';
 
-  const axisColor = isDarkCanvas ? '#475569' : '#CBD5E1';
-  const labelColor = isDarkCanvas ? '#94A3B8' : '#64748B';
+  const axisColor = isDarkCanvas ? '#334155' : '#CBD5E1';
+  const labelColor = isDarkCanvas ? '#94A3B8' : '#475569';
 
   const chartWidth = 500;
   const chartHeight = 220;
@@ -61,18 +61,18 @@ export const LineTrendChart: React.FC<LineTrendChartProps> = ({
       isDarkCanvas={isDarkCanvas}
       fontFamily={fontFamily}
     >
-      <div className="flex flex-col h-full space-y-2" style={{ fontFamily }}>
+      <div className="flex flex-col h-full space-y-2.5" style={{ fontFamily }}>
         {/* Legend */}
         <div className="flex items-center justify-center space-x-6 text-xs">
-          <div className="flex items-center space-x-1.5">
-            <span className="w-3.5 h-1 rounded-full" style={{ backgroundColor: seriesColor1 }} />
-            <span className={`font-medium text-[11px] ${isDarkCanvas ? 'text-slate-300' : 'text-slate-600'}`} style={{ fontFamily }}>
+          <div className="flex items-center space-x-2">
+            <span className="w-3.5 h-1.5 rounded-full border border-[#1E293B]" style={{ backgroundColor: seriesColor1 }} />
+            <span className="font-heading font-bold text-[11px] text-slate-700 dark:text-slate-300">
               2026 Actuals
             </span>
           </div>
-          <div className="flex items-center space-x-1.5">
-            <span className="w-3.5 h-1 border-t-2 border-dashed" style={{ borderColor: seriesColor2 }} />
-            <span className={`font-medium text-[11px] ${isDarkCanvas ? 'text-slate-300' : 'text-slate-600'}`} style={{ fontFamily }}>
+          <div className="flex items-center space-x-2">
+            <span className="w-3.5 h-1.5 border-t-2 border-dashed border-[#1E293B]" style={{ borderColor: seriesColor2 }} />
+            <span className="font-heading font-bold text-[11px] text-slate-700 dark:text-slate-300">
               2025 Benchmark
             </span>
           </div>
@@ -85,7 +85,7 @@ export const LineTrendChart: React.FC<LineTrendChartProps> = ({
             className="w-full h-auto max-h-[220px] overflow-visible"
           >
             <defs>
-              <linearGradient id="actualsGrad" x1="0" y1="0" x2="0" y2="1">
+              <linearGradient id="actualsGradPlayful" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor={seriesColor1} stopOpacity="0.25" />
                 <stop offset="100%" stopColor={seriesColor1} stopOpacity="0.0" />
               </linearGradient>
@@ -102,15 +102,16 @@ export const LineTrendChart: React.FC<LineTrendChartProps> = ({
                     x2={chartWidth - padding.right}
                     y2={y}
                     stroke={axisColor}
-                    strokeDasharray="3 3"
-                    strokeWidth="0.8"
-                    opacity={0.5}
+                    strokeDasharray="4 4"
+                    strokeWidth="1"
+                    opacity={0.8}
                   />
                   <text
                     x={padding.left - 6}
                     y={y + 3.5}
                     textAnchor="end"
                     fontSize="9"
+                    fontWeight="700"
                     fill={labelColor}
                     style={{ fontFamily }}
                   >
@@ -121,15 +122,15 @@ export const LineTrendChart: React.FC<LineTrendChartProps> = ({
             })}
 
             {/* Area Fill for Actuals */}
-            <path d={areaActuals} fill="url(#actualsGrad)" />
+            <path d={areaActuals} fill="url(#actualsGradPlayful)" />
 
             {/* Benchmark Line (Dashed) */}
             <path
               d={pathBenchmark}
               fill="none"
               stroke={seriesColor2}
-              strokeWidth="2"
-              strokeDasharray="4 4"
+              strokeWidth="2.5"
+              strokeDasharray="5 5"
             />
 
             {/* Actuals Line (Solid) */}
@@ -137,11 +138,11 @@ export const LineTrendChart: React.FC<LineTrendChartProps> = ({
               d={pathActuals}
               fill="none"
               stroke={seriesColor1}
-              strokeWidth="2.5"
+              strokeWidth="3.5"
               strokeLinecap="round"
             />
 
-            {/* Data Points & X-Labels */}
+            {/* Data Points */}
             {MONTHS.map((month, idx) => {
               const x = getX(idx);
               const yActual = getY(ACTUALS[idx]);
@@ -157,9 +158,9 @@ export const LineTrendChart: React.FC<LineTrendChartProps> = ({
                       y1={padding.top}
                       x2={x}
                       y2={padding.top + innerHeight}
-                      stroke={axisColor}
-                      strokeWidth="1"
-                      strokeDasharray="2 2"
+                      stroke="#1E293B"
+                      strokeWidth="1.5"
+                      strokeDasharray="3 3"
                     />
                   )}
 
@@ -167,8 +168,10 @@ export const LineTrendChart: React.FC<LineTrendChartProps> = ({
                   <circle
                     cx={x}
                     cy={yBench}
-                    r={isHovered ? 4.5 : 3}
+                    r={isHovered ? 5 : 3.5}
                     fill={seriesColor2}
+                    stroke="#1E293B"
+                    strokeWidth="1.5"
                     className="transition-all"
                   />
 
@@ -176,11 +179,11 @@ export const LineTrendChart: React.FC<LineTrendChartProps> = ({
                   <circle
                     cx={x}
                     cy={yActual}
-                    r={isHovered ? 5.5 : 3.5}
+                    r={isHovered ? 6.5 : 4.5}
                     fill={seriesColor1}
-                    stroke={isDarkCanvas ? '#0F172A' : '#FFFFFF'}
-                    strokeWidth="1.5"
-                    className="transition-all cursor-pointer"
+                    stroke="#1E293B"
+                    strokeWidth="2"
+                    className="transition-all cursor-pointer shadow-xs"
                   />
 
                   {/* X Axis Label */}
@@ -188,9 +191,9 @@ export const LineTrendChart: React.FC<LineTrendChartProps> = ({
                     x={x}
                     y={chartHeight - 10}
                     textAnchor="middle"
-                    fontSize="10"
+                    fontSize="11"
                     fill={labelColor}
-                    fontWeight={isHovered ? 'bold' : 'normal'}
+                    fontWeight="800"
                     style={{ fontFamily }}
                   >
                     {month}
@@ -200,28 +203,24 @@ export const LineTrendChart: React.FC<LineTrendChartProps> = ({
             })}
           </svg>
 
-          {/* Interactive Tooltip Callout */}
+          {/* Tooltip */}
           {hoveredIdx !== null && (
             <div
               style={{ fontFamily }}
-              className={`absolute top-2 right-2 px-2.5 py-1.5 rounded-lg text-xs border shadow-lg backdrop-blur-md pointer-events-none transition-all ${
-                isDarkCanvas
-                  ? 'bg-slate-950/90 border-slate-700 text-white'
-                  : 'bg-white/95 border-slate-200 text-slate-800'
-              }`}
+              className="absolute top-2 right-2 px-3 py-2 rounded-xl text-xs border-2 border-[#1E293B] shadow-[3px_3px_0px_0px_#1E293B] bg-white dark:bg-slate-900 text-[#1E293B] dark:text-white pointer-events-none transition-all"
             >
-              <div className="font-bold border-b border-slate-700/40 pb-1 mb-1">
-                {MONTHS[hoveredIdx]} Performance
+              <div className="font-heading font-extrabold border-b border-slate-200 dark:border-slate-800 pb-1 mb-1">
+                {MONTHS[hoveredIdx]} Metrics
               </div>
-              <div className="flex items-center space-x-2 text-[11px]">
-                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: seriesColor1 }} />
+              <div className="flex items-center space-x-2 text-[11px] font-bold">
+                <span className="w-2.5 h-2.5 rounded-full border border-[#1E293B]" style={{ backgroundColor: seriesColor1 }} />
                 <span>Actuals:</span>
-                <span className="font-bold">${ACTUALS[hoveredIdx]}k</span>
+                <span className="font-extrabold text-[#8B5CF6]">${ACTUALS[hoveredIdx]}k</span>
               </div>
-              <div className="flex items-center space-x-2 text-[11px] opacity-80">
-                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: seriesColor2 }} />
+              <div className="flex items-center space-x-2 text-[11px] font-bold text-slate-500">
+                <span className="w-2.5 h-2.5 rounded-full border border-[#1E293B]" style={{ backgroundColor: seriesColor2 }} />
                 <span>Benchmark:</span>
-                <span className="font-semibold">${BENCHMARK[hoveredIdx]}k</span>
+                <span>${BENCHMARK[hoveredIdx]}k</span>
               </div>
             </div>
           )}

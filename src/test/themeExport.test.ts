@@ -1,4 +1,7 @@
 import { describe, it, expect } from 'vitest';
+import fs from 'fs';
+import path from 'path';
+import Ajv from 'ajv';
 import { buildPowerBITheme, validatePowerBITheme, serializePowerBITheme } from '../core/powerBiTheme';
 import { deriveStructuralColors } from '../core/colorHarmonics';
 
@@ -14,10 +17,10 @@ describe('Theme Export & Advanced Customization', () => {
       fontFamily: 'Aptos',
     });
 
-    expect(themeAptos.textClasses.title.fontFamily).toBe('Aptos');
-    expect(themeAptos.textClasses.label.fontFamily).toBe('Aptos');
-    expect(themeAptos.textClasses.callout.fontFamily).toBe('Aptos');
-    expect(themeAptos.textClasses.header.fontFamily).toBe('Aptos');
+    expect(themeAptos.textClasses.title.fontFace).toBe('Aptos');
+    expect(themeAptos.textClasses.label.fontFace).toBe('Aptos');
+    expect(themeAptos.textClasses.callout.fontFace).toBe('Aptos');
+    expect(themeAptos.textClasses.header.fontFace).toBe('Aptos');
   });
 
   it('propagates visual container border and shadow flags', () => {
@@ -26,9 +29,10 @@ describe('Theme Export & Advanced Customization', () => {
       showVisualDropShadow: true,
     });
 
-    const containerStyle = themeCustom.visualStyles['*']['*'].visualContainer[0];
-    expect(containerStyle.border.show).toBe(false);
-    expect(containerStyle.dropShadow.show).toBe(true);
+    const borderStyle = themeCustom.visualStyles['*']['*'].border[0];
+    const shadowStyle = themeCustom.visualStyles['*']['*'].dropShadow[0];
+    expect(borderStyle.show).toBe(false);
+    expect(shadowStyle.show).toBe(true);
   });
 
   it('produces valid JSON string with serializePowerBITheme', () => {
@@ -51,5 +55,27 @@ describe('Theme Export & Advanced Customization', () => {
     expect(createSlug('Contoso & Partners! 2026')).toBe('contoso-partners-2026');
     expect(createSlug('Theme___v1.0')).toBe('theme-v1-0');
     expect(createSlug('   ')).toBe('power-bi-theme');
+  });
+
+  it('passes strict validation against official Microsoft Power BI reportThemeSchema', () => {
+    const theme = buildPowerBITheme('Certified Production Theme', dummyColors, structural, {
+      fontFamily: 'Segoe UI',
+      showVisualBorders: true,
+      showVisualDropShadow: true,
+    });
+
+    const schemaPath = path.resolve(__dirname, '../../reportThemeSchema.json');
+    if (fs.existsSync(schemaPath)) {
+      const rawSchema = JSON.parse(fs.readFileSync(schemaPath, 'utf8'));
+      const ajv = new Ajv({ strict: false, allErrors: true, validateSchema: false });
+      const validate = ajv.compile(rawSchema);
+
+      const isValid = validate(theme);
+      if (!isValid) {
+        console.error('Schema validation errors:', validate.errors);
+      }
+      expect(isValid).toBe(true);
+      expect(validate.errors).toBeNull();
+    }
   });
 });

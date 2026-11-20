@@ -27,3 +27,6 @@ dist-ssr
 *.tsbuildinfo
 .tmp/
 .vercel
+shots/
+.taste-skill/
+.agents/

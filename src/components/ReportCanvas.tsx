@@ -52,48 +52,50 @@ export const ReportCanvas: React.FC<ReportCanvasProps> = ({
   const fontCss = getFontFamilyCss(fontFamily);
 
   return (
-    <div className="w-full space-y-3">
+    <div className="w-full space-y-4">
       {/* Canvas Header & View Switcher */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center space-x-2">
-            <MonitorPlay className="w-4 h-4 text-[#EC9700]" />
-            <h2 className="text-base font-bold tracking-tight">
-              Live Power BI Report Canvas
+          <div className="flex items-center space-x-3">
+            <span className="w-7 h-7 rounded-full bg-[#34D399] text-[#1E293B] border-2 border-[#1E293B] flex items-center justify-center font-heading font-extrabold text-sm shadow-[2px_2px_0px_0px_#1E293B]">
+              2
+            </span>
+            <h2 className="text-xl sm:text-2xl font-heading font-extrabold text-[#1E293B] dark:text-white tracking-tight">
+              Live Power BI Canvas
             </h2>
-            <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-[11px] font-mono text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+            <span className="px-3 py-0.5 rounded-full bg-[#F472B6] text-white font-mono font-bold text-xs border-2 border-[#1E293B] shadow-[2px_2px_0px_0px_#1E293B]">
               Font: {fontFamily}
             </span>
           </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Real-time preview of Power BI visuals dynamically formatted with your custom 10-color palette, structural styles, and typography.
+          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium mt-1 pl-10">
+            Real-time interactive dashboard rendered with your custom 10-color palette, structural styles, and typography.
           </p>
         </div>
 
         {/* View Mode Toggle */}
-        <div className="inline-flex p-1 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 self-start sm:self-auto">
+        <div className="inline-flex p-1 rounded-2xl border-2 border-[#1E293B] dark:border-slate-700 bg-white dark:bg-slate-900 shadow-[3px_3px_0px_0px_#1E293B] pl-10 sm:pl-1">
           <button
             type="button"
             onClick={() => setAspectRatioMode('fluid')}
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-heading font-extrabold transition-all cursor-pointer ${
               aspectRatioMode === 'fluid'
-                ? 'bg-amber-500 text-slate-950 font-bold shadow-xs'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                ? 'bg-[#FBBF24] text-[#1E293B] border-2 border-[#1E293B] shadow-[2px_2px_0px_0px_#1E293B]'
+                : 'text-slate-600 dark:text-slate-400 hover:text-[#1E293B] dark:hover:text-white'
             }`}
           >
-            <LayoutGrid className="w-3.5 h-3.5" />
+            <LayoutGrid className="w-3.5 h-3.5 stroke-[2.5]" />
             <span>Responsive Grid</span>
           </button>
           <button
             type="button"
             onClick={() => setAspectRatioMode('16-9')}
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-heading font-extrabold transition-all cursor-pointer ${
               aspectRatioMode === '16-9'
-                ? 'bg-amber-500 text-slate-950 font-bold shadow-xs'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                ? 'bg-[#FBBF24] text-[#1E293B] border-2 border-[#1E293B] shadow-[2px_2px_0px_0px_#1E293B]'
+                : 'text-slate-600 dark:text-slate-400 hover:text-[#1E293B] dark:hover:text-white'
             }`}
           >
-            <MonitorPlay className="w-3.5 h-3.5" />
+            <MonitorPlay className="w-3.5 h-3.5 stroke-[2.5]" />
             <span>16:9 Desktop View</span>
           </button>
         </div>
@@ -102,57 +104,51 @@ export const ReportCanvas: React.FC<ReportCanvasProps> = ({
       {/* Power BI Canvas Frame */}
       <div
         style={{ fontFamily: fontCss }}
-        className={`w-full rounded-2xl border transition-all duration-300 overflow-hidden shadow-xl ${
+        className={`w-full rounded-3xl border-2 border-[#1E293B] dark:border-slate-700 transition-all duration-300 overflow-hidden shadow-[6px_6px_0px_0px_#1E293B] dark:shadow-[6px_6px_0px_0px_#020617] ${
           isDarkCanvas
-            ? 'border-slate-800 bg-[#0F172A] text-slate-100'
-            : 'border-slate-200 bg-[#FFFFFF] text-slate-900'
+            ? 'bg-[#0F172A] text-slate-100'
+            : 'bg-[#FFFFFF] text-slate-900'
         } ${
           aspectRatioMode === '16-9' ? 'aspect-[16/10] overflow-y-auto' : ''
         }`}
       >
-        {/* Power BI Report Ribbon / Page Bar */}
-        <div className={`px-4 sm:px-6 py-3 border-b flex flex-wrap items-center justify-between gap-3 ${
-          isDarkCanvas ? 'border-slate-800/80 bg-slate-950/40' : 'border-slate-100 bg-slate-50/70'
+        {/* Ribbon Bar */}
+        <div className={`px-5 sm:px-7 py-3.5 border-b-2 border-[#1E293B] dark:border-slate-800 flex flex-wrap items-center justify-between gap-3 ${
+          isDarkCanvas ? 'bg-slate-950/60' : 'bg-[#FFFDF5]'
         }`}>
           <div className="flex items-center space-x-3">
             <div
-              className="w-2.5 h-5 rounded-xs"
+              className="w-3 h-6 rounded-md border-2 border-[#1E293B] shadow-[1px_1px_0px_0px_#1E293B]"
               style={{ backgroundColor: structural.tableAccent }}
             />
             <div>
               <h1
                 style={{ fontFamily: fontCss }}
-                className={`text-sm font-bold tracking-tight ${
-                  isDarkCanvas ? 'text-white' : 'text-slate-900'
+                className={`text-sm sm:text-base font-heading font-black tracking-tight ${
+                  isDarkCanvas ? 'text-white' : 'text-[#1E293B]'
                 }`}
               >
                 {themeName} — Executive Dashboard
               </h1>
               <div className="flex items-center gap-2 mt-0.5">
-                <span className={`text-[10px] font-medium flex items-center gap-1 ${
-                  isDarkCanvas ? 'text-slate-400' : 'text-slate-500'
-                }`}>
-                  <Layers className="w-3 h-3 text-slate-400" />
+                <span className="text-[11px] font-bold text-slate-500 flex items-center gap-1">
+                  <Layers className="w-3.5 h-3.5 stroke-[2.5]" />
                   <span>Page 1 of 1</span>
                 </span>
                 <span className="text-[10px] text-slate-400">•</span>
-                <span className={`text-[10px] font-mono ${isDarkCanvas ? 'text-slate-400' : 'text-slate-500'}`}>
+                <span className="text-[11px] font-mono font-bold text-slate-500">
                   Auto-refresh: 15m
                 </span>
               </div>
             </div>
           </div>
 
-          {/* Quick Filter Breadcrumbs / Slicers */}
-          <div className="flex items-center space-x-2 text-[11px]">
-            <span className={`px-2.5 py-1 rounded-md border font-medium ${
-              isDarkCanvas ? 'bg-slate-900 border-slate-800 text-slate-300' : 'bg-white border-slate-200 text-slate-700'
-            }`}>
+          {/* Quick Filter Slicers */}
+          <div className="flex items-center space-x-2 text-xs">
+            <span className="px-3 py-1 rounded-full border-2 border-[#1E293B] bg-white dark:bg-slate-900 text-[#1E293B] dark:text-white font-bold shadow-[2px_2px_0px_0px_#1E293B]">
               Fiscal Year: <strong>2026</strong>
             </span>
-            <span className={`px-2.5 py-1 rounded-md border font-medium hidden sm:inline ${
-              isDarkCanvas ? 'bg-slate-900 border-slate-800 text-slate-300' : 'bg-white border-slate-200 text-slate-700'
-            }`}>
+            <span className="px-3 py-1 rounded-full border-2 border-[#1E293B] bg-white dark:bg-slate-900 text-[#1E293B] dark:text-white font-bold shadow-[2px_2px_0px_0px_#1E293B] hidden sm:inline">
               Segment: <strong>All Segments</strong>
             </span>
           </div>
@@ -160,7 +156,7 @@ export const ReportCanvas: React.FC<ReportCanvasProps> = ({
 
         {/* Canvas Body Content */}
         <div className="p-4 sm:p-6 space-y-4" style={{ fontFamily: fontCss }}>
-          {/* Row 1: KPI Summary Cards */}
+          {/* Row 1: KPI Cards */}
           <KpiCardRow
             dataColors={dataColors}
             structural={structural}

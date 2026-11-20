@@ -29,8 +29,8 @@ export const DonutChart: React.FC<DonutChartProps> = ({
 
   const size = 200;
   const center = size / 2;
-  const outerRadius = 80;
-  const innerRadius = 52;
+  const outerRadius = 82;
+  const innerRadius = 54;
 
   let accumulatedAngle = -90;
 
@@ -66,7 +66,7 @@ export const DonutChart: React.FC<DonutChartProps> = ({
     return {
       slice,
       pathData,
-      color: dataColors[idx] || '#2563EB',
+      color: dataColors[idx] || '#8B5CF6',
     };
   });
 
@@ -88,11 +88,13 @@ export const DonutChart: React.FC<DonutChartProps> = ({
                   key={idx}
                   d={arc.pathData}
                   fill={arc.color}
+                  stroke="#1E293B"
+                  strokeWidth="2"
                   className="transition-all duration-200 cursor-pointer"
                   style={{
-                    transform: isHovered ? 'scale(1.04)' : 'scale(1)',
+                    transform: isHovered ? 'scale(1.05)' : 'scale(1)',
                     transformOrigin: `${center}px ${center}px`,
-                    filter: isHovered ? 'brightness(1.1)' : 'none',
+                    filter: isHovered ? 'brightness(1.15)' : 'none',
                   }}
                   onMouseEnter={() => setHoveredSlice(arc.slice)}
                   onMouseLeave={() => setHoveredSlice(null)}
@@ -105,17 +107,13 @@ export const DonutChart: React.FC<DonutChartProps> = ({
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center">
             <span
               style={{ fontFamily }}
-              className={`text-[10px] uppercase font-bold tracking-wider ${
-                isDarkCanvas ? 'text-slate-400' : 'text-slate-500'
-              }`}
+              className="text-[10px] font-heading font-extrabold uppercase tracking-wider text-slate-500"
             >
               {hoveredSlice ? hoveredSlice.label : 'Total'}
             </span>
             <span
               style={{ fontFamily }}
-              className={`text-base font-extrabold ${
-                isDarkCanvas ? 'text-white' : 'text-slate-900'
-              }`}
+              className="text-lg font-heading font-black text-[#1E293B] dark:text-white"
             >
               {hoveredSlice ? `${hoveredSlice.percentage}%` : '100%'}
             </span>
@@ -125,7 +123,7 @@ export const DonutChart: React.FC<DonutChartProps> = ({
         {/* Legend List */}
         <div className="space-y-1.5 w-full sm:w-auto">
           {SLICES.map((slice, idx) => {
-            const color = dataColors[idx] || '#2563EB';
+            const color = dataColors[idx] || '#8B5CF6';
             const isHovered = hoveredSlice?.label === slice.label;
 
             return (
@@ -133,29 +131,27 @@ export const DonutChart: React.FC<DonutChartProps> = ({
                 key={slice.label}
                 onMouseEnter={() => setHoveredSlice(slice)}
                 onMouseLeave={() => setHoveredSlice(null)}
-                className={`flex items-center justify-between space-x-3 px-2 py-1 rounded-md transition-colors cursor-pointer ${
-                  isHovered ? (isDarkCanvas ? 'bg-slate-800' : 'bg-slate-100') : ''
+                className={`flex items-center justify-between space-x-3 px-2.5 py-1.5 rounded-xl border-2 transition-all cursor-pointer ${
+                  isHovered
+                    ? 'border-[#1E293B] bg-[#FFFDF5] dark:bg-slate-800 shadow-[2px_2px_0px_0px_#1E293B]'
+                    : 'border-transparent hover:border-slate-300'
                 }`}
               >
                 <div className="flex items-center space-x-2">
                   <span
-                    className="w-2.5 h-2.5 rounded-full flex-shrink-0 transition-colors"
+                    className="w-3 h-3 rounded-full border border-[#1E293B] shadow-[1px_1px_0px_0px_#1E293B]"
                     style={{ backgroundColor: color }}
                   />
                   <span
                     style={{ fontFamily }}
-                    className={`text-[11px] font-medium ${
-                      isDarkCanvas ? 'text-slate-300' : 'text-slate-700'
-                    }`}
+                    className="text-xs font-heading font-bold text-slate-700 dark:text-slate-300"
                   >
                     {slice.label}
                   </span>
                 </div>
                 <span
                   style={{ fontFamily }}
-                  className={`text-[11px] font-mono font-bold ${
-                    isDarkCanvas ? 'text-slate-400' : 'text-slate-500'
-                  }`}
+                  className="text-xs font-mono font-black text-[#1E293B] dark:text-white"
                 >
                   {slice.percentage}%
                 </span>

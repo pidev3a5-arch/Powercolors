@@ -155,13 +155,14 @@ describe('Power BI Theme Generation & Validation', () => {
     const theme = buildPowerBITheme('Contoso Sales Theme', dataColors, structural);
 
     expect(theme.name).toBe('Contoso Sales Theme');
-    expect(theme.$schema).toContain('reportThemeSchema-latest.json');
+    expect(theme.$schema).toContain('reportThemeSchema');
     expect(theme.dataColors).toHaveLength(10);
     expect(theme.background).toBe('#FFFFFF');
     expect(theme.foreground).toBe('#1E293B');
     expect(theme.tableAccent).toBe('#2563EB');
-    expect(theme.textClasses.title.fontFamily).toBe('Segoe UI');
-    expect(theme.visualStyles['*']['*'].visualContainer).toBeDefined();
+    expect(theme.textClasses.title.fontFace).toBe('Segoe UI');
+    expect(theme.visualStyles['*']['*'].border).toBeDefined();
+    expect(theme.visualStyles['*']['*'].dropShadow).toBeDefined();
 
     const validation = validatePowerBITheme(theme);
     expect(validation.isValid).toBe(true);

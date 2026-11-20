@@ -1,7 +1,7 @@
 import { PowerBITheme, StructuralColors, ThemeCustomizationOptions } from './types';
 
 export const POWER_BI_THEME_SCHEMA_URL =
-  'https://raw.githubusercontent.com/microsoft/powerbi-desktop-samples/main/Report%20Theme%20JSON%20Schema/reportThemeSchema-latest.json';
+  'https://raw.githubusercontent.com/microsoft/powerbi-desktop-samples/main/Report%20Theme%20JSON%20Schema/reportThemeSchema-2.159.json';
 
 /**
  * Generates an official, schema-compliant Microsoft Power BI Report Theme object.
@@ -30,22 +30,22 @@ export function buildPowerBITheme(
     neutral: structural.neutral,
     textClasses: {
       title: {
-        fontFamily,
+        fontFace: fontFamily,
         fontSize: 12,
         color: structural.foreground,
       },
       label: {
-        fontFamily,
+        fontFace: fontFamily,
         fontSize: 10,
         color: structural.foreground,
       },
       callout: {
-        fontFamily,
+        fontFace: fontFamily,
         fontSize: 24,
         color: structural.foreground,
       },
       header: {
-        fontFamily: fontFamily.includes('Segoe UI') ? 'Segoe UI Semibold' : fontFamily,
+        fontFace: fontFamily.includes('Segoe UI') ? 'Segoe UI Semibold' : fontFamily,
         fontSize: 11,
         color: structural.foreground,
       },
@@ -53,13 +53,15 @@ export function buildPowerBITheme(
     visualStyles: {
       '*': {
         '*': {
-          visualContainer: [
+          border: [
             {
-              dropShadow: { show: showDropShadow },
-              border: {
-                show: showBorders,
-                color: { solid: { color: structural.background === '#FFFFFF' ? '#E2E8F0' : '#334155' } },
-              },
+              show: showBorders,
+              color: { solid: { color: structural.background === '#FFFFFF' ? '#E2E8F0' : '#334155' } },
+            },
+          ],
+          dropShadow: [
+            {
+              show: showDropShadow,
             },
           ],
         },
@@ -135,6 +137,31 @@ export function validatePowerBITheme(theme: unknown): { isValid: boolean; errors
 
   if (!t.tableAccent || typeof t.tableAccent !== 'string') {
     errors.push('"tableAccent" color string is required');
+  }
+
+  // Check textClasses schema compliance
+  if (t.textClasses && typeof t.textClasses === 'object') {
+    const classes = t.textClasses as Record<string, unknown>;
+    for (const [key, val] of Object.entries(classes)) {
+      if (val && typeof val === 'object') {
+        const item = val as Record<string, unknown>;
+        if ('fontFamily' in item) {
+          errors.push(`textClasses.${key} must use "fontFace", not "fontFamily"`);
+        }
+        if (!item.fontFace || typeof item.fontFace !== 'string') {
+          errors.push(`textClasses.${key} missing valid "fontFace" string`);
+        }
+      }
+    }
+  }
+
+  // Check visualStyles schema compliance (avoid invalid visualContainer wrapper)
+  if (t.visualStyles && typeof t.visualStyles === 'object') {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const vs = t.visualStyles as Record<string, any>;
+    if (vs['*']?.['*']?.visualContainer) {
+      errors.push('visualStyles.*.* must not contain "visualContainer"; use direct "border" or "dropShadow" cards');
+    }
   }
 
   return {

@@ -32,7 +32,7 @@ export const StyledMatrixTable: React.FC<StyledMatrixTableProps> = ({
   isDarkCanvas,
   fontFamily,
 }) => {
-  const primaryBarColor = dataColors[0] || '#2563EB';
+  const primaryBarColor = dataColors[0] || '#8B5CF6';
   const maxRevenue = 1000;
 
   const getStatusColor = (status: TableRowData['status']) => {
@@ -70,28 +70,28 @@ export const StyledMatrixTable: React.FC<StyledMatrixTableProps> = ({
           <thead>
             <tr
               style={{ backgroundColor: structural.tableAccent, fontFamily }}
-              className="text-white font-semibold transition-colors"
+              className="text-white font-heading font-extrabold transition-colors border-b-2 border-[#1E293B]"
             >
-              <th className="py-2.5 px-3 rounded-l-md">Representative</th>
+              <th className="py-2.5 px-3 rounded-l-xl">Representative</th>
               <th className="py-2.5 px-3">Region</th>
               <th className="py-2.5 px-3 text-right">Deals</th>
               <th className="py-2.5 px-3 text-left min-w-[140px]">Revenue Volume</th>
               <th className="py-2.5 px-3 text-right">Margin</th>
-              <th className="py-2.5 px-3 text-center rounded-r-md">Status</th>
+              <th className="py-2.5 px-3 text-center rounded-r-xl">Status</th>
             </tr>
           </thead>
 
-          {/* Table Rows with Alternating Striping */}
-          <tbody className="divide-y divide-slate-800/20" style={{ fontFamily }}>
+          {/* Table Rows */}
+          <tbody className="divide-y-2 divide-dashed divide-slate-200 dark:divide-slate-800" style={{ fontFamily }}>
             {TABLE_ROWS.map((row, idx) => {
               const isEven = idx % 2 === 0;
               const rowBg = isEven
                 ? isDarkCanvas
-                  ? 'bg-slate-900/60'
+                  ? 'bg-slate-900'
                   : 'bg-white'
                 : isDarkCanvas
                 ? 'bg-slate-800/40'
-                : 'bg-slate-50/80';
+                : 'bg-[#FFFDF5]';
 
               const barWidth = `${(row.revenue / maxRevenue) * 100}%`;
               const statusColor = getStatusColor(row.status);
@@ -99,37 +99,39 @@ export const StyledMatrixTable: React.FC<StyledMatrixTableProps> = ({
               return (
                 <tr
                   key={row.rep}
-                  className={`transition-colors hover:bg-slate-500/10 ${rowBg}`}
+                  className={`transition-colors hover:bg-[#FBBF24]/10 ${rowBg}`}
                   style={{ fontFamily }}
                 >
-                  <td className="py-2.5 px-3 font-semibold">{row.rep}</td>
-                  <td className={`py-2.5 px-3 ${isDarkCanvas ? 'text-slate-400' : 'text-slate-600'}`}>
+                  <td className="py-2.5 px-3 font-heading font-bold text-[#1E293B] dark:text-white">
+                    {row.rep}
+                  </td>
+                  <td className="py-2.5 px-3 text-slate-500 font-medium">
                     {row.region}
                   </td>
-                  <td className="py-2.5 px-3 text-right font-mono font-semibold">
+                  <td className="py-2.5 px-3 text-right font-mono font-bold">
                     {row.deals}
                   </td>
                   <td className="py-2.5 px-3">
                     <div className="flex items-center space-x-2">
-                      <div className="flex-1 bg-slate-200 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+                      <div className="flex-1 bg-slate-200 dark:bg-slate-800 h-2.5 rounded-full border border-[#1E293B] overflow-hidden">
                         <div
                           className="h-full rounded-full transition-all duration-300"
                           style={{ width: barWidth, backgroundColor: primaryBarColor }}
                         />
                       </div>
-                      <span className="font-mono text-[11px] font-semibold w-12 text-right">
+                      <span className="font-mono text-[11px] font-black w-12 text-right">
                         ${row.revenue}k
                       </span>
                     </div>
                   </td>
-                  <td className="py-2.5 px-3 text-right font-mono">
+                  <td className="py-2.5 px-3 text-right font-mono font-bold">
                     {row.margin.toFixed(1)}%
                   </td>
                   <td className="py-2.5 px-3 text-center">
                     <span
-                      className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold"
+                      className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-heading font-black border border-[#1E293B] shadow-[1px_1px_0px_0px_#1E293B]"
                       style={{
-                        backgroundColor: `${statusColor}20`,
+                        backgroundColor: `${statusColor}25`,
                         color: statusColor,
                       }}
                     >

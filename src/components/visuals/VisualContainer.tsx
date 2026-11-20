@@ -21,21 +21,21 @@ export const VisualContainer: React.FC<VisualContainerProps> = ({
   return (
     <div
       style={{ fontFamily }}
-      className={`rounded-xl border transition-all duration-200 overflow-hidden flex flex-col ${
+      className={`rounded-2xl border-2 border-[#1E293B] dark:border-slate-700 transition-all duration-200 overflow-hidden flex flex-col shadow-[4px_4px_0px_0px_#1E293B] dark:shadow-[4px_4px_0px_0px_#020617] ${
         isDarkCanvas
-          ? 'bg-slate-900 border-slate-800 text-slate-100 shadow-lg'
-          : 'bg-white border-slate-200/90 text-slate-900 shadow-xs'
+          ? 'bg-slate-900 text-slate-100'
+          : 'bg-white text-slate-900'
       } ${className}`}
     >
       {/* Power BI Visual Header */}
-      <div className={`px-4 pt-3.5 pb-2 flex items-start justify-between border-b ${
-        isDarkCanvas ? 'border-slate-800/60' : 'border-slate-100'
+      <div className={`px-4 pt-3.5 pb-2.5 flex items-start justify-between border-b-2 border-[#1E293B]/15 dark:border-slate-800 ${
+        isDarkCanvas ? 'bg-slate-950/40' : 'bg-[#FFFDF5]/80'
       }`}>
         <div className="min-w-0 pr-2">
           <h3
             style={{ fontFamily }}
-            className={`text-xs font-bold tracking-tight truncate ${
-              isDarkCanvas ? 'text-slate-100' : 'text-slate-800'
+            className={`text-xs font-heading font-extrabold tracking-tight truncate ${
+              isDarkCanvas ? 'text-slate-100' : 'text-[#1E293B]'
             }`}
           >
             {title}
@@ -43,39 +43,35 @@ export const VisualContainer: React.FC<VisualContainerProps> = ({
           {subtitle && (
             <p
               style={{ fontFamily }}
-              className={`text-[11px] truncate mt-0.5 ${
-                isDarkCanvas ? 'text-slate-400' : 'text-slate-500'
-              }`}
+              className="text-[11px] truncate mt-0.5 text-slate-500 font-medium"
             >
               {subtitle}
             </p>
           )}
         </div>
 
-        {/* Power BI Action Icons */}
-        <div className={`flex items-center space-x-1 opacity-70 hover:opacity-100 transition-opacity ${
-          isDarkCanvas ? 'text-slate-400' : 'text-slate-400'
-        }`}>
+        {/* Action Icons */}
+        <div className="flex items-center space-x-1 text-slate-500">
           <button
             type="button"
-            className="p-1 rounded hover:bg-slate-500/10 cursor-pointer"
-            title="Filters on this visual"
+            className="p-1 rounded-md hover:bg-[#FBBF24] hover:text-[#1E293B] transition-colors cursor-pointer"
+            title="Filters on visual"
           >
-            <Filter className="w-3 h-3" />
+            <Filter className="w-3.5 h-3.5 stroke-[2.5]" />
           </button>
           <button
             type="button"
-            className="p-1 rounded hover:bg-slate-500/10 cursor-pointer"
+            className="p-1 rounded-md hover:bg-[#FBBF24] hover:text-[#1E293B] transition-colors cursor-pointer"
             title="Focus mode"
           >
-            <Maximize2 className="w-3 h-3" />
+            <Maximize2 className="w-3.5 h-3.5 stroke-[2.5]" />
           </button>
           <button
             type="button"
-            className="p-1 rounded hover:bg-slate-500/10 cursor-pointer"
+            className="p-1 rounded-md hover:bg-[#FBBF24] hover:text-[#1E293B] transition-colors cursor-pointer"
             title="More options"
           >
-            <MoreVertical className="w-3 h-3" />
+            <MoreVertical className="w-3.5 h-3.5 stroke-[2.5]" />
           </button>
         </div>
       </div>

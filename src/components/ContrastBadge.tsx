@@ -12,26 +12,31 @@ export const ContrastBadge: React.FC<ContrastBadgeProps> = ({
   showDetails = false,
 }) => {
   let label = 'Low';
-  let badgeClasses = 'bg-rose-500/10 text-rose-400 border-rose-500/20';
+  let badgeBg = 'bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300';
+  let dotBg = 'bg-rose-500';
 
   if (contrastRatio >= 7.0) {
     label = 'AAA';
-    badgeClasses = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
+    badgeBg = 'bg-[#34D399]/25 text-emerald-900 dark:text-emerald-300';
+    dotBg = 'bg-[#34D399]';
   } else if (contrastRatio >= 4.5) {
     label = 'AA';
-    badgeClasses = 'bg-teal-500/10 text-teal-400 border-teal-500/20';
+    badgeBg = 'bg-teal-100 dark:bg-teal-950/60 text-teal-800 dark:text-teal-300';
+    dotBg = 'bg-teal-500';
   } else if (contrastRatio >= 3.0) {
     label = 'AA Large';
-    badgeClasses = 'bg-blue-500/10 text-blue-400 border-blue-500/20';
+    badgeBg = 'bg-[#FBBF24]/25 text-amber-900 dark:text-amber-300';
+    dotBg = 'bg-[#FBBF24]';
   }
 
   return (
     <span
-      className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono font-medium border ${badgeClasses} ${className}`}
+      className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10.5px] font-mono font-black border border-[#1E293B] dark:border-slate-700 shadow-[1px_1px_0px_0px_#1E293B] dark:shadow-[1px_1px_0px_0px_#020617] whitespace-nowrap flex-shrink-0 ${badgeBg} ${className}`}
       title={`WCAG 2.1 Contrast Ratio: ${contrastRatio}:1 (${label})`}
     >
-      <span>{contrastRatio}:1</span>
-      {showDetails && <span className="opacity-75">• {label}</span>}
+      <span className={`w-1.5 h-1.5 rounded-full border border-[#1E293B] dark:border-slate-800 flex-shrink-0 ${dotBg}`} />
+      <span className="tracking-tight">{contrastRatio.toFixed(1)}:1</span>
+      {showDetails && <span className="font-sans font-extrabold text-[9px] opacity-80">({label})</span>}
     </span>
   );
 };

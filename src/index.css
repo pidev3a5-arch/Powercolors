@@ -1,17 +1,160 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
-  --font-sans: Verdana, Geneva, Tahoma, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-heading: "Outfit", system-ui, -apple-system, sans-serif;
+  --font-body: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+  /* Playful Geometric Color Tokens */
+  --color-pg-bg: #FFFDF5;
+  --color-pg-fg: #1E293B;
+  --color-pg-muted: #F1F5F9;
+  --color-pg-muted-fg: #64748B;
+  --color-pg-accent: #8B5CF6;
+  --color-pg-secondary: #F472B6;
+  --color-pg-tertiary: #FBBF24;
+  --color-pg-quaternary: #34D399;
+  --color-pg-destructive: #EF4444;
+  --color-pg-border: #1E293B;
 }
 
 @layer base {
+  :root {
+    --bg-page: #FFFDF5;
+    --fg-page: #1E293B;
+    --border-dark: #1E293B;
+    --card-bg: #FFFFFF;
+    --shadow-color: #1E293B;
+    --dot-color: rgba(30, 41, 59, 0.12);
+  }
+
+  .dark {
+    --bg-page: #0F172A;
+    --fg-page: #F8FAFC;
+    --border-dark: #334155;
+    --card-bg: #1E293B;
+    --shadow-color: #020617;
+    --dot-color: rgba(255, 255, 255, 0.1);
+  }
+
   html {
-    font-size: 16.5px;
+    font-size: 16px;
+    background-color: var(--bg-page);
+    color: var(--fg-page);
   }
+
   body {
-    font-family: Verdana, Geneva, Tahoma, -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: var(--font-body);
+    background-color: var(--bg-page);
+    color: var(--fg-page);
     line-height: 1.6;
+    letter-spacing: -0.01em;
   }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    letter-spacing: -0.025em;
+  }
+}
+
+/* Playful Geometric Dot Grid Background */
+.bg-dot-grid {
+  background-image: radial-gradient(var(--dot-color) 1.5px, transparent 1.5px);
+  background-size: 24px 24px;
+}
+
+/* Hard Shadows (The "Pop" Shadow System) */
+.pop-shadow-sm {
+  box-shadow: 2px 2px 0px 0px var(--shadow-color);
+}
+
+.pop-shadow {
+  box-shadow: 4px 4px 0px 0px var(--shadow-color);
+}
+
+.pop-shadow-lg {
+  box-shadow: 6px 6px 0px 0px var(--shadow-color);
+}
+
+.pop-shadow-xl {
+  box-shadow: 8px 8px 0px 0px var(--shadow-color);
+}
+
+.pop-shadow-pink {
+  box-shadow: 5px 5px 0px 0px #F472B6;
+}
+
+.pop-shadow-yellow {
+  box-shadow: 5px 5px 0px 0px #FBBF24;
+}
+
+.pop-shadow-violet {
+  box-shadow: 5px 5px 0px 0px #8B5CF6;
+}
+
+.pop-shadow-green {
+  box-shadow: 5px 5px 0px 0px #34D399;
+}
+
+/* The Tactile "Candy Button" & Interactive Pop */
+.pop-btn {
+  border-width: 2px;
+  border-color: var(--border-dark);
+  box-shadow: 4px 4px 0px 0px var(--shadow-color);
+  transition: all 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  user-select: none;
+}
+
+.pop-btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px 0px var(--shadow-color);
+}
+
+.pop-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px 0px var(--shadow-color);
+}
+
+/* The "Sticker Card" */
+.pop-card {
+  border-width: 2px;
+  border-color: var(--border-dark);
+  border-radius: 20px;
+  box-shadow: 5px 5px 0px 0px var(--shadow-color);
+  transition: all 250ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.pop-card-interactive:hover {
+  transform: translate(-3px, -3px) rotate(-0.5deg);
+  box-shadow: 8px 8px 0px 0px var(--shadow-color);
+}
+
+/* Input Fields */
+.pop-input {
+  border-width: 2px;
+  border-color: var(--border-dark);
+  box-shadow: 2px 2px 0px 0px var(--shadow-color);
+  transition: all 180ms ease;
+}
+
+.pop-input:focus {
+  outline: none;
+  border-color: #8B5CF6;
+  box-shadow: 4px 4px 0px 0px #8B5CF6;
+  transform: translateY(-1px);
+}
+
+/* Wiggle Keyframes */
+@keyframes pop-wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(4deg); }
+  75% { transform: rotate(-4deg); }
+}
+
+.hover-wiggle:hover {
+  animation: pop-wiggle 300ms ease-in-out;
 }
 
 /* Power BI Preview Font Families */
