@@ -76,7 +76,7 @@
 
 **Plans**:
 - [x] **Plan 7.1**: Dash Generator Core State, Resolution & Navigation Bar Engine (`.gsd/phases/7/1-PLAN.md`)
-- [ ] **Plan 7.2**: Canvas Layout Presets & Visual Shapes Grid Builder (`.gsd/phases/7/2-PLAN.md`)
+- [x] **Plan 7.2**: Canvas Layout Presets & Visual Shapes Grid Builder (`.gsd/phases/7/2-PLAN.md`)
 - [ ] **Plan 7.3**: Real-Time Vector SVG Canvas Preview & 1-Click Power BI SVG Export (`.gsd/phases/7/3-PLAN.md`)
 
 **Verification**:
