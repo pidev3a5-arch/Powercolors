@@ -54,15 +54,18 @@
 ---
 
 ### Phase 6: Multi-Page Navigation & Landing Page
-**Status**: ⬜ Not Started  
+**Status**: 🟨 In Progress (Planned)  
 **Objective**: Introduce multi-page navigation to support three distinct views: a playful, high-converting Landing Page, the existing Theme Generator studio, and the new Dash Generator.  
 **Depends on**: Phase 5  
 
-**Tasks**:
-- [ ] TBD (run /plan 6 to create)
+**Plans**:
+- [ ] **Plan 6.1**: Multi-Page Routing Architecture & Navigation Shell (`.gsd/phases/6/1-PLAN.md`)
+- [ ] **Plan 6.2**: High-Converting Playful Geometric Landing Page (`.gsd/phases/6/2-PLAN.md`)
 
 **Verification**:
-- TBD
+- Automated test suite passes (`npm test`)
+- Production build compiles cleanly (`npm run build`)
+- Visual verification across mobile (360px & 390px) and desktop (1440px) viewports
 
 ---
 
