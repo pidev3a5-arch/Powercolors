@@ -1,7 +1,7 @@
 # ROADMAP.md
 
-> **Current Phase**: Phase 5 (Final Polish & Production Verification) - Completed
-> **Milestone**: v1.0 - Completed
+> **Current Phase**: Phase 6 (Multi-Page Navigation & Landing Page) - Planned
+> **Milestone**: v2.0 - In Progress
 
 ## Must-Haves (from SPEC)
 - [x] Client-side image downsampling and RGBA extraction with alpha transparency filter
@@ -14,7 +14,15 @@
 - [x] Official site logo added (`public/logo.png`) transparent and borderless
 - [x] Creator & reviewer attribution in footer with LinkedIn link (Rachwen Mosbehi)
 - [x] Site-wide Light and Dark mode with Light Mode as default
-- [x] Rebranded to PowerLab with `#EC9700` accent and Poppins font
+- [x] Rebranded to PowerLab with Playful Geometric design language and official schema compliance
+- [ ] Multi-page client-side architecture (Landing Page, Theme Generator, Dash Generator)
+- [ ] Playful Geometric Landing Page showcasing both Power BI design tools with engaging CTAs
+- [ ] Dash Generator: Canvas resolution presets (1280x720, 1920x1080, custom) and canvas background color
+- [ ] Dash Generator: Configurable navigation bar (top or left orientation, custom color, and size)
+- [ ] Dash Generator: Report branding with logo upload and report title inside the nav bar
+- [ ] Dash Generator: Interactive navigation buttons builder (button count, labels, and Lucide icon picker)
+- [ ] Dash Generator: Card slots & visual shapes layout builder with configurable title/subtitle toggles
+- [ ] Dash Generator: Real-time SVG canvas live preview and 1-click Power BI background `.svg` export
 
 ## Phases
 
@@ -42,3 +50,29 @@
 **Status**: 🟩 Completed  
 **Objective**: Comprehensive end-to-end verification across all features and test suites, rebrand to PowerLab, and final production delivery.  
 **Requirements**: Full verification across all REQ items  
+
+---
+
+### Phase 6: Multi-Page Navigation & Landing Page
+**Status**: ⬜ Not Started  
+**Objective**: Introduce multi-page navigation to support three distinct views: a playful, high-converting Landing Page, the existing Theme Generator studio, and the new Dash Generator.  
+**Depends on**: Phase 5  
+
+**Tasks**:
+- [ ] TBD (run /plan 6 to create)
+
+**Verification**:
+- TBD
+
+---
+
+### Phase 7: Dashboard SVG Canvas Builder (Dash Generator)
+**Status**: ⬜ Not Started  
+**Objective**: Build an interactive Power BI SVG Canvas Background Generator allowing report authors to configure canvas resolution, top/left navigation bar, logo, page navigation buttons with icon picker, visual card slots with titles/subtitles, and export a pixel-perfect .svg for Power BI page background.  
+**Depends on**: Phase 6  
+
+**Tasks**:
+- [ ] TBD (run /plan 7 to create)
+
+**Verification**:
+- TBD  
