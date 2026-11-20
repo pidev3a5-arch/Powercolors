@@ -71,6 +71,8 @@ export interface PageTitleItem {
   title: string;
   subtitle: string;
   position: PageTitlePosition;
+  showTitle?: boolean;
+  showSubtitle?: boolean;
   fontFamily?: string;
   titleSize?: number;
   titleColor?: string;
@@ -295,12 +297,12 @@ export const DEFAULT_DASH_CANVAS_STATE: DashCanvasState = {
   pageTitles: [
     {
       id: 'title-main',
-      title: 'Monthly Executive Overview',
+      title: 'Executive Sales Overview',
       subtitle: 'Live Fabric Data • Real-Time KPIs',
       position: 'top-right',
-      titleSize: 15,
+      titleSize: 18,
       titleColor: '#1E293B',
-      subtitleSize: 11,
+      subtitleSize: 11.5,
       subtitleColor: '#64748B',
     },
   ],

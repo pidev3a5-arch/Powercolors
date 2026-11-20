@@ -373,7 +373,12 @@ export const DashCanvasControls: React.FC<DashCanvasControlsProps> = ({
           <button
             type="button"
             onClick={onAddPageTitle}
-            className="pop-btn inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-heading font-black bg-[#FBBF24] hover:bg-[#F59E0B] text-[#1E293B] border-2 border-[#1E293B] shadow-[2px_2px_0px_0px_#1E293B] cursor-pointer"
+            disabled={pageTitles.length >= 4}
+            className={`pop-btn inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-heading font-black border-2 border-[#1E293B] shadow-[2px_2px_0px_0px_#1E293B] transition-all ${
+              pageTitles.length >= 4
+                ? 'opacity-40 cursor-not-allowed bg-slate-200 text-slate-500'
+                : 'bg-[#FBBF24] hover:bg-[#F59E0B] text-[#1E293B] cursor-pointer'
+            }`}
           >
             <Plus className="w-3.5 h-3.5 stroke-[3]" />
             <span>Add Title</span>
@@ -436,6 +441,56 @@ export const DashCanvasControls: React.FC<DashCanvasControlsProps> = ({
                 placeholder="Page Subtitle (e.g. Live Q3 Metrics)"
                 className="w-full px-2.5 py-1 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-medium text-slate-700 dark:text-slate-300 outline-none focus:border-[#8B5CF6]"
               />
+
+              {/* Title & Subtitle Size & Color Controls */}
+              <div className="grid grid-cols-2 gap-2.5 pt-1.5 border-t border-slate-200 dark:border-slate-700/80">
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between text-[10px] font-bold text-slate-500">
+                    <span>Title Size ({pt.titleSize ?? 18}px)</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <input
+                      type="range"
+                      min={12}
+                      max={26}
+                      value={pt.titleSize ?? 18}
+                      onChange={(e) => onUpdatePageTitle(pt.id, { titleSize: Number(e.target.value) })}
+                      className="w-full accent-[#FBBF24] cursor-pointer"
+                    />
+                    <input
+                      type="color"
+                      value={pt.titleColor ?? typography.titleColor ?? '#1E293B'}
+                      onChange={(e) => onUpdatePageTitle(pt.id, { titleColor: e.target.value })}
+                      className="w-5 h-5 rounded border border-[#1E293B] cursor-pointer flex-shrink-0"
+                      title="Title text color"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between text-[10px] font-bold text-slate-500">
+                    <span>Subtitle ({pt.subtitleSize ?? 11.5}px)</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <input
+                      type="range"
+                      min={9}
+                      max={16}
+                      step={0.5}
+                      value={pt.subtitleSize ?? 11.5}
+                      onChange={(e) => onUpdatePageTitle(pt.id, { subtitleSize: Number(e.target.value) })}
+                      className="w-full accent-[#FBBF24] cursor-pointer"
+                    />
+                    <input
+                      type="color"
+                      value={pt.subtitleColor ?? typography.subtitleColor ?? '#64748B'}
+                      onChange={(e) => onUpdatePageTitle(pt.id, { subtitleColor: e.target.value })}
+                      className="w-5 h-5 rounded border border-[#1E293B] cursor-pointer flex-shrink-0"
+                      title="Subtitle text color"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
           ))}
         </div>

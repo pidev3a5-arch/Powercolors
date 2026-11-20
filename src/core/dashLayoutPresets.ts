@@ -2,6 +2,7 @@ import {
   LayoutPresetType,
   NavBarConfig,
   VisualContainerConfig,
+  PageTitleItem,
 } from './dashTypes';
 
 export interface LayoutPresetInfo {
@@ -77,7 +78,8 @@ export function generateLayoutContainers(
   preset: LayoutPresetType,
   canvasWidth: number,
   canvasHeight: number,
-  navBar: NavBarConfig
+  navBar: NavBarConfig,
+  pageTitles?: PageTitleItem[]
 ): VisualContainerConfig[] {
   // Determine usable bounds taking nav bar into account
   let usableX = 0;
@@ -100,10 +102,29 @@ export function generateLayoutContainers(
   const padding = isHighRes ? 28 : 20;
   const gap = isHighRes ? 20 : 16;
 
+  // Check if any active page titles are positioned at the top or bottom
+  const hasTopTitle =
+    pageTitles &&
+    pageTitles.some(
+      (pt) =>
+        (pt.position === 'top-right' || pt.position === 'top-left') &&
+        ((pt.title && pt.title.trim().length > 0) || (pt.subtitle && pt.subtitle.trim().length > 0))
+    );
+  const hasBottomTitle =
+    pageTitles &&
+    pageTitles.some(
+      (pt) =>
+        (pt.position === 'bottom-right' || pt.position === 'bottom-left') &&
+        ((pt.title && pt.title.trim().length > 0) || (pt.subtitle && pt.subtitle.trim().length > 0))
+    );
+
+  const topHeaderH = hasTopTitle ? (isHighRes ? 68 : 56) : 0;
+  const bottomHeaderH = hasBottomTitle ? (isHighRes ? 44 : 36) : 0;
+
   const contentX = usableX + padding;
-  const contentY = usableY + padding;
+  const contentY = usableY + padding + topHeaderH;
   const contentW = Math.max(100, usableWidth - 2 * padding);
-  const contentH = Math.max(100, usableHeight - 2 * padding);
+  const contentH = Math.max(100, usableHeight - 2 * padding - topHeaderH - bottomHeaderH);
 
   switch (preset) {
     case 'executive-overview': {
@@ -715,7 +736,8 @@ export function autoArrangeContainers(
   containers: VisualContainerConfig[],
   canvasWidth: number,
   canvasHeight: number,
-  navBar: NavBarConfig
+  navBar: NavBarConfig,
+  pageTitles?: PageTitleItem[]
 ): VisualContainerConfig[] {
   if (containers.length === 0) return [];
 
@@ -738,10 +760,28 @@ export function autoArrangeContainers(
   const padding = isHighRes ? 28 : 20;
   const gap = isHighRes ? 20 : 16;
 
+  const hasTopTitle =
+    pageTitles &&
+    pageTitles.some(
+      (pt) =>
+        (pt.position === 'top-right' || pt.position === 'top-left') &&
+        ((pt.title && pt.title.trim().length > 0) || (pt.subtitle && pt.subtitle.trim().length > 0))
+    );
+  const hasBottomTitle =
+    pageTitles &&
+    pageTitles.some(
+      (pt) =>
+        (pt.position === 'bottom-right' || pt.position === 'bottom-left') &&
+        ((pt.title && pt.title.trim().length > 0) || (pt.subtitle && pt.subtitle.trim().length > 0))
+    );
+
+  const topHeaderH = hasTopTitle ? (isHighRes ? 68 : 56) : 0;
+  const bottomHeaderH = hasBottomTitle ? (isHighRes ? 44 : 36) : 0;
+
   const contentX = usableX + padding;
-  const contentY = usableY + padding;
+  const contentY = usableY + padding + topHeaderH;
   const contentW = Math.max(100, usableWidth - 2 * padding);
-  const contentH = Math.max(100, usableHeight - 2 * padding);
+  const contentH = Math.max(100, usableHeight - 2 * padding - topHeaderH - bottomHeaderH);
 
   const count = containers.length;
 

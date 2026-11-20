@@ -50,58 +50,7 @@ export function generateDashSvg(state: DashCanvasState, forPreview = false): str
     `  <rect width="${width}" height="${height}" fill="${state.backgroundColor}" />`
   );
 
-  // 2. Page Titles (if configured)
-  if (pageTitles && pageTitles.length > 0) {
-    parts.push(`  <!-- Page Titles -->`);
-    for (const pt of pageTitles) {
-      if (!pt.title && !pt.subtitle) continue;
-
-      let titleX = width - 32;
-      let titleY = 36;
-      let anchor = 'end';
-
-      if (pt.position === 'top-left') {
-        titleX = navBar.show && navBar.orientation === 'left' ? navBar.size + 32 : 32;
-        titleY = navBar.show && navBar.orientation === 'top' ? navBar.size + 36 : 36;
-        anchor = 'start';
-      } else if (pt.position === 'top-right') {
-        titleX = width - 32;
-        titleY = navBar.show && navBar.orientation === 'top' ? navBar.size + 36 : 36;
-        anchor = 'end';
-      } else if (pt.position === 'bottom-left') {
-        titleX = navBar.show && navBar.orientation === 'left' ? navBar.size + 32 : 32;
-        titleY = height - 28;
-        anchor = 'start';
-      } else if (pt.position === 'bottom-right') {
-        titleX = width - 32;
-        titleY = height - 28;
-        anchor = 'end';
-      }
-
-      const pTitleSize = pt.titleSize || 15;
-      const pTitleColor = pt.titleColor || defaultTitleColor;
-      const pSubtitleSize = pt.subtitleSize || 11;
-      const pSubtitleColor = pt.subtitleColor || defaultSubtitleColor;
-
-      if (pt.title) {
-        parts.push(
-          `  <text x="${titleX}" y="${titleY}" font-size="${pTitleSize}" font-weight="800" text-anchor="${anchor}" fill="${pTitleColor}">${escapeXml(
-            pt.title
-          )}</text>`
-        );
-      }
-      if (pt.subtitle) {
-        const subY = pt.position.startsWith('bottom') ? titleY - pTitleSize - 2 : titleY + pSubtitleSize + 5;
-        parts.push(
-          `  <text x="${titleX}" y="${subY}" font-size="${pSubtitleSize}" font-weight="500" text-anchor="${anchor}" fill="${pSubtitleColor}">${escapeXml(
-            pt.subtitle
-          )}</text>`
-        );
-      }
-    }
-  }
-
-  // 3. Visual Container Slots
+  // 2. Visual Container Slots
   parts.push(`  <!-- Visual Container Slots -->`);
   for (const c of containers) {
     const rx = containerStyle.cornerRadius;
@@ -385,6 +334,79 @@ export function generateDashSvg(state: DashCanvasState, forPreview = false): str
 
           btnX += btnW + btnGap;
         }
+      }
+    }
+  }
+
+  // 4. Page Header Titles (Rendered on top layer above visual slots and navigation)
+  if (pageTitles && pageTitles.length > 0) {
+    parts.push(`  <!-- Page Titles -->`);
+
+    // Determine usable bounds taking nav bar into account
+    let usableX = 0;
+    let usableY = 0;
+    if (navBar.show) {
+      if (navBar.orientation === 'left') {
+        usableX = navBar.size;
+      } else {
+        usableY = navBar.size;
+      }
+    }
+
+    const isHighRes = width >= 1920;
+    const padding = isHighRes ? 28 : 20;
+
+    for (const pt of pageTitles) {
+      const hasTitle = pt.title && pt.title.trim().length > 0;
+      const hasSubtitle = pt.subtitle && pt.subtitle.trim().length > 0;
+      if (!hasTitle && !hasSubtitle) continue;
+
+      let titleX = width - padding;
+      let titleY = usableY + padding + (isHighRes ? 22 : 18);
+      let anchor = 'end';
+
+      if (pt.position === 'top-left') {
+        titleX = usableX + padding;
+        titleY = usableY + padding + (isHighRes ? 22 : 18);
+        anchor = 'start';
+      } else if (pt.position === 'top-right') {
+        titleX = width - padding;
+        titleY = usableY + padding + (isHighRes ? 22 : 18);
+        anchor = 'end';
+      } else if (pt.position === 'bottom-left') {
+        titleX = usableX + padding;
+        titleY = height - padding - (isHighRes ? 26 : 22);
+        anchor = 'start';
+      } else if (pt.position === 'bottom-right') {
+        titleX = width - padding;
+        titleY = height - padding - (isHighRes ? 26 : 22);
+        anchor = 'end';
+      }
+
+      const pTitleSize = pt.titleSize || (isHighRes ? 20 : 16);
+      const pTitleColor = pt.titleColor || defaultTitleColor;
+      const pSubtitleSize = pt.subtitleSize || (isHighRes ? 12 : 11);
+      const pSubtitleColor = pt.subtitleColor || defaultSubtitleColor;
+
+      if (hasTitle) {
+        parts.push(
+          `  <text x="${Math.round(titleX)}" y="${Math.round(
+            titleY
+          )}" font-size="${pTitleSize}" font-weight="800" text-anchor="${anchor}" fill="${pTitleColor}">${escapeXml(
+            pt.title
+          )}</text>`
+        );
+      }
+
+      if (hasSubtitle) {
+        const subY = hasTitle ? titleY + pSubtitleSize + 4 : titleY;
+        parts.push(
+          `  <text x="${Math.round(titleX)}" y="${Math.round(
+            subY
+          )}" font-size="${pSubtitleSize}" font-weight="500" text-anchor="${anchor}" fill="${pSubtitleColor}">${escapeXml(
+            pt.subtitle
+          )}</text>`
+        );
       }
     }
   }

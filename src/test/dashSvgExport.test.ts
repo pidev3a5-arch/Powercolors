@@ -153,12 +153,51 @@ describe('Dash SVG Canvas Export & Layout Engine', () => {
         },
       ],
     };
+    state.containers = generateLayoutContainers(
+      state.layoutPreset,
+      state.dimensions.width,
+      state.dimensions.height,
+      state.navBar,
+      state.pageTitles
+    );
 
     const svg = generateDashSvg(state);
     expect(svg).toContain('Top Right Executive Stamp');
     expect(svg).toContain('Live API Telemetry');
     expect(svg).toContain('Confidential Internal');
     expect(svg).toContain('Do not distribute');
+
+    // Verify SVG order: Page Titles must be rendered AFTER Visual Container Slots
+    // so card rects never occlude page titles
+    const slotsIndex = svg.indexOf('<!-- Visual Container Slots -->');
+    const titlesIndex = svg.indexOf('<!-- Page Titles -->');
+    expect(slotsIndex).toBeGreaterThan(-1);
+    expect(titlesIndex).toBeGreaterThan(-1);
+    expect(titlesIndex).toBeGreaterThan(slotsIndex);
+
+    // Verify top containers start below the top header title area (y >= 70)
+    for (const c of state.containers) {
+      expect(c.y).toBeGreaterThanOrEqual(70);
+    }
+  });
+
+  it('renders DEFAULT_DASH_CANVAS_STATE with visible default page header titles', () => {
+    const initial = { ...DEFAULT_DASH_CANVAS_STATE };
+    initial.containers = generateLayoutContainers(
+      initial.layoutPreset,
+      initial.dimensions.width,
+      initial.dimensions.height,
+      initial.navBar,
+      initial.pageTitles
+    );
+
+    const svg = generateDashSvg(initial);
+    expect(svg).toContain('Executive Sales Overview');
+    expect(svg).toContain('Live Fabric Data • Real-Time KPIs');
+
+    const slotsIndex = svg.indexOf('<!-- Visual Container Slots -->');
+    const titlesIndex = svg.indexOf('<!-- Page Titles -->');
+    expect(titlesIndex).toBeGreaterThan(slotsIndex);
   });
 
   it('supports 4 new layout presets correctly', () => {

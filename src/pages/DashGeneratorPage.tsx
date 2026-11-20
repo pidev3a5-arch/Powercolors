@@ -50,15 +50,22 @@ export const DashGeneratorPage: React.FC<DashGeneratorPageProps> = ({ onNavigate
       initial.layoutPreset,
       initial.dimensions.width,
       initial.dimensions.height,
-      initial.navBar
+      initial.navBar,
+      initial.pageTitles
     );
     return initial;
   });
 
-  // Re-generate containers whenever resolution or nav bar orientation changes (if preset is selected)
+  // Re-generate containers whenever resolution, nav bar, or page header titles change
   const syncContainersWithLayout = useCallback(
-    (preset: LayoutPresetType, width: number, height: number, navBar: NavBarConfig) => {
-      return generateLayoutContainers(preset, width, height, navBar);
+    (
+      preset: LayoutPresetType,
+      width: number,
+      height: number,
+      navBar: NavBarConfig,
+      pageTitles?: PageTitleItem[]
+    ) => {
+      return generateLayoutContainers(preset, width, height, navBar, pageTitles);
     },
     []
   );
@@ -70,7 +77,8 @@ export const DashGeneratorPage: React.FC<DashGeneratorPageProps> = ({ onNavigate
         prev.layoutPreset,
         dimensions.width,
         dimensions.height,
-        prev.navBar
+        prev.navBar,
+        prev.pageTitles
       );
       return {
         ...prev,
@@ -103,10 +111,29 @@ export const DashGeneratorPage: React.FC<DashGeneratorPageProps> = ({ onNavigate
 
   // 5. Page Titles
   const handleUpdatePageTitle = (id: string, updates: Partial<PageTitleItem>) => {
-    setDashState((prev) => ({
-      ...prev,
-      pageTitles: prev.pageTitles.map((t) => (t.id === id ? { ...t, ...updates } : t)),
-    }));
+    setDashState((prev) => {
+      const nextTitles = prev.pageTitles.map((t) => (t.id === id ? { ...t, ...updates } : t));
+      const shouldRecalc =
+        updates.position !== undefined ||
+        updates.title !== undefined ||
+        updates.subtitle !== undefined;
+
+      const nextContainers = shouldRecalc
+        ? syncContainersWithLayout(
+            prev.layoutPreset,
+            prev.dimensions.width,
+            prev.dimensions.height,
+            prev.navBar,
+            nextTitles
+          )
+        : prev.containers;
+
+      return {
+        ...prev,
+        pageTitles: nextTitles,
+        containers: nextContainers,
+      };
+    });
   };
 
   const handleAddPageTitle = () => {
@@ -118,30 +145,65 @@ export const DashGeneratorPage: React.FC<DashGeneratorPageProps> = ({ onNavigate
       const newTitle: PageTitleItem = {
         id: newId,
         title: 'New Page Stamp',
-        subtitle: 'Secondary Metadata',
+        subtitle: 'Secondary KPI Telemetry',
         position: nextPos,
-        titleSize: 13,
-        subtitleSize: 10,
+        titleSize: 15,
+        titleColor: prev.typography.titleColor || '#1E293B',
+        subtitleSize: 11,
+        subtitleColor: prev.typography.subtitleColor || '#64748B',
       };
+      const nextTitles = [...prev.pageTitles, newTitle];
+      const nextContainers = syncContainersWithLayout(
+        prev.layoutPreset,
+        prev.dimensions.width,
+        prev.dimensions.height,
+        prev.navBar,
+        nextTitles
+      );
       return {
         ...prev,
-        pageTitles: [...prev.pageTitles, newTitle],
+        pageTitles: nextTitles,
+        containers: nextContainers,
       };
     });
   };
 
   const handleRemovePageTitle = (id: string) => {
-    setDashState((prev) => ({
-      ...prev,
-      pageTitles: prev.pageTitles.filter((t) => t.id !== id),
-    }));
+    setDashState((prev) => {
+      const nextTitles = prev.pageTitles.filter((t) => t.id !== id);
+      const nextContainers = syncContainersWithLayout(
+        prev.layoutPreset,
+        prev.dimensions.width,
+        prev.dimensions.height,
+        prev.navBar,
+        nextTitles
+      );
+      return {
+        ...prev,
+        pageTitles: nextTitles,
+        containers: nextContainers,
+      };
+    });
   };
 
   // 6. Ready Designs
   const handleApplyReadyDesign = (presetId: string) => {
     const found = READY_DESIGN_PRESETS.find((p) => p.id === presetId);
     if (found) {
-      setDashState((curr) => found.apply(curr));
+      setDashState((curr) => {
+        const applied = found.apply(curr);
+        const nextContainers = syncContainersWithLayout(
+          applied.layoutPreset,
+          applied.dimensions.width,
+          applied.dimensions.height,
+          applied.navBar,
+          applied.pageTitles
+        );
+        return {
+          ...applied,
+          containers: nextContainers,
+        };
+      });
     }
   };
 
@@ -152,7 +214,8 @@ export const DashGeneratorPage: React.FC<DashGeneratorPageProps> = ({ onNavigate
         layoutPreset,
         prev.dimensions.width,
         prev.dimensions.height,
-        prev.navBar
+        prev.navBar,
+        prev.pageTitles
       );
       return {
         ...prev,
@@ -176,7 +239,8 @@ export const DashGeneratorPage: React.FC<DashGeneratorPageProps> = ({ onNavigate
             prev.layoutPreset,
             prev.dimensions.width,
             prev.dimensions.height,
-            nextNavBar
+            nextNavBar,
+            prev.pageTitles
           )
         : prev.containers;
 
@@ -285,7 +349,8 @@ export const DashGeneratorPage: React.FC<DashGeneratorPageProps> = ({ onNavigate
         all,
         prev.dimensions.width,
         prev.dimensions.height,
-        prev.navBar
+        prev.navBar,
+        prev.pageTitles
       );
       return {
         ...prev,
@@ -301,7 +366,8 @@ export const DashGeneratorPage: React.FC<DashGeneratorPageProps> = ({ onNavigate
         prev.layoutPreset,
         prev.dimensions.width,
         prev.dimensions.height,
-        prev.navBar
+        prev.navBar,
+        prev.pageTitles
       ),
     }));
   };
@@ -313,7 +379,8 @@ export const DashGeneratorPage: React.FC<DashGeneratorPageProps> = ({ onNavigate
         prev.containers,
         prev.dimensions.width,
         prev.dimensions.height,
-        prev.navBar
+        prev.navBar,
+        prev.pageTitles
       ),
     }));
   };
