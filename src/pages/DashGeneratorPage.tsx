@@ -1,120 +1,438 @@
-import React from 'react';
-import { Layout, Palette, ArrowRight, Sparkles, Monitor, Navigation, Image as ImageIcon, Sliders, CheckCircle2, Download } from 'lucide-react';
+import React, { useState, useCallback } from 'react';
+import {
+  Download,
+  Copy,
+  Check,
+  Monitor,
+  Navigation,
+  Boxes,
+  HelpCircle,
+  Palette,
+  Sparkles,
+} from 'lucide-react';
+import {
+  DashCanvasState,
+  CanvasDimension,
+  DashCanvasContainerStyle,
+  LayoutPresetType,
+  NavBarConfig,
+  NavButtonConfig,
+  VisualContainerConfig,
+  DEFAULT_DASH_CANVAS_STATE,
+} from '../core/dashTypes';
+import { generateLayoutContainers } from '../core/dashLayoutPresets';
+import { generateDashSvg, downloadDashSvg } from '../core/dashSvgExport';
+import { DashNavControls } from '../components/dash/DashNavControls';
+import { DashCanvasControls } from '../components/dash/DashCanvasControls';
+import { DashContainerConfig } from '../components/dash/DashContainerConfig';
+import { DashSvgCanvas } from '../components/dash/DashSvgCanvas';
 import { AppPage } from '../core/types';
 
 interface DashGeneratorPageProps {
   onNavigate: (page: AppPage) => void;
 }
 
+type DashTab = 'canvas' | 'nav' | 'containers';
+
 export const DashGeneratorPage: React.FC<DashGeneratorPageProps> = ({ onNavigate }) => {
-  const plannedFeatures = [
-    {
-      icon: Monitor,
-      title: 'Canvas Resolution & Background',
-      desc: '1280×720 (16:9 standard), 1920×1080 (Full HD), or custom dimensions with custom solid or gradient canvas colors.',
-      color: '#8B5CF6',
+  const [activeTab, setActiveTab] = useState<DashTab>('canvas');
+  const [copied, setCopied] = useState(false);
+
+  // Dash Canvas Core State
+  const [dashState, setDashState] = useState<DashCanvasState>(() => {
+    const initial = { ...DEFAULT_DASH_CANVAS_STATE };
+    initial.containers = generateLayoutContainers(
+      initial.layoutPreset,
+      initial.dimensions.width,
+      initial.dimensions.height,
+      initial.navBar
+    );
+    return initial;
+  });
+
+  // Re-generate containers whenever resolution or nav bar orientation changes (if preset is selected)
+  const syncContainersWithLayout = useCallback(
+    (preset: LayoutPresetType, width: number, height: number, navBar: NavBarConfig) => {
+      return generateLayoutContainers(preset, width, height, navBar);
     },
-    {
-      icon: Navigation,
-      title: 'Left & Top Navigation Bars',
-      desc: 'Dockable navigation ribbons with customizable thickness, accent fills, and clean separator borders.',
-      color: '#F472B6',
-    },
-    {
-      icon: ImageIcon,
-      title: 'Brand Logo & Report Title',
-      desc: 'Direct brand logo asset embedding and typography formatting right inside the header ribbon.',
-      color: '#FBBF24',
-    },
-    {
-      icon: Sliders,
-      title: 'Interactive Button Pack with Icons',
-      desc: 'Configure page navigation pills with custom labels and icons selected from the Lucide icon pack.',
-      color: '#34D399',
-    },
-    {
-      icon: Layout,
-      title: 'Visual Grid & Card Slots',
-      desc: 'Pre-calculate card slots for KPI metric cards, chart containers, and matrix tables with optional titles and subtitles.',
-      color: '#38BDF8',
-    },
-    {
-      icon: Download,
-      title: 'Power BI Background SVG Export',
-      desc: '1-click export of razor-sharp .svg wallpaper ready to set under Canvas Background → Image in Power BI Desktop.',
-      color: '#EC4899',
-    },
-  ];
+    []
+  );
+
+  // 1. Canvas Dimensions
+  const handleUpdateDimensions = (dimensions: CanvasDimension) => {
+    setDashState((prev) => {
+      const nextContainers = syncContainersWithLayout(
+        prev.layoutPreset,
+        dimensions.width,
+        dimensions.height,
+        prev.navBar
+      );
+      return {
+        ...prev,
+        dimensions,
+        containers: nextContainers,
+      };
+    });
+  };
+
+  // 2. Background Color
+  const handleUpdateBackgroundColor = (backgroundColor: string) => {
+    setDashState((prev) => ({ ...prev, backgroundColor }));
+  };
+
+  // 3. Container Style
+  const handleUpdateContainerStyle = (updates: Partial<DashCanvasContainerStyle>) => {
+    setDashState((prev) => ({
+      ...prev,
+      containerStyle: { ...prev.containerStyle, ...updates },
+    }));
+  };
+
+  // 4. Layout Preset
+  const handleSelectLayoutPreset = (layoutPreset: LayoutPresetType) => {
+    setDashState((prev) => {
+      const nextContainers = syncContainersWithLayout(
+        layoutPreset,
+        prev.dimensions.width,
+        prev.dimensions.height,
+        prev.navBar
+      );
+      return {
+        ...prev,
+        layoutPreset,
+        containers: nextContainers,
+      };
+    });
+  };
+
+  // 5. Navigation Bar Updates
+  const handleUpdateNavBar = (updates: Partial<NavBarConfig>) => {
+    setDashState((prev) => {
+      const nextNavBar = { ...prev.navBar, ...updates };
+      // If orientation or size or show changed, update container positions
+      const shouldRecalc =
+        updates.orientation !== undefined ||
+        updates.size !== undefined ||
+        updates.show !== undefined;
+
+      const nextContainers = shouldRecalc
+        ? syncContainersWithLayout(
+            prev.layoutPreset,
+            prev.dimensions.width,
+            prev.dimensions.height,
+            nextNavBar
+          )
+        : prev.containers;
+
+      return {
+        ...prev,
+        navBar: nextNavBar,
+        containers: nextContainers,
+      };
+    });
+  };
+
+  // 6. Navigation Buttons
+  const handleAddNavButton = () => {
+    setDashState((prev) => {
+      const newId = `btn-${Date.now()}`;
+      const newButton: NavButtonConfig = {
+        id: newId,
+        label: `Tab ${prev.navBar.buttons.length + 1}`,
+        icon: 'bar-chart',
+        isActive: false,
+      };
+      return {
+        ...prev,
+        navBar: {
+          ...prev.navBar,
+          buttons: [...prev.navBar.buttons, newButton],
+        },
+      };
+    });
+  };
+
+  const handleRemoveNavButton = (id: string) => {
+    setDashState((prev) => ({
+      ...prev,
+      navBar: {
+        ...prev.navBar,
+        buttons: prev.navBar.buttons.filter((b) => b.id !== id),
+      },
+    }));
+  };
+
+  const handleUpdateNavButton = (id: string, updates: Partial<NavButtonConfig>) => {
+    setDashState((prev) => ({
+      ...prev,
+      navBar: {
+        ...prev.navBar,
+        buttons: prev.navBar.buttons.map((b) =>
+          b.id === id ? { ...b, ...updates } : b
+        ),
+      },
+    }));
+  };
+
+  const handleReorderNavButtons = (fromIndex: number, toIndex: number) => {
+    setDashState((prev) => {
+      const btns = [...prev.navBar.buttons];
+      if (toIndex < 0 || toIndex >= btns.length) return prev;
+      const [moved] = btns.splice(fromIndex, 1);
+      btns.splice(toIndex, 0, moved);
+      return {
+        ...prev,
+        navBar: {
+          ...prev.navBar,
+          buttons: btns,
+        },
+      };
+    });
+  };
+
+  // 7. Visual Containers Customization
+  const handleUpdateContainer = (id: string, updates: Partial<VisualContainerConfig>) => {
+    setDashState((prev) => ({
+      ...prev,
+      containers: prev.containers.map((c) =>
+        c.id === id ? { ...c, ...updates } : c
+      ),
+    }));
+  };
+
+  const handleRemoveContainer = (id: string) => {
+    setDashState((prev) => ({
+      ...prev,
+      containers: prev.containers.filter((c) => c.id !== id),
+    }));
+  };
+
+  const handleAddContainer = () => {
+    setDashState((prev) => {
+      const newId = `container-${Date.now()}`;
+      const newContainer: VisualContainerConfig = {
+        id: newId,
+        title: 'Custom Visual Slot',
+        subtitle: 'Placeholder for Power BI visual',
+        showTitle: true,
+        showSubtitle: true,
+        x: 40,
+        y: 100,
+        width: 320,
+        height: 200,
+      };
+      return {
+        ...prev,
+        containers: [...prev.containers, newContainer],
+      };
+    });
+  };
+
+  const handleResetContainers = () => {
+    setDashState((prev) => ({
+      ...prev,
+      containers: syncContainersWithLayout(
+        prev.layoutPreset,
+        prev.dimensions.width,
+        prev.dimensions.height,
+        prev.navBar
+      ),
+    }));
+  };
+
+  // Copy SVG Code
+  const handleCopySvg = async () => {
+    try {
+      const markup = generateDashSvg(dashState);
+      await navigator.clipboard.writeText(markup);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      alert('Could not copy to clipboard.');
+    }
+  };
+
+  // Download SVG File
+  const handleDownloadSvg = () => {
+    const filename = `powerbi-dash-${dashState.dimensions.width}x${dashState.dimensions.height}.svg`;
+    downloadDashSvg(dashState, filename);
+  };
 
   return (
-    <main className="flex-1 max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 w-full space-y-10 sm:space-y-12">
-      {/* Hero Header */}
-      <div className="relative space-y-4">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#34D399] text-[#1E293B] text-xs font-heading font-black border-2 border-[#1E293B] shadow-[2px_2px_0px_0px_#1E293B]">
-          <Sparkles className="w-3.5 h-3.5 stroke-[2.5]" />
-          <span>Coming in Phase 7 • Dashboard SVG Generator</span>
-        </div>
-
-        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-heading font-black tracking-tight text-[#1E293B] dark:text-white leading-[1.1]">
-          Dash <span className="text-[#F472B6]">Generator</span>
-        </h1>
-
-        <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 max-w-2xl font-medium">
-          Build pixel-perfect SVG canvas background layouts for Power BI Desktop. Customize navigation ribbons, embed logos, generate page buttons, and configure visual containers with 1-click SVG download.
-        </p>
-      </div>
-
-      {/* Feature Preview Grid */}
-      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {plannedFeatures.map((feat, idx) => {
-          const Icon = feat.icon;
-          return (
-            <div
-              key={idx}
-              className="pop-card bg-white dark:bg-slate-900 p-6 rounded-2xl border-2 border-[#1E293B] dark:border-slate-700 shadow-[4px_4px_0px_0px_#1E293B] space-y-3"
-            >
-              <div
-                className="w-10 h-10 rounded-xl border-2 border-[#1E293B] flex items-center justify-center text-[#1E293B] shadow-[2px_2px_0px_0px_#1E293B]"
-                style={{ backgroundColor: feat.color }}
-              >
-                <Icon className="w-5 h-5 stroke-[2.5]" />
-              </div>
-              <h3 className="text-base font-heading font-extrabold text-[#1E293B] dark:text-white">
-                {feat.title}
-              </h3>
-              <p className="text-xs text-slate-600 dark:text-slate-400 font-medium leading-relaxed">
-                {feat.desc}
-              </p>
-              <div className="pt-2 flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                <CheckCircle2 className="w-3.5 h-3.5 stroke-[3]" />
-                <span>Specified for Phase 7</span>
-              </div>
-            </div>
-          );
-        })}
-      </section>
-
-      {/* Cross-Link Callout to Theme Studio */}
-      <section className="rounded-3xl border-2 border-[#1E293B] dark:border-slate-700 bg-[#FFFDF5] dark:bg-slate-900 p-6 sm:p-8 shadow-[6px_6px_0px_0px_#1E293B] flex flex-col sm:flex-row items-center justify-between gap-6">
-        <div className="space-y-1 text-center sm:text-left">
-          <h3 className="text-lg sm:text-xl font-heading font-black text-[#1E293B] dark:text-white">
-            Need a color palette right now?
-          </h3>
+    <main className="flex-1 max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 w-full space-y-8">
+      {/* Page Header Ribbon */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b-2 border-slate-200 dark:border-slate-800">
+        <div className="space-y-1">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F472B6] text-white text-xs font-heading font-black border-2 border-[#1E293B] shadow-[2px_2px_0px_0px_#1E293B]">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Power BI Canvas Background Builder</span>
+          </div>
+          <h1 className="text-3xl sm:text-4xl font-heading font-black text-[#1E293B] dark:text-white">
+            Dash <span className="text-[#F472B6]">Canvas Generator</span>
+          </h1>
           <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">
-            Extract 10 official Power BI data colors from your brand logo and download a schema-compliant theme JSON in seconds.
+            Configure navigation ribbons, card containers, and branding into a pixel-perfect Power BI wallpaper SVG.
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={() => onNavigate('theme-generator')}
-          className="pop-btn w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full text-xs sm:text-sm font-heading font-black bg-[#8B5CF6] hover:bg-[#7C3AED] text-white shadow-[3px_3px_0px_0px_#1E293B] transition-all cursor-pointer flex-shrink-0"
-        >
-          <Palette className="w-4 h-4 stroke-[2.5]" />
-          <span>Open Theme Studio</span>
-          <ArrowRight className="w-4 h-4 stroke-[2.5]" />
-        </button>
-      </section>
+        {/* Global Action Buttons */}
+        <div className="flex items-center gap-2.5 flex-wrap">
+          <button
+            type="button"
+            onClick={handleCopySvg}
+            className="pop-btn inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs sm:text-sm font-heading font-black bg-white dark:bg-slate-800 text-[#1E293B] dark:text-white border-2 border-[#1E293B] shadow-[2.5px_2.5px_0px_0px_#1E293B] hover:bg-slate-50 transition-all cursor-pointer"
+          >
+            {copied ? (
+              <Check className="w-4 h-4 text-emerald-600 stroke-[3]" />
+            ) : (
+              <Copy className="w-4 h-4 text-slate-500 stroke-[2.5]" />
+            )}
+            <span>{copied ? 'Copied SVG!' : 'Copy SVG'}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleDownloadSvg}
+            className="pop-btn inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs sm:text-sm font-heading font-black bg-[#F472B6] hover:bg-[#EC4899] text-white border-2 border-[#1E293B] shadow-[3px_3px_0px_0px_#1E293B] transition-all cursor-pointer"
+          >
+            <Download className="w-4 h-4 stroke-[2.5]" />
+            <span>Download Background (.svg)</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Main Studio Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* Left Control Panel (5 cols on lg) */}
+        <div className="lg:col-span-5 space-y-4">
+          {/* Navigation Tabs for Controls */}
+          <div className="flex items-center gap-1.5 p-1 rounded-2xl border-2 border-[#1E293B] bg-white dark:bg-slate-900 shadow-[2px_2px_0px_0px_#1E293B]">
+            <button
+              type="button"
+              onClick={() => setActiveTab('canvas')}
+              className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl text-xs font-heading font-black transition-all cursor-pointer ${
+                activeTab === 'canvas'
+                  ? 'bg-[#8B5CF6] text-white shadow-[2px_2px_0px_0px_#1E293B]'
+                  : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100'
+              }`}
+            >
+              <Monitor className="w-3.5 h-3.5" />
+              <span>Canvas</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab('nav')}
+              className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl text-xs font-heading font-black transition-all cursor-pointer ${
+                activeTab === 'nav'
+                  ? 'bg-[#8B5CF6] text-white shadow-[2px_2px_0px_0px_#1E293B]'
+                  : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100'
+              }`}
+            >
+              <Navigation className="w-3.5 h-3.5" />
+              <span>Nav Ribbon</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab('containers')}
+              className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl text-xs font-heading font-black transition-all cursor-pointer ${
+                activeTab === 'containers'
+                  ? 'bg-[#8B5CF6] text-white shadow-[2px_2px_0px_0px_#1E293B]'
+                  : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100'
+              }`}
+            >
+              <Boxes className="w-3.5 h-3.5" />
+              <span>Slots ({dashState.containers.length})</span>
+            </button>
+          </div>
+
+          {/* Tab Content Panels */}
+          {activeTab === 'canvas' && (
+            <DashCanvasControls
+              dimensions={dashState.dimensions}
+              backgroundColor={dashState.backgroundColor}
+              containerStyle={dashState.containerStyle}
+              layoutPreset={dashState.layoutPreset}
+              onChangeDimensions={handleUpdateDimensions}
+              onChangeBackgroundColor={handleUpdateBackgroundColor}
+              onChangeContainerStyle={handleUpdateContainerStyle}
+              onSelectLayoutPreset={handleSelectLayoutPreset}
+            />
+          )}
+
+          {activeTab === 'nav' && (
+            <DashNavControls
+              navBar={dashState.navBar}
+              onUpdateNavBar={handleUpdateNavBar}
+              onAddButton={handleAddNavButton}
+              onRemoveButton={handleRemoveNavButton}
+              onUpdateButton={handleUpdateNavButton}
+              onReorderButtons={handleReorderNavButtons}
+            />
+          )}
+
+          {activeTab === 'containers' && (
+            <DashContainerConfig
+              containers={dashState.containers}
+              onUpdateContainer={handleUpdateContainer}
+              onRemoveContainer={handleRemoveContainer}
+              onAddContainer={handleAddContainer}
+              onResetLayout={handleResetContainers}
+            />
+          )}
+        </div>
+
+        {/* Right Canvas Preview & Import Instructions (7 cols on lg) */}
+        <div className="lg:col-span-7 space-y-6">
+          {/* Live Vector Canvas Viewport */}
+          <DashSvgCanvas state={dashState} />
+
+          {/* Power BI Desktop Import Guide */}
+          <div className="pop-card bg-white dark:bg-slate-900 p-6 rounded-3xl border-3 border-[#1E293B] dark:border-slate-700 shadow-[4px_4px_0px_0px_#1E293B] space-y-3">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-xl bg-[#FBBF24] border-2 border-[#1E293B] flex items-center justify-center text-[#1E293B] shadow-[2px_2px_0px_0px_#1E293B]">
+                <HelpCircle className="w-4 h-4 stroke-[2.5]" />
+              </div>
+              <h3 className="text-base font-heading font-black text-[#1E293B] dark:text-white">
+                How to Import in Power BI Desktop
+              </h3>
+            </div>
+
+            <ol className="text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-300 space-y-2 list-decimal list-inside pl-1">
+              <li>
+                Download the <span className="font-bold text-[#F472B6]">.svg</span> background using the button above.
+              </li>
+              <li>
+                Open your report in <span className="font-bold text-[#1E293B] dark:text-white">Power BI Desktop</span> and click on the blank canvas area.
+              </li>
+              <li>
+                In the right panel, go to <span className="font-bold text-[#8B5CF6]">Format Page &gt; Canvas background</span>.
+              </li>
+              <li>
+                Click <span className="font-bold">Browse / Add file</span> and select the downloaded SVG file.
+              </li>
+              <li>
+                Set <span className="font-bold text-emerald-600">Image fit = Normal</span> (or <span className="font-bold text-emerald-600">Fit</span>) and change <span className="font-bold text-emerald-600">Transparency = 0%</span>.
+              </li>
+            </ol>
+
+            <div className="pt-2 flex items-center justify-between border-t border-slate-100 dark:border-slate-800 text-xs">
+              <span className="text-slate-500 font-bold">
+                Need matching visual colors?
+              </span>
+              <button
+                type="button"
+                onClick={() => onNavigate('theme-generator')}
+                className="inline-flex items-center gap-1 font-heading font-black text-[#8B5CF6] hover:underline cursor-pointer"
+              >
+                <Palette className="w-3.5 h-3.5" />
+                <span>Open Theme Studio &rarr;</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </main>
   );
 };

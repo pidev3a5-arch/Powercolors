@@ -17,8 +17,19 @@ const DEFAULT_PALETTE_HEXES = [
 ];
 
 export default function App() {
+  // Helper to parse hash route
+  const getPageFromHash = (): AppPage | null => {
+    const hash = window.location.hash.replace(/^#\/?/, '');
+    if (hash === 'theme-generator' || hash === 'dash-generator' || hash === 'landing') {
+      return hash as AppPage;
+    }
+    return null;
+  };
+
   // Navigation Page State ('landing' | 'theme-generator' | 'dash-generator')
   const [currentPage, setCurrentPage] = useState<AppPage>(() => {
+    const fromHash = typeof window !== 'undefined' ? getPageFromHash() : null;
+    if (fromHash) return fromHash;
     const saved = localStorage.getItem('powerlab_current_page');
     if (saved === 'theme-generator' || saved === 'dash-generator' || saved === 'landing') {
       return saved;
@@ -28,9 +39,22 @@ export default function App() {
 
   const handleNavigate = useCallback((page: AppPage) => {
     setCurrentPage(page);
+    window.location.hash = page;
     localStorage.setItem('powerlab_current_page', page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
+
+  // Listen for browser back/forward or hash changes
+  useEffect(() => {
+    const onHashChange = () => {
+      const fromHash = getPageFromHash();
+      if (fromHash && fromHash !== currentPage) {
+        setCurrentPage(fromHash);
+      }
+    };
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
+  }, [currentPage]);
 
   // Site Theme: Light mode by default (Warm Cream Paper Feel)
   const [isDarkSite, setIsDarkSite] = useState<boolean>(() => {
