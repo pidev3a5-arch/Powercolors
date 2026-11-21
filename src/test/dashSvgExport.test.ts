@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { generateDashSvg, escapeXml } from '../core/dashSvgExport';
+import { generateDashSvg, escapeXml, sanitizeFilename, getDefaultSvgFilename } from '../core/dashSvgExport';
 import { DashCanvasState, DEFAULT_DASH_CANVAS_STATE } from '../core/dashTypes';
 import { generateLayoutContainers, autoArrangeContainers } from '../core/dashLayoutPresets';
 import { READY_DESIGN_PRESETS } from '../core/dashDesignPresets';
@@ -359,5 +359,33 @@ describe('Dash SVG Canvas Export & Layout Engine', () => {
     // Each container should have a unique non-zero position
     expect(arranged[1].x).toBeGreaterThan(arranged[0].x);
     expect(arranged[2].y).toBeGreaterThan(arranged[0].y);
+  });
+
+  it('sanitizes SVG download filename and formats ReportTitle_PageHeaderTitle.svg', () => {
+    expect(sanitizeFilename('Executive Sales : Q1 / Global')).toBe('Executive_Sales_Q1_Global');
+    expect(sanitizeFilename('  Trimmed   Name  ')).toBe('Trimmed_Name');
+
+    const state: DashCanvasState = {
+      ...DEFAULT_DASH_CANVAS_STATE,
+      navBar: {
+        ...DEFAULT_DASH_CANVAS_STATE.navBar,
+        reportTitle: 'Sales Performance',
+      },
+      pageTitles: [
+        {
+          id: 'title-1',
+          title: 'Q4 Summary',
+          subtitle: 'Global Metrics',
+          position: 'top-left',
+          titleSize: 22,
+          subtitleSize: 13,
+          titleColor: '#0F172A',
+          subtitleColor: '#64748B',
+        },
+      ],
+    };
+
+    const defaultFilename = getDefaultSvgFilename(state);
+    expect(defaultFilename).toBe('Sales_Performance_Q4_Summary.svg');
   });
 });

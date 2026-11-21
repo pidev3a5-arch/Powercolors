@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import {
   Download,
   Copy,
@@ -9,6 +9,7 @@ import {
   HelpCircle,
   Palette,
   Sparkles,
+  FileText,
 } from 'lucide-react';
 import {
   DashCanvasState,
@@ -26,7 +27,7 @@ import {
 } from '../core/dashTypes';
 import { generateLayoutContainers, autoArrangeContainers } from '../core/dashLayoutPresets';
 import { READY_DESIGN_PRESETS } from '../core/dashDesignPresets';
-import { generateDashSvg, downloadDashSvg } from '../core/dashSvgExport';
+import { generateDashSvg, downloadDashSvg, getDefaultSvgFilename } from '../core/dashSvgExport';
 import { DashNavControls } from '../components/dash/DashNavControls';
 import { DashCanvasControls } from '../components/dash/DashCanvasControls';
 import { DashContainerConfig } from '../components/dash/DashContainerConfig';
@@ -385,6 +386,13 @@ export const DashGeneratorPage: React.FC<DashGeneratorPageProps> = ({ onNavigate
     }));
   };
 
+  // Custom SVG Download Filename (Requirement 2)
+  const [customSvgFilename, setCustomSvgFilename] = useState<string>('');
+
+  const defaultSvgFilename = useMemo(() => {
+    return getDefaultSvgFilename(dashState);
+  }, [dashState]);
+
   // Copy SVG Code
   const handleCopySvg = async () => {
     try {
@@ -399,7 +407,7 @@ export const DashGeneratorPage: React.FC<DashGeneratorPageProps> = ({ onNavigate
 
   // Download SVG File
   const handleDownloadSvg = () => {
-    const filename = `powerbi-dash-${dashState.dimensions.width}x${dashState.dimensions.height}.svg`;
+    const filename = customSvgFilename.trim() || defaultSvgFilename;
     downloadDashSvg(dashState, filename);
   };
 
@@ -420,8 +428,22 @@ export const DashGeneratorPage: React.FC<DashGeneratorPageProps> = ({ onNavigate
           </p>
         </div>
 
-        {/* Global Action Buttons */}
+        {/* Global Action Buttons & Custom Filename Input (Requirement 2) */}
         <div className="flex items-center gap-2.5 flex-wrap">
+          {/* Filename Input */}
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border-2 border-[#1E293B] bg-white dark:bg-slate-800 shadow-[2px_2px_0px_0px_#1E293B]">
+            <FileText className="w-3.5 h-3.5 text-[#F472B6] flex-shrink-0" />
+            <input
+              type="text"
+              value={customSvgFilename !== '' ? customSvgFilename : defaultSvgFilename.replace(/\.svg$/, '')}
+              onChange={(e) => setCustomSvgFilename(e.target.value)}
+              placeholder={defaultSvgFilename.replace(/\.svg$/, '')}
+              className="text-xs font-mono font-bold bg-transparent border-none outline-none text-[#1E293B] dark:text-white w-44 sm:w-60"
+              title="Custom SVG filename (defaults to ReportTitle_PageHeaderTitle)"
+            />
+            <span className="text-[11px] font-mono font-bold text-slate-400">.svg</span>
+          </div>
+
           <button
             type="button"
             onClick={handleCopySvg}

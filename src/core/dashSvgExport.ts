@@ -469,6 +469,26 @@ export function generateDashSvg(state: DashCanvasState, forPreview = false): str
 }
 
 /**
+ * Sanitizes a string into a safe file name
+ */
+export function sanitizeFilename(str: string): string {
+  if (!str) return '';
+  return str
+    .trim()
+    .replace(/[<>:"/\\|?*\x00-\x1F]/g, '')
+    .replace(/\s+/g, '_');
+}
+
+/**
+ * Computes default SVG filename starting with Report Title_Page Header Title
+ */
+export function getDefaultSvgFilename(state: DashCanvasState): string {
+  const rep = sanitizeFilename(state.navBar.reportTitle || 'Report') || 'Report';
+  const page = sanitizeFilename(state.pageTitles[0]?.title || 'Overview') || 'Overview';
+  return `${rep}_${page}.svg`;
+}
+
+/**
  * Downloads generated SVG as a file in the browser
  */
 export function downloadDashSvg(state: DashCanvasState, filename?: string): void {
@@ -480,7 +500,7 @@ export function downloadDashSvg(state: DashCanvasState, filename?: string): void
     ? filename.endsWith('.svg')
       ? filename
       : `${filename}.svg`
-    : `powerbi-canvas-${state.dimensions.width}x${state.dimensions.height}.svg`;
+    : getDefaultSvgFilename(state);
 
   const link = document.createElement('a');
   link.href = url;

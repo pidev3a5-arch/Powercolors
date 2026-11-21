@@ -1,5 +1,5 @@
-import React, { useState, useMemo, useRef } from 'react';
-import { ZoomIn, ZoomOut, Maximize2, Layers, RotateCcw } from 'lucide-react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
+import { ZoomIn, ZoomOut, Maximize2, Layers, RotateCcw, Eye, X } from 'lucide-react';
 import { DashCanvasState } from '../../core/dashTypes';
 import { generateDashSvg } from '../../core/dashSvgExport';
 
@@ -17,6 +17,9 @@ export const DashSvgCanvas: React.FC<DashSvgCanvasProps> = ({ state }) => {
   const [isDragging, setIsDragging] = useState(false);
   const dragStartRef = useRef({ x: 0, y: 0, scrollLeft: 0, scrollTop: 0 });
 
+  // Real size 1:1 popup modal state
+  const [isRealSizePopupOpen, setIsRealSizePopupOpen] = useState(false);
+
   // Generate real-time SVG markup for preview (with style="width: 100%; height: 100%;")
   const svgMarkup = useMemo(() => {
     return generateDashSvg(state, true);
@@ -25,14 +28,47 @@ export const DashSvgCanvas: React.FC<DashSvgCanvasProps> = ({ state }) => {
   const { width, height } = state.dimensions;
   const aspectRatio = `${width} / ${height}`;
 
+  // Wheel zoom in/out with scroll mouse (Requirement 1)
+  useEffect(() => {
+    const el = viewportRef.current;
+    if (!el) return;
+
+    const handleNativeWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      setIsFitMode(false);
+      const delta = e.deltaY < 0 ? 8 : -8;
+      setZoomPercent((prev) => Math.min(220, Math.max(35, prev + delta)));
+    };
+
+    el.addEventListener('wheel', handleNativeWheel, { passive: false });
+    return () => {
+      el.removeEventListener('wheel', handleNativeWheel);
+    };
+  }, []);
+
+  // Escape key listener to close Real Size popup
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsRealSizePopupOpen(false);
+      }
+    };
+    if (isRealSizePopupOpen) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isRealSizePopupOpen]);
+
   const handleZoomIn = () => {
     setIsFitMode(false);
-    setZoomPercent((prev) => Math.min(160, prev + 15));
+    setZoomPercent((prev) => Math.min(220, prev + 15));
   };
 
   const handleZoomOut = () => {
     setIsFitMode(false);
-    setZoomPercent((prev) => Math.max(40, prev - 15));
+    setZoomPercent((prev) => Math.max(35, prev - 15));
   };
 
   const handleResetFit = () => {
@@ -165,6 +201,16 @@ export const DashSvgCanvas: React.FC<DashSvgCanvasProps> = ({ state }) => {
           <div className="flex items-center gap-2">
             <button
               type="button"
+              onClick={() => setIsRealSizePopupOpen(true)}
+              className="pop-btn inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-white dark:bg-slate-800 border-2 border-[#1E293B] dark:border-slate-700 text-xs font-heading font-black text-[#1E293B] dark:text-white shadow-[2px_2px_0px_0px_#1E293B] hover:bg-[#FBBF24] hover:text-[#1E293B] transition-all cursor-pointer"
+              title="Open canvas wallpaper at 1:1 real pixel size in a popup"
+            >
+              <Eye className="w-3.5 h-3.5 text-[#8B5CF6]" />
+              <span>Real Size Popup</span>
+            </button>
+
+            <button
+              type="button"
               onClick={handleResetFit}
               className="text-[10px] font-heading font-black text-slate-500 hover:text-[#8B5CF6] flex items-center gap-1 cursor-pointer"
             >
@@ -206,6 +252,59 @@ export const DashSvgCanvas: React.FC<DashSvgCanvasProps> = ({ state }) => {
           />
         </div>
       </div>
+
+      {/* Real Size 1:1 Scale Popup Modal (Requirement 1) */}
+      {isRealSizePopupOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/75 backdrop-blur-sm animate-in fade-in duration-150"
+          onClick={() => setIsRealSizePopupOpen(false)}
+        >
+          <div
+            className="relative w-full max-w-[96vw] h-[92vh] flex flex-col bg-slate-100 dark:bg-slate-900 rounded-3xl border-3 border-[#1E293B] dark:border-slate-700 shadow-[8px_8px_0px_0px_#1E293B] overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="flex items-center justify-between px-5 py-3 border-b-2 border-[#1E293B] dark:border-slate-700 bg-white dark:bg-slate-800 flex-shrink-0">
+              <div className="flex items-center gap-2.5">
+                <span className="w-3 h-3 rounded-full bg-rose-400 border border-[#1E293B]" />
+                <span className="w-3 h-3 rounded-full bg-amber-400 border border-[#1E293B]" />
+                <span className="w-3 h-3 rounded-full bg-emerald-400 border border-[#1E293B]" />
+                <h3 className="text-sm sm:text-base font-heading font-black text-[#1E293B] dark:text-white ml-1">
+                  Real Size Preview (1:1 Native Resolution — {width} × {height} px)
+                </h3>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="text-[11px] font-mono font-bold text-slate-500 bg-slate-100 dark:bg-slate-900 px-2.5 py-1 rounded-full border border-slate-300 dark:border-slate-700 hidden sm:inline">
+                  100% Scale Actual Pixels
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setIsRealSizePopupOpen(false)}
+                  className="p-1.5 rounded-xl border-2 border-[#1E293B] bg-slate-100 dark:bg-slate-700 text-[#1E293B] dark:text-white hover:bg-rose-100 hover:text-rose-600 shadow-[2px_2px_0px_0px_#1E293B] cursor-pointer transition-all"
+                  aria-label="Close"
+                >
+                  <X className="w-5 h-5 stroke-[2.5]" />
+                </button>
+              </div>
+            </div>
+
+            {/* Scrollable Container with exact 1:1 Pixel Dimensions */}
+            <div className="flex-1 overflow-auto p-6 sm:p-10 flex items-center justify-center bg-[#E2E8F0]/50 dark:bg-slate-950">
+              <div
+                className="shadow-2xl border border-[#1E293B] flex-shrink-0 rounded-none overflow-hidden"
+                style={{
+                  width: `${width}px`,
+                  height: `${height}px`,
+                  backgroundColor: state.backgroundColor,
+                }}
+                dangerouslySetInnerHTML={{ __html: svgMarkup }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
