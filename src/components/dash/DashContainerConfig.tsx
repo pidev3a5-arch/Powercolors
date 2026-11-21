@@ -161,15 +161,49 @@ export const DashContainerConfig: React.FC<DashContainerConfigProps> = ({
                 </div>
 
                 {container.showTitle && (
-                  <input
-                    type="text"
-                    value={container.title}
-                    onChange={(e) =>
-                      onUpdateContainer(container.id, { title: e.target.value })
-                    }
-                    placeholder="Card title (e.g. Total Revenue)"
-                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-[#FFFDF5] dark:bg-slate-950 text-xs font-bold text-[#1E293B] dark:text-white outline-none focus:border-[#8B5CF6]"
-                  />
+                  <div className="space-y-2">
+                    <input
+                      type="text"
+                      value={container.title}
+                      onChange={(e) =>
+                        onUpdateContainer(container.id, { title: e.target.value })
+                      }
+                      placeholder="Card title (e.g. Total Revenue)"
+                      className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-[#FFFDF5] dark:bg-slate-950 text-xs font-bold text-[#1E293B] dark:text-white outline-none focus:border-[#8B5CF6]"
+                    />
+
+                    {/* Title Font Size & Color */}
+                    <div className="flex items-center gap-2 pt-0.5">
+                      <div className="flex-1 space-y-0.5">
+                        <div className="flex justify-between text-[9.5px] font-bold text-slate-500">
+                          <span>Font Size</span>
+                          <span className="font-mono">{container.titleSize || 13}px</span>
+                        </div>
+                        <input
+                          type="range"
+                          min={10}
+                          max={22}
+                          value={container.titleSize || 13}
+                          onChange={(e) =>
+                            onUpdateContainer(container.id, { titleSize: Number(e.target.value) })
+                          }
+                          className="w-full accent-[#8B5CF6] cursor-pointer"
+                        />
+                      </div>
+                      <div className="space-y-0.5">
+                        <span className="text-[9.5px] font-bold text-slate-500 block">Color</span>
+                        <input
+                          type="color"
+                          value={container.titleColor || '#1E293B'}
+                          onChange={(e) =>
+                            onUpdateContainer(container.id, { titleColor: e.target.value })
+                          }
+                          className="w-5 h-5 rounded border border-[#1E293B] cursor-pointer"
+                          title="Title text color"
+                        />
+                      </div>
+                    </div>
+                  </div>
                 )}
               </div>
 
@@ -197,15 +231,115 @@ export const DashContainerConfig: React.FC<DashContainerConfigProps> = ({
                 </div>
 
                 {container.showSubtitle && (
-                  <input
-                    type="text"
-                    value={container.subtitle}
-                    onChange={(e) =>
-                      onUpdateContainer(container.id, { subtitle: e.target.value })
+                  <div className="space-y-2">
+                    <input
+                      type="text"
+                      value={container.subtitle}
+                      onChange={(e) =>
+                        onUpdateContainer(container.id, { subtitle: e.target.value })
+                      }
+                      placeholder="Card subtitle (e.g. Monthly breakdown vs target)"
+                      className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-[#FFFDF5] dark:bg-slate-950 text-xs font-medium text-slate-700 dark:text-slate-300 outline-none focus:border-[#8B5CF6]"
+                    />
+
+                    {/* Subtitle Font Size & Color */}
+                    <div className="flex items-center gap-2 pt-0.5">
+                      <div className="flex-1 space-y-0.5">
+                        <div className="flex justify-between text-[9.5px] font-bold text-slate-500">
+                          <span>Font Size</span>
+                          <span className="font-mono">{container.subtitleSize || 10.5}px</span>
+                        </div>
+                        <input
+                          type="range"
+                          min={8}
+                          max={16}
+                          step={0.5}
+                          value={container.subtitleSize || 10.5}
+                          onChange={(e) =>
+                            onUpdateContainer(container.id, { subtitleSize: Number(e.target.value) })
+                          }
+                          className="w-full accent-[#8B5CF6] cursor-pointer"
+                        />
+                      </div>
+                      <div className="space-y-0.5">
+                        <span className="text-[9.5px] font-bold text-slate-500 block">Color</span>
+                        <input
+                          type="color"
+                          value={container.subtitleColor || '#64748B'}
+                          onChange={(e) =>
+                            onUpdateContainer(container.id, { subtitleColor: e.target.value })
+                          }
+                          className="w-5 h-5 rounded border border-[#1E293B] cursor-pointer"
+                          title="Subtitle text color"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Slot Header Divider Configuration (Requirement 5) */}
+              <div className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-heading font-black text-slate-700 dark:text-slate-300">
+                    Header Divider Line
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      onUpdateContainer(container.id, {
+                        showDivider: container.showDivider !== false ? false : true,
+                      })
                     }
-                    placeholder="Card subtitle (e.g. Monthly breakdown vs target)"
-                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-[#FFFDF5] dark:bg-slate-950 text-xs font-medium text-slate-700 dark:text-slate-300 outline-none focus:border-[#8B5CF6]"
-                  />
+                    className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border border-[#1E293B] transition-colors cursor-pointer ${
+                      container.showDivider !== false
+                        ? 'bg-[#34D399] text-[#1E293B]'
+                        : 'bg-slate-200 dark:bg-slate-700 text-slate-400'
+                    }`}
+                  >
+                    {container.showDivider !== false ? 'Active' : 'Off'}
+                  </button>
+                </div>
+
+                {container.showDivider !== false && (
+                  <div className="grid grid-cols-2 gap-2 pt-1 border-t border-dashed border-slate-200 dark:border-slate-700">
+                    <div className="space-y-0.5">
+                      <span className="text-[9.5px] font-bold text-slate-500 block">Thickness</span>
+                      <div className="flex gap-1">
+                        {[1, 1.5, 2, 3].map((th) => (
+                          <button
+                            key={th}
+                            type="button"
+                            onClick={() => onUpdateContainer(container.id, { dividerThickness: th })}
+                            className={`flex-1 py-0.5 rounded text-[10px] font-bold border border-[#1E293B] cursor-pointer ${
+                              (container.dividerThickness || 1) === th
+                                ? 'bg-[#8B5CF6] text-white'
+                                : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300'
+                            }`}
+                          >
+                            {th}px
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="space-y-0.5">
+                      <span className="text-[9.5px] font-bold text-slate-500 block">Divider Color</span>
+                      <div className="flex items-center gap-1 p-0.5 rounded border border-[#1E293B] bg-white dark:bg-slate-900">
+                        <input
+                          type="color"
+                          value={container.dividerColor || '#E2E8F0'}
+                          onChange={(e) =>
+                            onUpdateContainer(container.id, { dividerColor: e.target.value })
+                          }
+                          className="w-4 h-4 rounded cursor-pointer"
+                        />
+                        <span className="font-mono text-[9.5px] font-bold truncate">
+                          {container.dividerColor || '#E2E8F0'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
                 )}
               </div>
 

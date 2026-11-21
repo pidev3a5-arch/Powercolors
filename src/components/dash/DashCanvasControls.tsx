@@ -51,6 +51,7 @@ const FONT_FAMILIES = [
   'Segoe UI',
   'Aptos',
   'DIN',
+  'Verdana',
   'Arial',
   'Calibri',
   'Plus Jakarta Sans',
@@ -79,6 +80,10 @@ export const DashCanvasControls: React.FC<DashCanvasControlsProps> = ({
       onChangeDimensions({ preset, width: 1280, height: 720 });
     } else if (preset === '1920x1080') {
       onChangeDimensions({ preset, width: 1920, height: 1080 });
+    } else if (preset === '1024x768') {
+      onChangeDimensions({ preset, width: 1024, height: 768 });
+    } else if (preset === '1440x900') {
+      onChangeDimensions({ preset, width: 1440, height: 900 });
     } else {
       onChangeDimensions({ ...dimensions, preset: 'custom' });
     }
@@ -86,24 +91,24 @@ export const DashCanvasControls: React.FC<DashCanvasControlsProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* 1. Ready-Made Design Themes (Requirement 2) */}
+      {/* 1. Ready-Made Design Themes (Requirement 1: 6 Unique Presets) */}
       <div className="pop-card bg-white dark:bg-slate-900 p-5 rounded-2xl border-2 border-[#1E293B] dark:border-slate-700 shadow-[3px_3px_0px_0px_#1E293B] space-y-4">
         <div className="flex items-center justify-between">
           <div>
             <h4 className="text-sm font-heading font-black text-[#1E293B] dark:text-white flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-[#F472B6]" />
-              <span>Ready Design Presets</span>
+              <span>Ready Design Presets (6)</span>
             </h4>
             <p className="text-[11px] text-slate-500 font-medium">
-              Pick a complete matching theme to download or tweak
+              Distinct slot counts, layouts, fonts & nav orientations
             </p>
           </div>
           <span className="text-[10px] font-heading font-black px-2 py-0.5 rounded-full bg-[#8B5CF6]/15 text-[#8B5CF6]">
-            1-Click Style
+            1-Click Theme
           </span>
         </div>
 
-        <div className="grid grid-cols-2 gap-2.5">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
           {READY_DESIGN_PRESETS.map((preset) => (
             <button
               key={preset.id}
@@ -119,6 +124,15 @@ export const DashCanvasControls: React.FC<DashCanvasControlsProps> = ({
                   className="w-3.5 h-3.5 rounded-full border border-[#1E293B] shadow-xs flex-shrink-0"
                   style={{ backgroundColor: preset.accentColor }}
                 />
+              </div>
+
+              {/* Distinct Specs Badge */}
+              <div className="text-[9.5px] font-bold text-slate-500 dark:text-slate-400 leading-tight">
+                <span className="font-mono text-[#8B5CF6] font-black">{preset.slotCount} Slots</span>
+                {' • '}
+                <span>{preset.navType === 'left' ? `Left ${preset.navSize}px` : `Top ${preset.navSize}px`}</span>
+                {' • '}
+                <span className="text-slate-600 dark:text-slate-300">{preset.fontFamily}</span>
               </div>
 
               {/* Color swatch row preview */}
@@ -149,7 +163,7 @@ export const DashCanvasControls: React.FC<DashCanvasControlsProps> = ({
         </div>
       </div>
 
-      {/* 2. Canvas Resolution & Dimensions */}
+      {/* 2. Canvas Resolution & Dimensions (Requirement 2: 4 Presets) */}
       <div className="pop-card bg-white dark:bg-slate-900 p-5 rounded-2xl border-2 border-[#1E293B] dark:border-slate-700 shadow-[3px_3px_0px_0px_#1E293B] space-y-4">
         <h4 className="text-sm font-heading font-black text-[#1E293B] dark:text-white flex items-center gap-2">
           <Monitor className="w-4 h-4 text-[#8B5CF6]" />
@@ -170,6 +184,8 @@ export const DashCanvasControls: React.FC<DashCanvasControlsProps> = ({
           >
             <option value="1280x720">1280 × 720 px (16:9 Standard Power BI)</option>
             <option value="1920x1080">1920 × 1080 px (16:9 Full HD Crisp)</option>
+            <option value="1024x768">1024 × 768 px (4:3 Classic Standard)</option>
+            <option value="1440x900">1440 × 900 px (16:10 Widescreen Display)</option>
             <option value="custom">Custom Dimensions (W × H)</option>
           </select>
         </div>

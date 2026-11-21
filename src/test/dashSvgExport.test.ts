@@ -181,8 +181,10 @@ describe('Dash SVG Canvas Export & Layout Engine', () => {
     }
   });
 
-  it('renders DEFAULT_DASH_CANVAS_STATE with visible default page header titles', () => {
+  it('renders DEFAULT_DASH_CANVAS_STATE with visible default page header titles in top-left', () => {
     const initial = { ...DEFAULT_DASH_CANVAS_STATE };
+    expect(initial.pageTitles[0].position).toBe('top-left');
+
     initial.containers = generateLayoutContainers(
       initial.layoutPreset,
       initial.dimensions.width,
@@ -198,6 +200,106 @@ describe('Dash SVG Canvas Export & Layout Engine', () => {
     const slotsIndex = svg.indexOf('<!-- Visual Container Slots -->');
     const titlesIndex = svg.indexOf('<!-- Page Titles -->');
     expect(titlesIndex).toBeGreaterThan(slotsIndex);
+  });
+
+  it('supports 1024x768 and 1440x900 aspect ratio presets cleanly', () => {
+    const presets = [
+      { width: 1024, height: 768, preset: '1024x768' as const },
+      { width: 1440, height: 900, preset: '1440x900' as const },
+    ];
+
+    for (const p of presets) {
+      const state: DashCanvasState = {
+        ...DEFAULT_DASH_CANVAS_STATE,
+        dimensions: p,
+      };
+      state.containers = generateLayoutContainers(
+        state.layoutPreset,
+        p.width,
+        p.height,
+        state.navBar,
+        state.pageTitles
+      );
+      const svg = generateDashSvg(state);
+      expect(svg).toContain(`viewBox="0 0 ${p.width} ${p.height}"`);
+      expect(svg).toContain(`width="${p.width}"`);
+      expect(svg).toContain(`height="${p.height}"`);
+    }
+  });
+
+  it('renders custom slot divider, title size/color, and subtitle size/color', () => {
+    const state: DashCanvasState = {
+      ...DEFAULT_DASH_CANVAS_STATE,
+      containers: [
+        {
+          id: 'slot-1',
+          title: 'Custom Title',
+          subtitle: 'Custom Subtitle',
+          showTitle: true,
+          showSubtitle: true,
+          x: 250,
+          y: 100,
+          width: 300,
+          height: 200,
+          titleSize: 19,
+          titleColor: '#E11D48',
+          subtitleSize: 13,
+          subtitleColor: '#4F46E5',
+          showDivider: true,
+          dividerColor: '#F59E0B',
+          dividerThickness: 3,
+        },
+      ],
+    };
+
+    const svg = generateDashSvg(state);
+    expect(svg).toContain('font-size="19"');
+    expect(svg).toContain('fill="#E11D48"');
+    expect(svg).toContain('font-size="13"');
+    expect(svg).toContain('fill="#4F46E5"');
+    expect(svg).toContain('stroke="#F59E0B"');
+    expect(svg).toContain('stroke-width="3"');
+  });
+
+  it('supports hiding slot divider when showDivider is false', () => {
+    const state: DashCanvasState = {
+      ...DEFAULT_DASH_CANVAS_STATE,
+      containers: [
+        {
+          id: 'slot-no-div',
+          title: 'No Divider Slot',
+          subtitle: 'Clean look',
+          showTitle: true,
+          showSubtitle: true,
+          x: 250,
+          y: 100,
+          width: 300,
+          height: 200,
+          showDivider: false,
+        },
+      ],
+    };
+
+    const svg = generateDashSvg(state);
+    expect(svg).not.toContain('stroke-dasharray="4 2"');
+  });
+
+  it('renders custom reportTitleSize and respects showButtonIcons toggle', () => {
+    const stateWithIconsOff: DashCanvasState = {
+      ...DEFAULT_DASH_CANVAS_STATE,
+      navBar: {
+        ...DEFAULT_DASH_CANVAS_STATE.navBar,
+        reportTitle: 'Custom Sized Brand',
+        reportTitleSize: 21,
+        showButtonIcons: false,
+      },
+    };
+
+    const svg = generateDashSvg(stateWithIconsOff);
+    expect(svg).toContain('Custom Sized Brand');
+    expect(svg).toContain('font-size="21"');
+    // When icons are disabled on left nav, label starts at x="24" without svg icon group
+    expect(svg).toContain('x="24"');
   });
 
   it('supports 4 new layout presets correctly', () => {
@@ -220,13 +322,27 @@ describe('Dash SVG Canvas Export & Layout Engine', () => {
     }
   });
 
-  it('applies ready-made complete design presets cleanly', () => {
+  it('applies 6 ready-made complete design presets, all with distinct slots, fonts, and nav configurations', () => {
+    expect(READY_DESIGN_PRESETS.length).toBe(6);
+
+    const slotCounts = new Set(READY_DESIGN_PRESETS.map((p) => p.slotCount));
+    const fonts = new Set(READY_DESIGN_PRESETS.map((p) => p.fontFamily));
+    const colors = new Set(READY_DESIGN_PRESETS.map((p) => p.backgroundColor));
+
+    // All 6 presets have distinct slot counts, fonts, and colors
+    expect(slotCounts.size).toBe(6);
+    expect(fonts.size).toBe(6);
+    expect(colors.size).toBe(6);
+
     const initial = { ...DEFAULT_DASH_CANVAS_STATE };
     for (const preset of READY_DESIGN_PRESETS) {
       const updated = preset.apply(initial);
       expect(updated.backgroundColor).toBe(preset.backgroundColor);
       expect(updated.navBar.backgroundColor).toBe(preset.navColor);
       expect(updated.containerStyle.backgroundColor).toBe(preset.cardColor);
+      expect(updated.layoutPreset).toBe(preset.layoutPreset);
+      expect(updated.typography.fontFamily).toBe(preset.fontFamily);
+      expect(updated.navBar.orientation).toBe(preset.navType);
     }
   });
 

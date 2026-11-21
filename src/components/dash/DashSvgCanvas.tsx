@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { ZoomIn, ZoomOut, Maximize2, Layers, RotateCcw } from 'lucide-react';
 import { DashCanvasState } from '../../core/dashTypes';
 import { generateDashSvg } from '../../core/dashSvgExport';
@@ -11,6 +11,11 @@ export const DashSvgCanvas: React.FC<DashSvgCanvasProps> = ({ state }) => {
   // Zoom mode: 'fit' (scales to 100% of available viewport width with aspect ratio) or custom zoom percentage (50% to 150%)
   const [isFitMode, setIsFitMode] = useState<boolean>(true);
   const [zoomPercent, setZoomPercent] = useState<number>(100);
+
+  // Pan / Grab-to-move state when zoomed in
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const dragStartRef = useRef({ x: 0, y: 0, scrollLeft: 0, scrollTop: 0 });
 
   // Generate real-time SVG markup for preview (with style="width: 100%; height: 100%;")
   const svgMarkup = useMemo(() => {
@@ -33,6 +38,36 @@ export const DashSvgCanvas: React.FC<DashSvgCanvasProps> = ({ state }) => {
   const handleResetFit = () => {
     setIsFitMode(true);
     setZoomPercent(100);
+    if (viewportRef.current) {
+      viewportRef.current.scrollLeft = 0;
+      viewportRef.current.scrollTop = 0;
+    }
+  };
+
+  // Drag-to-pan handlers (hand mouse pointer)
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (isFitMode) return;
+    if (!viewportRef.current) return;
+    setIsDragging(true);
+    dragStartRef.current = {
+      x: e.clientX,
+      y: e.clientY,
+      scrollLeft: viewportRef.current.scrollLeft,
+      scrollTop: viewportRef.current.scrollTop,
+    };
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || !viewportRef.current) return;
+    e.preventDefault();
+    const dx = e.clientX - dragStartRef.current.x;
+    const dy = e.clientY - dragStartRef.current.y;
+    viewportRef.current.scrollLeft = dragStartRef.current.scrollLeft - dx;
+    viewportRef.current.scrollTop = dragStartRef.current.scrollTop - dy;
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
   };
 
   return (
@@ -142,14 +177,30 @@ export const DashSvgCanvas: React.FC<DashSvgCanvasProps> = ({ state }) => {
           </div>
         </div>
 
-        {/* Canvas Display Viewport (Scrollable when zoomed, centered when fit) */}
-        <div className="w-full max-h-[700px] overflow-auto rounded-2xl border-2 border-[#1E293B] dark:border-slate-700 bg-[#E2E8F0]/40 dark:bg-slate-950 p-3 sm:p-6 flex items-center justify-center">
+        {/* Canvas Display Viewport (Scrollable when zoomed, centered when fit, with grab-and-drag hand cursor) */}
+        <div
+          ref={viewportRef}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseUp}
+          className={`w-full max-h-[700px] overflow-auto rounded-2xl border-2 border-[#1E293B] dark:border-slate-700 bg-[#E2E8F0]/40 dark:bg-slate-950 p-3 sm:p-6 flex items-center justify-center select-none ${
+            isFitMode
+              ? 'cursor-default'
+              : isDragging
+              ? 'cursor-grabbing'
+              : 'cursor-grab'
+          }`}
+          title={!isFitMode ? 'Click and drag with hand cursor to pan canvas' : undefined}
+        >
+          {/* Dashboard Canvas Container: Corner Radius 0px, 1px contour border, flush left edge */}
           <div
-            className="transition-all duration-150 shadow-2xl rounded-xl overflow-hidden border-2 border-[#1E293B] flex-shrink-0 bg-white"
+            className="transition-transform duration-75 shadow-2xl rounded-none overflow-hidden border border-[#1E293B] flex-shrink-0"
             style={{
               width: isFitMode ? '100%' : `${(width * zoomPercent) / 100}px`,
               maxWidth: isFitMode ? '100%' : 'none',
               aspectRatio: aspectRatio,
+              backgroundColor: state.backgroundColor,
             }}
             dangerouslySetInnerHTML={{ __html: svgMarkup }}
           />

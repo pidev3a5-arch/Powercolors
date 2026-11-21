@@ -224,19 +224,40 @@ export const DashNavControls: React.FC<DashNavControlsProps> = ({
               <span>Report Branding</span>
             </h4>
 
-            {/* Report Title Input */}
-            <div className="space-y-1">
-              <label className="text-xs font-heading font-black text-slate-600 dark:text-slate-400">
-                Report Title
-              </label>
-              <input
-                type="text"
-                value={navBar.reportTitle}
-                maxLength={40}
-                onChange={(e) => onUpdateNavBar({ reportTitle: e.target.value })}
-                placeholder="e.g. Executive Sales Performance"
-                className="w-full px-3 py-2 rounded-xl border-2 border-[#1E293B] dark:border-slate-700 bg-[#FFFDF5] dark:bg-slate-950 text-xs sm:text-sm font-bold text-[#1E293B] dark:text-white outline-none focus:border-[#8B5CF6] focus:shadow-[2px_2px_0px_0px_#8B5CF6] transition-all"
-              />
+            {/* Report Title Input & Font Size (Requirement 7) */}
+            <div className="space-y-2">
+              <div className="space-y-1">
+                <label className="text-xs font-heading font-black text-slate-600 dark:text-slate-400">
+                  Report Title
+                </label>
+                <input
+                  type="text"
+                  value={navBar.reportTitle}
+                  maxLength={40}
+                  onChange={(e) => onUpdateNavBar({ reportTitle: e.target.value })}
+                  placeholder="e.g. Executive Sales Performance"
+                  className="w-full px-3 py-2 rounded-xl border-2 border-[#1E293B] dark:border-slate-700 bg-[#FFFDF5] dark:bg-slate-950 text-xs sm:text-sm font-bold text-[#1E293B] dark:text-white outline-none focus:border-[#8B5CF6] focus:shadow-[2px_2px_0px_0px_#8B5CF6] transition-all"
+                />
+              </div>
+
+              {/* Title Font Size */}
+              <div className="space-y-1 pt-1">
+                <div className="flex justify-between text-xs font-bold text-slate-600 dark:text-slate-400">
+                  <span>Title Font Size</span>
+                  <span className="font-mono text-[#8B5CF6]">
+                    {navBar.reportTitleSize || (navBar.orientation === 'left' ? 14 : 15)} px
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min={11}
+                  max={24}
+                  step={1}
+                  value={navBar.reportTitleSize || (navBar.orientation === 'left' ? 14 : 15)}
+                  onChange={(e) => onUpdateNavBar({ reportTitleSize: Number(e.target.value) })}
+                  className="w-full accent-[#8B5CF6] cursor-pointer"
+                />
+              </div>
             </div>
 
             {/* Logo Upload */}
@@ -284,6 +305,35 @@ export const DashNavControls: React.FC<DashNavControlsProps> = ({
                 className="hidden"
               />
             </div>
+          </div>
+
+          {/* Button Icons Global Switcher (Requirement 8) */}
+          <div className="pop-card bg-white dark:bg-slate-900 p-4 rounded-2xl border-2 border-[#1E293B] dark:border-slate-700 shadow-[2px_2px_0px_0px_#1E293B] flex items-center justify-between">
+            <div>
+              <span className="text-xs font-heading font-black text-[#1E293B] dark:text-white block">
+                Navigation Button Icons
+              </span>
+              <span className="text-[11px] text-slate-500 font-medium">
+                Show or hide vector icons across all navigation tabs
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() =>
+                onUpdateNavBar({
+                  showButtonIcons: navBar.showButtonIcons === false ? true : false,
+                })
+              }
+              className={`relative inline-flex h-6 w-11 items-center rounded-full border border-[#1E293B] transition-colors cursor-pointer ${
+                navBar.showButtonIcons !== false ? 'bg-[#34D399]' : 'bg-slate-200 dark:bg-slate-700'
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white border border-[#1E293B] shadow-xs transition-transform ${
+                  navBar.showButtonIcons !== false ? 'translate-x-5' : 'translate-x-0.5'
+                }`}
+              />
+            </button>
           </div>
 
           {/* Section 1: MENU Tabs */}

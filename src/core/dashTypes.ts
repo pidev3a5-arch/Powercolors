@@ -1,4 +1,4 @@
-export type CanvasResolutionPreset = '1280x720' | '1920x1080' | 'custom';
+export type CanvasResolutionPreset = '1280x720' | '1920x1080' | '1024x768' | '1440x900' | 'custom';
 
 export interface CanvasDimension {
   width: number;
@@ -16,6 +16,7 @@ export interface NavButtonConfig {
   icon: string;
   isActive?: boolean;
   section?: NavButtonSection;
+  showIcon?: boolean;
 }
 
 export interface NavBarConfig {
@@ -26,6 +27,8 @@ export interface NavBarConfig {
   textColor: string;
   accentColor: string;
   reportTitle: string;
+  reportTitleSize?: number;
+  showButtonIcons?: boolean;
   logoUrl: string | null;
   buttons: NavButtonConfig[];
 }
@@ -44,6 +47,14 @@ export interface VisualContainerConfig {
   borderColor?: string;
   borderWidth?: number;
   showBorder?: boolean;
+  // Per-slot divider and typography overrides
+  showDivider?: boolean;
+  dividerColor?: string;
+  dividerThickness?: number;
+  titleColor?: string;
+  titleSize?: number;
+  subtitleColor?: string;
+  subtitleSize?: number;
 }
 
 export interface DashCanvasContainerStyle {
@@ -233,6 +244,72 @@ export const AVAILABLE_NAV_ICONS: NavIconDefinition[] = [
     path: 'M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9 M13.73 21a2 2 0 0 1-3.46 0',
   },
   {
+    name: 'compass',
+    label: 'Compass',
+    category: 'navigation',
+    path: 'M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm4.24 6.76l-1.98 5.66a1 1 0 0 1-.58.58l-5.66 1.98a.5.5 0 0 1-.63-.63l1.98-5.66a1 1 0 0 1 .58-.58l5.66-1.98a.5.5 0 0 1 .63.63z',
+  },
+  {
+    name: 'share-2',
+    label: 'Share',
+    category: 'general',
+    path: 'M18 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M6 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M18 22a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M8.59 13.51l6.83 3.98 M15.41 6.51l-6.82 3.98',
+  },
+  {
+    name: 'search',
+    label: 'Search',
+    category: 'general',
+    path: 'M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16z M21 21l-4.35-4.35',
+  },
+  {
+    name: 'folder',
+    label: 'Folder',
+    category: 'general',
+    path: 'M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z',
+  },
+  {
+    name: 'cpu',
+    label: 'Compute',
+    category: 'analytics',
+    path: 'M4 4h16v16H4z M9 9h6v6H9z M9 1v3 M15 1v3 M9 20v3 M15 20v3 M20 9h3 M20 15h3 M1 9h3 M1 15h3',
+  },
+  {
+    name: 'credit-card',
+    label: 'Billing',
+    category: 'commerce',
+    path: 'M1 4h22v16H1z M1 10h22',
+  },
+  {
+    name: 'shield',
+    label: 'Security',
+    category: 'general',
+    path: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z',
+  },
+  {
+    name: 'zap',
+    label: 'Realtime',
+    category: 'analytics',
+    path: 'M13 2L3 14h9l-1 8 10-12h-9l1-8z',
+  },
+  {
+    name: 'user-check',
+    label: 'Verified Users',
+    category: 'general',
+    path: 'M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2 M9 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8z M16 11l2 2 4-4',
+  },
+  {
+    name: 'inbox',
+    label: 'Inbox',
+    category: 'general',
+    path: 'M22 12h-6l-2 3h-4l-2-3H2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-7z M5.45 5.11L2 12v0 M18.55 5.11L22 12v0',
+  },
+  {
+    name: 'map-pin',
+    label: 'Geographies',
+    category: 'general',
+    path: 'M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z M12 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6z',
+  },
+  {
     name: 'settings',
     label: 'Settings',
     category: 'general',
@@ -268,6 +345,8 @@ export const DEFAULT_DASH_CANVAS_STATE: DashCanvasState = {
     textColor: '#FFFFFF',
     accentColor: '#8B5CF6',
     reportTitle: 'Executive Sales',
+    reportTitleSize: 14,
+    showButtonIcons: true,
     logoUrl: null,
     buttons: [
       { id: 'btn-1', label: 'Overview', icon: 'home', isActive: true, section: 'menu' },
@@ -299,7 +378,7 @@ export const DEFAULT_DASH_CANVAS_STATE: DashCanvasState = {
       id: 'title-main',
       title: 'Executive Sales Overview',
       subtitle: 'Live Fabric Data • Real-Time KPIs',
-      position: 'top-right',
+      position: 'top-left', // Requirement 4: default top-left
       titleSize: 18,
       titleColor: '#1E293B',
       subtitleSize: 11.5,
