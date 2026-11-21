@@ -132,16 +132,6 @@ export const NavigationHeader: React.FC<NavigationHeaderProps> = ({
                 </button>
               )}
             </>
-          ) : currentPage === 'landing' ? (
-            /* Quick CTA when on Landing */
-            <button
-              type="button"
-              onClick={() => onNavigate('theme-generator')}
-              className="pop-btn inline-flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-full text-xs font-heading font-black bg-[#8B5CF6] hover:bg-[#7C3AED] text-white transition-all cursor-pointer shadow-[2.5px_2.5px_0px_0px_#1E293B]"
-            >
-              <Palette className="w-3.5 h-3.5 stroke-[2.5]" />
-              <span>Theme Studio</span>
-            </button>
           ) : null}
         </div>
       </div>
