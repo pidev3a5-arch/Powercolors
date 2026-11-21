@@ -65,6 +65,25 @@ export const DashNavControls: React.FC<DashNavControlsProps> = ({
     }
   };
 
+  const isTitlesActive =
+    navBar.showButtonLabels !== false && navBar.showReportTitle !== false;
+
+  const handleToggleTitlesAndLabels = () => {
+    if (isTitlesActive) {
+      onUpdateNavBar({
+        showButtonLabels: false,
+        showReportTitle: false,
+        ...(navBar.orientation === 'left' ? { size: 68 } : {}),
+      });
+    } else {
+      onUpdateNavBar({
+        showButtonLabels: true,
+        showReportTitle: true,
+        ...(navBar.orientation === 'left' && navBar.size <= 80 ? { size: 210 } : {}),
+      });
+    }
+  };
+
   const currentEditingButton = navBar.buttons.find((b) => b.id === editingIconBtnId);
 
   const menuButtons = navBar.buttons
@@ -156,7 +175,7 @@ export const DashNavControls: React.FC<DashNavControlsProps> = ({
               </div>
               <input
                 type="range"
-                min={navBar.orientation === 'left' ? 150 : 55}
+                min={navBar.orientation === 'left' ? (!isTitlesActive ? 55 : 150) : 55}
                 max={navBar.orientation === 'left' ? 280 : 120}
                 step={5}
                 value={navBar.size}
@@ -334,6 +353,31 @@ export const DashNavControls: React.FC<DashNavControlsProps> = ({
               <span
                 className={`inline-block h-4 w-4 transform rounded-full bg-white border border-[#1E293B] shadow-xs transition-transform ${
                   navBar.showButtonIcons !== false ? 'translate-x-5' : 'translate-x-0.5'
+                }`}
+              />
+            </button>
+          </div>
+
+          {/* Button Titles & Report Title Global Switcher */}
+          <div className="pop-card bg-white dark:bg-slate-900 p-4 rounded-2xl border-2 border-[#1E293B] dark:border-slate-700 shadow-[2px_2px_0px_0px_#1E293B] flex items-center justify-between">
+            <div>
+              <span className="text-xs font-heading font-black text-[#1E293B] dark:text-white block">
+                Button Titles & Report Title
+              </span>
+              <span className="text-[11px] text-slate-500 font-medium">
+                Keep only icon and logo; auto-resizes left sidebar to compact rail
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={handleToggleTitlesAndLabels}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full border border-[#1E293B] transition-colors cursor-pointer ${
+                isTitlesActive ? 'bg-[#34D399]' : 'bg-slate-200 dark:bg-slate-700'
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white border border-[#1E293B] shadow-xs transition-transform ${
+                  isTitlesActive ? 'translate-x-5' : 'translate-x-0.5'
                 }`}
               />
             </button>

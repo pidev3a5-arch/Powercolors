@@ -149,19 +149,30 @@ export function generateDashSvg(state: DashCanvasState, forPreview = false): str
       // Logo & Title
       let titleX = 20;
       const titleY = 44;
+      const showReportTitle = navBar.showReportTitle !== false;
+      const showButtonLabels = navBar.showButtonLabels !== false;
+      const isCompactRail = navBar.size <= 80 || !showButtonLabels;
 
       if (navBar.logoUrl) {
+        const logoX = isCompactRail ? Math.round((navBar.size - 32) / 2) : 18;
         parts.push(
-          `  <image x="18" y="20" width="34" height="34" href="${escapeXml(
+          `  <image x="${logoX}" y="20" width="32" height="32" href="${escapeXml(
             navBar.logoUrl
           )}" preserveAspectRatio="xMidYMid meet" />`
         );
         titleX = 58;
+      } else if (isCompactRail && !showReportTitle) {
+        // Render a clean brandmark icon when title is hidden in compact rail
+        const iconBoxX = Math.round((navBar.size - 32) / 2);
+        parts.push(
+          `  <rect x="${iconBoxX}" y="20" width="32" height="32" rx="8" fill="${navBar.accentColor}" opacity="0.9" />`,
+          `  <path d="M ${iconBoxX + 9} 36 L ${iconBoxX + 16} 27 L ${iconBoxX + 23} 36 Z" fill="#FFFFFF" />`
+        );
       }
 
       const reportTitleSizeLeft = navBar.reportTitleSize || 14;
 
-      if (navBar.reportTitle) {
+      if (showReportTitle && navBar.reportTitle) {
         parts.push(
           `  <text x="${titleX}" y="${titleY}" font-size="${reportTitleSizeLeft}" font-weight="800" fill="${
             navBar.textColor
@@ -171,13 +182,14 @@ export function generateDashSvg(state: DashCanvasState, forPreview = false): str
 
       // Divider below brand header
       parts.push(
-        `  <line x1="16" y1="70" x2="${navBar.size - 16}" y2="70" stroke="${
+        `  <line x1="12" y1="68" x2="${navBar.size - 12}" y2="68" stroke="${
           navBar.textColor
         }" opacity="0.15" stroke-width="1" />`
       );
 
       const btnH = 38;
-      const btnW = navBar.size - 28;
+      const btnW = isCompactRail ? Math.max(38, Math.min(44, navBar.size - 16)) : (navBar.size - 28);
+      const btnX = Math.round((navBar.size - btnW) / 2);
       const globalShowIcons = navBar.showButtonIcons !== false;
 
       // Typography config for buttons
@@ -188,11 +200,13 @@ export function generateDashSvg(state: DashCanvasState, forPreview = false): str
       // Section 1: MENU
       let btnY = 94;
       if (menuButtons.length > 0) {
-        parts.push(
-          `  <text x="18" y="${btnY - 8}" font-size="9" font-weight="800" letter-spacing="1" fill="${
-            navBar.textColor
-          }" opacity="0.5">MENU</text>`
-        );
+        if (!isCompactRail) {
+          parts.push(
+            `  <text x="18" y="${btnY - 8}" font-size="9" font-weight="800" letter-spacing="1" fill="${
+              navBar.textColor
+            }" opacity="0.5">MENU</text>`
+          );
+        }
 
         for (const btn of menuButtons) {
           const isActive = !!btn.isActive;
@@ -207,7 +221,7 @@ export function generateDashSvg(state: DashCanvasState, forPreview = false): str
 
           if (isActive) {
             parts.push(
-              `  <rect x="14" y="${btnY}" width="${btnW}" height="${btnH}" rx="8" fill="${navBar.accentColor}" />`
+              `  <rect x="${btnX}" y="${btnY}" width="${btnW}" height="${btnH}" rx="8" fill="${navBar.accentColor}" />`
             );
           }
 
@@ -215,7 +229,15 @@ export function generateDashSvg(state: DashCanvasState, forPreview = false): str
           const iconColor = isActive ? '#FFFFFF' : navBar.textColor;
           const textOpacity = isActive ? '1' : '0.85';
 
-          if (showIcon) {
+          if (isCompactRail) {
+            // Icon-only compact rail: center vector icon in button
+            const iconCenterX = Math.round((navBar.size - 20) / 2);
+            parts.push(
+              `  <g transform="translate(${iconCenterX}, ${btnY + 9}) scale(0.83)" fill="none" stroke="${iconColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="${textOpacity}">`,
+              `    <path d="${iconPath}" />`,
+              `  </g>`
+            );
+          } else if (showIcon) {
             parts.push(
               `  <g transform="translate(24, ${btnY + 9}) scale(0.83)" fill="none" stroke="${iconColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="${textOpacity}">`,
               `    <path d="${iconPath}" />`,
@@ -236,14 +258,20 @@ export function generateDashSvg(state: DashCanvasState, forPreview = false): str
       if (generalButtons.length > 0) {
         btnY += 12;
         parts.push(
-          `  <line x1="16" y1="${btnY - 8}" x2="${navBar.size - 16}" y2="${btnY - 8}" stroke="${
+          `  <line x1="12" y1="${btnY - 8}" x2="${navBar.size - 12}" y2="${btnY - 8}" stroke="${
             navBar.textColor
-          }" opacity="0.15" stroke-width="1" />`,
-          `  <text x="18" y="${btnY + 4}" font-size="9" font-weight="800" letter-spacing="1" fill="${
-            navBar.textColor
-          }" opacity="0.5">GENERAL</text>`
+          }" opacity="0.15" stroke-width="1" />`
         );
-        btnY += 14;
+        if (!isCompactRail) {
+          parts.push(
+            `  <text x="18" y="${btnY + 4}" font-size="9" font-weight="800" letter-spacing="1" fill="${
+              navBar.textColor
+            }" opacity="0.5">GENERAL</text>`
+          );
+          btnY += 14;
+        } else {
+          btnY += 6;
+        }
 
         for (const btn of generalButtons) {
           const isActive = !!btn.isActive;
@@ -258,7 +286,7 @@ export function generateDashSvg(state: DashCanvasState, forPreview = false): str
 
           if (isActive) {
             parts.push(
-              `  <rect x="14" y="${btnY}" width="${btnW}" height="${btnH}" rx="8" fill="${navBar.accentColor}" />`
+              `  <rect x="${btnX}" y="${btnY}" width="${btnW}" height="${btnH}" rx="8" fill="${navBar.accentColor}" />`
             );
           }
 
@@ -266,7 +294,14 @@ export function generateDashSvg(state: DashCanvasState, forPreview = false): str
           const iconColor = isActive ? '#FFFFFF' : navBar.textColor;
           const textOpacity = isActive ? '1' : '0.85';
 
-          if (showIcon) {
+          if (isCompactRail) {
+            const iconCenterX = Math.round((navBar.size - 20) / 2);
+            parts.push(
+              `  <g transform="translate(${iconCenterX}, ${btnY + 9}) scale(0.83)" fill="none" stroke="${iconColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="${textOpacity}">`,
+              `    <path d="${iconPath}" />`,
+              `  </g>`
+            );
+          } else if (showIcon) {
             parts.push(
               `  <g transform="translate(24, ${btnY + 9}) scale(0.83)" fill="none" stroke="${iconColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="${textOpacity}">`,
               `    <path d="${iconPath}" />`,
@@ -292,6 +327,8 @@ export function generateDashSvg(state: DashCanvasState, forPreview = false): str
       // Logo & Title
       let titleX = 24;
       const centerY = Math.round(navBar.size / 2);
+      const showReportTitle = navBar.showReportTitle !== false;
+      const showButtonLabels = navBar.showButtonLabels !== false;
 
       if (navBar.logoUrl) {
         const logoH = Math.min(36, navBar.size - 20);
@@ -305,7 +342,7 @@ export function generateDashSvg(state: DashCanvasState, forPreview = false): str
 
       const reportTitleSizeTop = navBar.reportTitleSize || 15;
 
-      if (navBar.reportTitle) {
+      if (showReportTitle && navBar.reportTitle) {
         parts.push(
           `  <text x="${titleX}" y="${centerY + 5}" font-size="${reportTitleSizeTop}" font-weight="800" fill="${
             navBar.textColor
@@ -315,7 +352,7 @@ export function generateDashSvg(state: DashCanvasState, forPreview = false): str
 
       // Buttons horizontally placed on the right
       const btnH = 34;
-      const btnW = 115;
+      const btnW = showButtonLabels ? 115 : 38;
       const btnGap = 8;
       const totalBtnsCount = navBar.buttons.length;
       const hasGeneral = generalButtons.length > 0;
@@ -351,7 +388,15 @@ export function generateDashSvg(state: DashCanvasState, forPreview = false): str
         const iconColor = isActive ? '#FFFFFF' : navBar.textColor;
         const textOpacity = isActive ? '1' : '0.85';
 
-        if (showIcon) {
+        if (!showButtonLabels) {
+          // Icon-only mode in top navbar
+          const iconOffsetX = btnX + Math.round((btnW - 18) / 2);
+          parts.push(
+            `  <g transform="translate(${iconOffsetX}, ${btnY + 8}) scale(0.75)" fill="none" stroke="${iconColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="${textOpacity}">`,
+            `    <path d="${iconPath}" />`,
+            `  </g>`
+          );
+        } else if (showIcon) {
           parts.push(
             `  <g transform="translate(${btnX + 10}, ${btnY + 8}) scale(0.75)" fill="none" stroke="${iconColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="${textOpacity}">`,
             `    <path d="${iconPath}" />`,
@@ -397,7 +442,14 @@ export function generateDashSvg(state: DashCanvasState, forPreview = false): str
           const iconColor = isActive ? '#FFFFFF' : navBar.textColor;
           const textOpacity = isActive ? '1' : '0.85';
 
-          if (showIcon) {
+          if (!showButtonLabels) {
+            const iconOffsetX = btnX + Math.round((btnW - 18) / 2);
+            parts.push(
+              `  <g transform="translate(${iconOffsetX}, ${btnY + 8}) scale(0.75)" fill="none" stroke="${iconColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="${textOpacity}">`,
+              `    <path d="${iconPath}" />`,
+              `  </g>`
+            );
+          } else if (showIcon) {
             parts.push(
               `  <g transform="translate(${btnX + 10}, ${btnY + 8}) scale(0.75)" fill="none" stroke="${iconColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="${textOpacity}">`,
               `    <path d="${iconPath}" />`,

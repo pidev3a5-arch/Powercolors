@@ -32,6 +32,8 @@ export interface NavBarConfig {
   reportTitle: string;
   reportTitleSize?: number;
   showButtonIcons?: boolean;
+  showButtonLabels?: boolean;
+  showReportTitle?: boolean;
   buttonFontSize?: number;
   buttonFontBold?: boolean;
   buttonFontItalic?: boolean;
@@ -383,6 +385,8 @@ export const DEFAULT_DASH_CANVAS_STATE: DashCanvasState = {
     reportTitle: 'Executive Sales',
     reportTitleSize: 14,
     showButtonIcons: true,
+    showButtonLabels: true,
+    showReportTitle: true,
     buttonFontSize: 12,
     buttonFontBold: true,
     buttonFontItalic: false,

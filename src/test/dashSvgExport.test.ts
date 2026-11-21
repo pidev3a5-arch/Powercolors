@@ -337,6 +337,7 @@ describe('Dash SVG Canvas Export & Layout Engine', () => {
     const citronPreset = READY_DESIGN_PRESETS.find((p) => p.id === 'citron-obsidian');
     const pastelPreset = READY_DESIGN_PRESETS.find((p) => p.id === 'pastel-horizon');
     const cobaltPreset = READY_DESIGN_PRESETS.find((p) => p.id === 'cobalt-sapphire');
+    const forgePreset = READY_DESIGN_PRESETS.find((p) => p.id === 'data-forge-performance');
 
     expect(citronPreset).toBeDefined();
     expect(citronPreset?.navType).toBe('left');
@@ -344,6 +345,9 @@ describe('Dash SVG Canvas Export & Layout Engine', () => {
     expect(pastelPreset?.navType).toBe('left');
     expect(cobaltPreset).toBeDefined();
     expect(cobaltPreset?.navType).toBe('left');
+    expect(forgePreset).toBeDefined();
+    expect(forgePreset?.navType).toBe('left');
+    expect(READY_DESIGN_PRESETS.find((p) => p.id === 'modern-midnight')).toBeUndefined();
 
     expect(DEFAULT_DASH_CANVAS_STATE.containerStyle.showDropShadow).toBe(false);
 
@@ -600,5 +604,39 @@ describe('Dash SVG Canvas Export & Layout Engine', () => {
     expect(eventReceived).toBe(1);
 
     target.removeEventListener('powerlab:copy-dash-svg', listener);
+  });
+
+  it('renders Left sidebar as compact icon-only rail when showButtonLabels and showReportTitle are false', () => {
+    const compactState: DashCanvasState = {
+      ...DEFAULT_DASH_CANVAS_STATE,
+      navBar: {
+        ...DEFAULT_DASH_CANVAS_STATE.navBar,
+        orientation: 'left',
+        size: 68,
+        showReportTitle: false,
+        showButtonLabels: false,
+        showButtonIcons: true,
+        reportTitle: 'Executive Sales',
+        buttons: [
+          { id: 'btn-1', label: 'Overview', icon: 'home', isActive: true, section: 'menu' },
+          { id: 'btn-2', label: 'Reports', icon: 'bar-chart', isActive: false, section: 'menu' },
+          { id: 'btn-gen-1', label: 'Settings', icon: 'settings', isActive: false, section: 'general' },
+        ],
+      },
+    };
+
+    const svg = generateDashSvg(compactState);
+    expect(svg).toContain('<rect x="0" y="0" width="68" height="720"');
+    // Report title text should NOT be rendered
+    expect(svg).not.toContain('Executive Sales</text>');
+    // Button labels should NOT be rendered as text elements
+    expect(svg).not.toContain('>Overview</text>');
+    expect(svg).not.toContain('>Reports</text>');
+    expect(svg).not.toContain('>Settings</text>');
+    // Section headers "MENU" and "GENERAL" should NOT be rendered in compact rail
+    expect(svg).not.toContain('>MENU</text>');
+    expect(svg).not.toContain('>GENERAL</text>');
+    // But SVG vector paths for icons ARE rendered
+    expect(svg).toContain('<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z');
   });
 });

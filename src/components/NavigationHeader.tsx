@@ -1,5 +1,5 @@
-import React from 'react';
-import { Sun, Moon, Download, Copy, Check, Code2, Sparkles, Home, Palette, Layout } from 'lucide-react';
+import React, { useState } from 'react';
+import { Sun, Moon, Download, Copy, Check, Code2, Sparkles, Home, Palette, Layout, Donut, X } from 'lucide-react';
 import { AppPage } from '../core/types';
 
 interface NavigationHeaderProps {
@@ -31,11 +31,42 @@ export const NavigationHeader: React.FC<NavigationHeaderProps> = ({
   svgCopied,
   onDownloadSvg,
 }) => {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
   const navItems: Array<{ id: AppPage; label: string; icon: React.ComponentType<{ className?: string }> }> = [
     { id: 'landing', label: 'Home', icon: Home },
     { id: 'theme-generator', label: 'Theme Studio', icon: Palette },
     { id: 'dash-generator', label: 'Dash Canvas', icon: Layout },
   ];
+
+  const renderNavTabs = (className?: string) => (
+    <nav
+      aria-label="Main Navigation"
+      className={`items-center gap-1.5 p-1 rounded-full bg-white dark:bg-slate-800 border-2 border-[#1E293B] shadow-[2px_2px_0px_0px_#1E293B] ${
+        className || ''
+      }`}
+    >
+      {navItems.map((item) => {
+        const Icon = item.icon;
+        const isActive = currentPage === item.id;
+        return (
+          <button
+            key={item.id}
+            type="button"
+            onClick={() => onNavigate(item.id)}
+            className={`inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-heading font-black transition-all cursor-pointer ${
+              isActive
+                ? 'bg-[#8B5CF6] text-white shadow-[2px_2px_0px_0px_#1E293B] border border-[#1E293B]'
+                : 'text-[#1E293B] dark:text-slate-300 hover:bg-[#FBBF24] hover:text-[#1E293B]'
+            }`}
+          >
+            <Icon className="w-3.5 h-3.5 stroke-[2.5]" />
+            <span>{item.label}</span>
+          </button>
+        );
+      })}
+    </nav>
+  );
 
   return (
     <header className={`border-b-2 border-[#1E293B] dark:border-slate-800 sticky top-0 z-40 backdrop-blur-md transition-colors duration-200 ${
@@ -64,31 +95,14 @@ export const NavigationHeader: React.FC<NavigationHeaderProps> = ({
           </span>
         </div>
 
-        {/* Center: Desktop Navigation Tabs */}
-        <nav aria-label="Main Navigation" className="hidden md:flex items-center gap-1.5 p-1 rounded-full bg-white dark:bg-slate-800 border-2 border-[#1E293B] shadow-[2px_2px_0px_0px_#1E293B]">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = currentPage === item.id;
-            return (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => onNavigate(item.id)}
-                className={`inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-heading font-black transition-all cursor-pointer ${
-                  isActive
-                    ? 'bg-[#8B5CF6] text-white shadow-[2px_2px_0px_0px_#1E293B] border border-[#1E293B]'
-                    : 'text-[#1E293B] dark:text-slate-300 hover:bg-[#FBBF24] hover:text-[#1E293B]'
-                }`}
-              >
-                <Icon className="w-3.5 h-3.5 stroke-[2.5]" />
-                <span>{item.label}</span>
-              </button>
-            );
-          })}
-        </nav>
+        {/* Center: Desktop Navigation Tabs (Hidden on landing page, moved beside mode button) */}
+        {currentPage !== 'landing' && renderNavTabs('hidden md:flex')}
 
         {/* Right: Actions Toolbar */}
         <div className="flex items-center space-x-1 sm:space-x-2 flex-shrink-0">
+          {/* Landing page ONLY: Desktop navigation tabs placed beside the mode button */}
+          {currentPage === 'landing' && renderNavTabs('hidden md:flex mr-1 sm:mr-2')}
+
           {/* Site Dark/Light Switcher */}
           <button
             type="button"
@@ -97,6 +111,21 @@ export const NavigationHeader: React.FC<NavigationHeaderProps> = ({
             title={isDarkSite ? 'Switch to Warm Cream Paper Mode' : 'Switch to Playful Dark Mode'}
           >
             {isDarkSite ? <Sun className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2.5]" /> : <Moon className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2.5]" />}
+          </button>
+
+          {/* Mobile Donut Menu Button (Visible on mobile only, beside mode button) */}
+          <button
+            type="button"
+            onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+            className="md:hidden pop-btn p-1.5 rounded-full bg-white dark:bg-slate-800 text-[#1E293B] dark:text-white hover:bg-[#FBBF24] hover:text-[#1E293B] transition-all cursor-pointer border-2 border-[#1E293B] shadow-[1.5px_1.5px_0px_0px_#1E293B]"
+            title="Toggle Menu"
+            aria-label="Navigation Menu"
+          >
+            {isMobileMenuOpen ? (
+              <X className="w-4 h-4 stroke-[2.5]" />
+            ) : (
+              <Donut className="w-4 h-4 stroke-[2.5]" />
+            )}
           </button>
 
           {/* Theme Studio-specific Actions */}
@@ -177,28 +206,42 @@ export const NavigationHeader: React.FC<NavigationHeaderProps> = ({
         </div>
       </div>
 
-      {/* Mobile Sub-Navigation Bar: Always visible on mobile, smooth horizontal pill strip */}
-      <div className="md:hidden border-t border-[#1E293B]/20 dark:border-slate-800 px-3 py-1.5 bg-[#FFFDF5]/95 dark:bg-[#0F172A]/95 overflow-x-auto flex items-center justify-around gap-1.5">
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = currentPage === item.id;
-          return (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => onNavigate(item.id)}
-              className={`flex-1 inline-flex items-center justify-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-heading font-black transition-all cursor-pointer ${
-                isActive
-                  ? 'bg-[#8B5CF6] text-white shadow-[2px_2px_0px_0px_#1E293B] border border-[#1E293B]'
-                  : 'bg-white dark:bg-slate-800 text-[#1E293B] dark:text-slate-300 border border-[#1E293B]/20'
-              }`}
-            >
-              <Icon className="w-3 h-3 stroke-[2.5]" />
-              <span>{item.label}</span>
-            </button>
-          );
-        })}
-      </div>
+      {/* Mobile Dropdown Drawer: Opened via Donut menu button beside mode switch */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden border-t-2 border-[#1E293B] dark:border-slate-800 px-4 py-3 bg-[#FFFDF5] dark:bg-[#0F172A] space-y-2 shadow-[0px_4px_0px_0px_#1E293B]">
+          <div className="space-y-1.5">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = currentPage === item.id;
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => {
+                    onNavigate(item.id);
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-heading font-black transition-all cursor-pointer ${
+                    isActive
+                      ? 'bg-[#8B5CF6] text-white shadow-[2px_2px_0px_0px_#1E293B] border-2 border-[#1E293B]'
+                      : 'bg-white dark:bg-slate-800 text-[#1E293B] dark:text-slate-200 border-2 border-[#1E293B]/20 hover:bg-[#FBBF24] hover:text-[#1E293B]'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Icon className="w-4 h-4 stroke-[2.5]" />
+                    <span>{item.label}</span>
+                  </div>
+                  {isActive && (
+                    <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-white/20">
+                      Active
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </header>
   );
 };
