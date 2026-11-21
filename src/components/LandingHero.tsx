@@ -101,19 +101,20 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onNavigate }) => {
         {/* Interactive Teaser Mockup Switcher & Preview */}
         <div className="pt-6 sm:pt-8 max-w-4xl mx-auto space-y-4">
           {/* Mockup Switcher Tabs */}
-          <div className="flex items-center justify-center gap-2">
+          <div className="flex items-center justify-center gap-1.5 sm:gap-2 px-2">
             <button
               type="button"
               onClick={() => setActiveMockup('dash')}
-              className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-heading font-black border-2 border-[#1E293B] cursor-pointer transition-all ${
+              className={`inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-heading font-black border-2 border-[#1E293B] cursor-pointer transition-all whitespace-nowrap ${
                 activeMockup === 'dash'
-                  ? 'bg-[#F472B6] text-white shadow-[2.5px_2.5px_0px_0px_#1E293B]'
+                  ? 'bg-[#F472B6] text-white shadow-[2px_2px_0px_0px_#1E293B] sm:shadow-[2.5px_2.5px_0px_0px_#1E293B]'
                   : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-[#FBBF24] hover:text-[#1E293B]'
               }`}
             >
               <Layout className="w-3.5 h-3.5 stroke-[2.5]" />
-              <span>Dash Canvas SVG</span>
-              <span className="text-[9.5px] px-1.5 py-0.2 rounded-full bg-white/30 text-white font-extrabold uppercase">
+              <span className="sm:hidden">Canvas</span>
+              <span className="hidden sm:inline">Dash Canvas SVG</span>
+              <span className="hidden sm:inline text-[9.5px] px-1.5 py-0.2 rounded-full bg-white/30 text-white font-extrabold uppercase">
                 New
               </span>
             </button>
@@ -121,28 +122,30 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onNavigate }) => {
             <button
               type="button"
               onClick={() => setActiveMockup('theme')}
-              className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-heading font-black border-2 border-[#1E293B] cursor-pointer transition-all ${
+              className={`inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-heading font-black border-2 border-[#1E293B] cursor-pointer transition-all whitespace-nowrap ${
                 activeMockup === 'theme'
-                  ? 'bg-[#8B5CF6] text-white shadow-[2.5px_2.5px_0px_0px_#1E293B]'
+                  ? 'bg-[#8B5CF6] text-white shadow-[2px_2px_0px_0px_#1E293B] sm:shadow-[2.5px_2.5px_0px_0px_#1E293B]'
                   : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-[#FBBF24] hover:text-[#1E293B]'
               }`}
             >
               <Palette className="w-3.5 h-3.5 stroke-[2.5]" />
-              <span>Theme Studio (.pbix)</span>
+              <span className="sm:hidden">Theme</span>
+              <span className="hidden sm:inline">Theme Studio (.pbix)</span>
             </button>
 
             <button
               type="button"
               onClick={() => setActiveMockup('svg')}
-              className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-heading font-black border-2 border-[#1E293B] cursor-pointer transition-all ${
+              className={`inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-heading font-black border-2 border-[#1E293B] cursor-pointer transition-all whitespace-nowrap ${
                 activeMockup === 'svg'
-                  ? 'bg-[#38BDF8] text-[#1E293B] shadow-[2.5px_2.5px_0px_0px_#1E293B]'
+                  ? 'bg-[#38BDF8] text-[#1E293B] shadow-[2px_2px_0px_0px_#1E293B] sm:shadow-[2.5px_2.5px_0px_0px_#1E293B]'
                   : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-[#FBBF24] hover:text-[#1E293B]'
               }`}
             >
               <Sparkles className="w-3.5 h-3.5 stroke-[2.5]" />
-              <span>SVG Micro-Visuals</span>
-              <span className="text-[9.5px] px-1.5 py-0.2 rounded-full bg-white/60 text-[#1E293B] font-extrabold uppercase">
+              <span className="sm:hidden">SVG</span>
+              <span className="hidden sm:inline">SVG Micro-Visuals</span>
+              <span className="hidden sm:inline text-[9.5px] px-1.5 py-0.2 rounded-full bg-white/60 text-[#1E293B] font-extrabold uppercase">
                 v3.0
               </span>
             </button>
