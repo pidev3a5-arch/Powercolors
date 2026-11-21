@@ -301,7 +301,7 @@ export const SVG_VISUALS_CATALOG: SvgVisualDefinition[] = [
           { name: '_IsPositive', expression: '_DeltaPct >= 0' },
           { name: '_Color', expression: 'IF( _IsPositive, _PosColor, _NegColor )' },
           { name: '_Arrow', expression: 'IF( _IsPositive, "▲", "▼" )' },
-          { name: '_DeltaFormatted', expression: '_Arrow & " " & FORMAT( ABS( _DeltaPct ), "0.0%" ) & " " & _Subtext' },
+          { name: '_DeltaFormatted', expression: '_Arrow & " " & FORMAT( ABS( _DeltaPct ), "0.0" ) & "% " & _Subtext' },
         ],
         svgElements: [
           { name: '_ValueText', expression: '"<text x=\'5\' y=\'20\' font-family=\'Segoe UI, sans-serif\' font-size=\'18\' font-weight=\'900\' fill=\'#1E293B\'>" & _MetricValue & "</text>"' },

@@ -907,9 +907,8 @@ export const SvgVisualMakerPage: React.FC<SvgVisualMakerPageProps> = ({ onNaviga
                       <div className="p-3 rounded-xl bg-purple-50 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-800 text-[11.5px] text-purple-900 dark:text-purple-200 font-semibold flex items-start gap-2">
                         <Info className="w-4 h-4 flex-shrink-0 text-[#8B5CF6] mt-0.5" />
                         <div>
-                          <strong>Power BI Desktop Tip:</strong> Paste this DAX expression into a new measure.
-                          Select the measure, go to <strong>Measure Tools</strong>, and set{' '}
-                          <strong>Data Category = Image URL</strong>.
+                          <strong>Power BI Desktop Tip:</strong> In Power BI, click <em>New Measure</em>, select all in the formula bar (<kbd className="font-mono px-1 py-0.5 rounded bg-white dark:bg-slate-800 border border-purple-300 dark:border-purple-700 text-[10px]">Ctrl+A</kbd>), and paste (<kbd className="font-mono px-1 py-0.5 rounded bg-white dark:bg-slate-800 border border-purple-300 dark:border-purple-700 text-[10px]">Ctrl+V</kbd>).
+                          Then go to <strong>Measure Tools</strong> and set <strong>Data Category = Image URL</strong>.
                         </div>
                       </div>
 
@@ -1243,6 +1242,14 @@ export const SvgVisualMakerPage: React.FC<SvgVisualMakerPageProps> = ({ onNaviga
                           <Download className="w-4 h-4 stroke-[2.5]" />
                         </button>
                       </div>
+                    </div>
+
+                    {/* Power BI Formula Bar Paste Tip */}
+                    <div className="p-2.5 rounded-xl bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800 text-[11px] font-medium text-purple-950 dark:text-purple-200 flex items-start gap-2">
+                      <Info className="w-4 h-4 text-[#8B5CF6] shrink-0 mt-0.5" />
+                      <span>
+                        <strong>In Power BI Desktop:</strong> Click <em>New Measure</em>, select all in the formula bar (<kbd className="font-mono px-1 py-0.5 rounded bg-white dark:bg-slate-800 border border-purple-300 dark:border-purple-700 text-[10px]">Ctrl+A</kbd>), then paste (<kbd className="font-mono px-1 py-0.5 rounded bg-white dark:bg-slate-800 border border-purple-300 dark:border-purple-700 text-[10px]">Ctrl+V</kbd>).
+                      </span>
                     </div>
 
                     <pre className="p-4 rounded-2xl bg-[#1E293B] text-slate-100 font-mono text-[11.5px] overflow-x-auto max-h-[250px] leading-relaxed border-2 border-[#1E293B] select-all">

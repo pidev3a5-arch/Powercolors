@@ -1,4 +1,5 @@
 import { SvgToDaxOptions, SvgToDaxResult } from './types';
+import { formatDaxMeasureName } from './daxGenerator';
 
 /**
  * Parses, sanitizes, and converts any arbitrary SVG XML into a robust,
@@ -56,14 +57,15 @@ export function convertRawSvgToDax(
     .replace(/\n\s*/g, ' ')
     .trim();
 
-  // Build DAX Measure
+  // Build DAX Measure (Line 1 must be measure header for Power BI Desktop formula bar compatibility)
   const lines: string[] = [];
-  lines.push(`// ==========================================================`);
-  lines.push(`// Power BI SVG Measure: ${measureName}`);
-  lines.push(`// Converted from custom SVG by PowerLab SVG Visual Maker`);
-  lines.push(`// IMPORTANT: Set Data Category to 'Image URL' under Measure Tools`);
-  lines.push(`// ==========================================================`);
-  lines.push(`${measureName} = `);
+  const formattedHeader = formatDaxMeasureName(rawMeasureName);
+  lines.push(`${formattedHeader} = `);
+  lines.push(`-- ==========================================================`);
+  lines.push(`-- Power BI SVG Measure: ${measureName}`);
+  lines.push(`-- Converted from custom SVG by PowerLab SVG Visual Maker`);
+  lines.push(`-- IMPORTANT: Set Data Category to 'Image URL' under Measure Tools`);
+  lines.push(`-- ==========================================================`);
 
   // 1. Inputs & dynamic parameters
   lines.push(`-- ---------------------------------------------------------`);

@@ -43,6 +43,28 @@ export function formatDaxValue(value: unknown, type: string): string {
 }
 
 /**
+ * Formats a DAX measure name according to strict Power BI syntax rules.
+ * If the measure name contains spaces or non-alphanumeric characters,
+ * it is safely enclosed in square brackets `[Measure Name]`.
+ */
+export function formatDaxMeasureName(name: string): string {
+  const trimmed = (name || 'Custom_SVG_Measure').trim();
+
+  // If already bracketed, return as is
+  if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+    return trimmed;
+  }
+
+  // If contains spaces, hyphens, parentheses, or special characters, wrap in [ ... ]
+  if (/[\s\W]/.test(trimmed)) {
+    const escaped = trimmed.replace(/\]/g, ']]');
+    return `[${escaped}]`;
+  }
+
+  return trimmed;
+}
+
+/**
  * Builds a clean, professional Power BI DAX measure string following the standard VAR pattern.
  */
 export function buildDaxMeasure(options: DaxMeasureOptions): string {
@@ -61,17 +83,20 @@ export function buildDaxMeasure(options: DaxMeasureOptions): string {
 
   const lines: string[] = [];
 
-  // Measure Header Comments
-  lines.push(`// ==========================================================`);
-  lines.push(`// Power BI SVG Measure: ${measureName}`);
+  // 1. Measure Header (MUST be on line 1 for Power BI Desktop formula bar compliance)
+  const formattedHeader = formatDaxMeasureName(measureName);
+  lines.push(`${formattedHeader} = `);
+
+  // 2. Measure Documentation Comments (Clean DAX standard -- comments placed inside expression body)
+  lines.push(`-- ==========================================================`);
+  lines.push(`-- Power BI SVG Measure: ${measureName.replace(/[\[\]]/g, '')}`);
   if (description) {
-    lines.push(`// Description: ${description}`);
+    lines.push(`-- Description: ${description}`);
   }
-  lines.push(`// IMPORTANT: After creating this measure, select it in the model`);
-  lines.push(`// and set Data Category to 'Image URL' (under Measure Tools).`);
-  lines.push(`// Use in: Table, Matrix, Card (new), or Image visuals.`);
-  lines.push(`// ==========================================================`);
-  lines.push(`${measureName} = `);
+  lines.push(`-- IMPORTANT: After creating this measure, select it in the model`);
+  lines.push(`-- and set Data Category to 'Image URL' (under Measure Tools).`);
+  lines.push(`-- Use in: Table, Matrix, Card (new), or Image visuals.`);
+  lines.push(`-- ==========================================================`);
 
   if (hasOneValueGuard) {
     lines.push(`IF(`);

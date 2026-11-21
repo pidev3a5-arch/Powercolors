@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { SVG_VISUALS_CATALOG, SVG_CATEGORIES } from '../core/svgVisuals/catalog';
 import { convertRawSvgToDax } from '../core/svgVisuals/svgToDaxConverter';
-import { buildDaxMeasure, sanitizeSvgForDax } from '../core/svgVisuals/daxGenerator';
+import { buildDaxMeasure, sanitizeSvgForDax, formatDaxMeasureName } from '../core/svgVisuals/daxGenerator';
 import { getPaginationRange } from '../core/svgVisuals/pagination';
 
 describe('SVG Visuals Catalog & DAX Generator (Phase 8)', () => {
@@ -43,12 +43,43 @@ describe('SVG Visuals Catalog & DAX Generator (Phase 8)', () => {
       const measureName = `Test_${visual.id.replace(/-/g, '_')}`;
       const dax = visual.generateDax(defaultParams, measureName);
 
-      expect(dax).toContain(measureName);
+      expect(dax.startsWith(`${measureName} = `)).toBe(true);
       expect(dax).toContain('Image URL');
       expect(dax).toContain('data:image/svg+xml;utf8,');
       expect(dax).toContain('VAR ');
       expect(dax).toContain('RETURN');
     }
+  });
+
+  it('formatDaxMeasureName should handle spaces, brackets, and identifiers for DAX compliance', () => {
+    // Plain identifier remains unchanged
+    expect(formatDaxMeasureName('SVG_Metric_Callout')).toBe('SVG_Metric_Callout');
+
+    // Names with spaces are safely wrapped in square brackets [ ... ]
+    expect(formatDaxMeasureName('SVG Metric Callout with Delta Arrow')).toBe('[SVG Metric Callout with Delta Arrow]');
+    expect(formatDaxMeasureName('Sales % Variance')).toBe('[Sales % Variance]');
+
+    // Already bracketed names stay untouched
+    expect(formatDaxMeasureName('[My Custom Measure]')).toBe('[My Custom Measure]');
+
+    // Empty or falsy falls back safely
+    expect(formatDaxMeasureName('')).toBe('Custom_SVG_Measure');
+  });
+
+  it('buildDaxMeasure MUST place measure name on Line 1 for Power BI Desktop formula bar compatibility', () => {
+    const daxWithSpaces = buildDaxMeasure({
+      measureName: 'SVG Metric Callout with Delta Arrow',
+      description: 'Test metric callout',
+      configVars: [{ name: '_Val', value: 100, type: 'number' }],
+      svgElements: [{ name: '_El', expression: '"<rect/>"' }],
+      viewBox: '0 0 100 100',
+    });
+
+    const lines = daxWithSpaces.split('\n');
+    // Line 1 MUST be the bracketed measure identifier and =
+    expect(lines[0]).toBe('[SVG Metric Callout with Delta Arrow] = ');
+    // Line 2 MUST be comments, NOT preceding line 1
+    expect(lines[1]).toContain('-- ==========================================================');
   });
 
   it('direct reference visuals (gauge-with-track, gauge-with-outline-needle, kpi-ring-checkpoint) exist and behave accurately', () => {
@@ -110,7 +141,7 @@ describe('SVG Visuals Catalog & DAX Generator (Phase 8)', () => {
     const res = convertRawSvgToDax(sampleSvg, { measureName: 'My_Imported_Visual' });
     expect(res.error).toBeUndefined();
     expect(res.measureName).toBe('My_Imported_Visual');
-    expect(res.daxCode).toContain('My_Imported_Visual =');
+    expect(res.daxCode.startsWith('My_Imported_Visual = ')).toBe(true);
     expect(res.daxCode).toContain('data:image/svg+xml;utf8,');
     expect(res.daxCode).toContain('Image URL');
     expect(res.detectedColors).toContain('#2563EB');
