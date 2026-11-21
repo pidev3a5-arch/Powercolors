@@ -244,10 +244,11 @@ export const DashSvgCanvas: React.FC<DashSvgCanvasProps> = ({ state }) => {
             className={isFitMode ? 'w-full flex items-center justify-center' : 'min-w-full flex items-center'}
             style={!isFitMode ? { width: 'fit-content', margin: '0 auto' } : undefined}
           >
-            {/* Dashboard Canvas Container: Corner Radius 0px, 1px contour border, flush left edge */}
+            {/* Dashboard Canvas Container: Corner Radius 8px, 1px contour border, flush left edge */}
             <div
-              className="transition-transform duration-75 shadow-2xl rounded-none overflow-hidden border border-[#1E293B] flex-shrink-0"
+              className="transition-transform duration-75 shadow-2xl rounded-[8px] overflow-hidden border border-[#1E293B] flex-shrink-0"
               style={{
+                borderRadius: '8px',
                 width: isFitMode ? '100%' : `${(width * zoomPercent) / 100}px`,
                 maxWidth: isFitMode ? '100%' : 'none',
                 aspectRatio: aspectRatio,
@@ -299,8 +300,9 @@ export const DashSvgCanvas: React.FC<DashSvgCanvasProps> = ({ state }) => {
             {/* Clear, fitted preview display without needing to scroll around */}
             <div className="flex-1 p-4 sm:p-8 flex items-center justify-center bg-[#E2E8F0]/50 dark:bg-slate-950 overflow-hidden">
               <div
-                className="shadow-2xl border border-[#1E293B] flex-shrink-0 rounded-none overflow-hidden"
+                className="shadow-2xl border border-[#1E293B] flex-shrink-0 rounded-[8px] overflow-hidden"
                 style={{
+                  borderRadius: '8px',
                   width: '100%',
                   maxWidth: `min(90vw, calc((84vh - 80px) * (${width} / ${height})))`,
                   aspectRatio: `${width} / ${height}`,

@@ -345,12 +345,15 @@ describe('Dash SVG Canvas Export & Layout Engine', () => {
     expect(cobaltPreset).toBeDefined();
     expect(cobaltPreset?.navType).toBe('left');
 
+    expect(DEFAULT_DASH_CANVAS_STATE.containerStyle.showDropShadow).toBe(false);
+
     const initial = { ...DEFAULT_DASH_CANVAS_STATE };
     for (const preset of READY_DESIGN_PRESETS) {
       const updated = preset.apply(initial);
       expect(updated.backgroundColor).toBe(preset.backgroundColor);
       expect(updated.layoutPreset).toBe(preset.layoutPreset);
       expect(updated.typography.fontFamily).toBe(preset.fontFamily);
+      expect(updated.containerStyle.showDropShadow).toBe(false);
       if (preset.id === 'blank-page') {
         expect(updated.containers).toEqual([]);
         expect(updated.navBar.show).toBe(false);

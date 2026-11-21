@@ -393,7 +393,7 @@ export const DEFAULT_DASH_CANVAS_STATE: DashCanvasState = {
     borderWidth: 2,
     borderColor: '#1E293B',
     backgroundColor: '#FFFFFF',
-    showDropShadow: true,
+    showDropShadow: false,
     shadowColor: '#1E293B',
   },
   typography: {

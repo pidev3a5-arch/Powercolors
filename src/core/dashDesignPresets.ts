@@ -50,7 +50,7 @@ export const READY_DESIGN_PRESETS: ReadyDesignPreset[] = [
         borderColor: '#1E293B',
         showBorder: true,
         borderWidth: 2,
-        showDropShadow: true,
+        showDropShadow: false,
         shadowColor: '#1E293B',
       },
       typography: {
@@ -95,7 +95,7 @@ export const READY_DESIGN_PRESETS: ReadyDesignPreset[] = [
         borderColor: '#374151',
         showBorder: true,
         borderWidth: 1.5,
-        showDropShadow: true,
+        showDropShadow: false,
         shadowColor: '#030712',
       },
       typography: {
@@ -145,7 +145,7 @@ export const READY_DESIGN_PRESETS: ReadyDesignPreset[] = [
         borderColor: '#CBD5E1',
         showBorder: true,
         borderWidth: 2,
-        showDropShadow: true,
+        showDropShadow: false,
         shadowColor: '#0F172A',
       },
       typography: {
@@ -195,7 +195,7 @@ export const READY_DESIGN_PRESETS: ReadyDesignPreset[] = [
         borderColor: '#1E293B',
         showBorder: true,
         borderWidth: 2,
-        showDropShadow: true,
+        showDropShadow: false,
         shadowColor: '#1E293B',
       },
       typography: {
@@ -245,7 +245,7 @@ export const READY_DESIGN_PRESETS: ReadyDesignPreset[] = [
         borderColor: '#3F3F46',
         showBorder: true,
         borderWidth: 1.5,
-        showDropShadow: true,
+        showDropShadow: false,
         shadowColor: '#09090B',
       },
       typography: {
@@ -295,7 +295,7 @@ export const READY_DESIGN_PRESETS: ReadyDesignPreset[] = [
         borderColor: '#E2E8F0',
         showBorder: true,
         borderWidth: 1.5,
-        showDropShadow: true,
+        showDropShadow: false,
         shadowColor: '#1E1B4B',
       },
       typography: {
@@ -348,7 +348,7 @@ export const READY_DESIGN_PRESETS: ReadyDesignPreset[] = [
         showBorder: true,
         borderWidth: 1.5,
         cornerRadius: 16,
-        showDropShadow: true,
+        showDropShadow: false,
         shadowColor: '#18191B',
       },
       typography: {
@@ -402,7 +402,7 @@ export const READY_DESIGN_PRESETS: ReadyDesignPreset[] = [
         showBorder: true,
         borderWidth: 1.5,
         cornerRadius: 16,
-        showDropShadow: true,
+        showDropShadow: false,
         shadowColor: '#2C2D30',
       },
       typography: {
@@ -454,7 +454,7 @@ export const READY_DESIGN_PRESETS: ReadyDesignPreset[] = [
         borderColor: '#334155',
         showBorder: true,
         borderWidth: 1.5,
-        showDropShadow: true,
+        showDropShadow: false,
         shadowColor: '#0B132B',
       },
       typography: {
