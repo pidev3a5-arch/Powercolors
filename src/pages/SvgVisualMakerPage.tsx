@@ -360,7 +360,7 @@ export const SvgVisualMakerPage: React.FC<SvgVisualMakerPageProps> = ({ onNaviga
                         title="Click to customize and view DAX measure"
                       >
                         <div
-                          className="w-full max-w-[140px] max-h-[90px] flex items-center justify-center transition-transform group-hover:scale-105 duration-200"
+                          className="w-full max-w-[140px] h-[90px] flex items-center justify-center transition-transform group-hover:scale-105 duration-200 [&>svg]:max-h-[85px] [&>svg]:max-w-[140px] [&>svg]:w-auto [&>svg]:h-auto"
                           dangerouslySetInnerHTML={{ __html: defaultSvg }}
                         />
                         <span className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity px-2 py-0.5 rounded-md bg-[#1E293B] text-white text-[10px] font-bold flex items-center gap-1 shadow-sm">
@@ -385,7 +385,11 @@ export const SvgVisualMakerPage: React.FC<SvgVisualMakerPageProps> = ({ onNaviga
                           <button
                             type="button"
                             onClick={() => handleCopyDax(defaultDax, visual.id)}
-                            className="flex-1 pop-btn py-1.5 px-2.5 rounded-xl text-xs font-heading font-black bg-[#8B5CF6] text-white hover:bg-[#7C3AED] transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-[1.5px_1.5px_0px_0px_#1E293B]"
+                            className={`flex-1 pop-btn py-1.5 px-2.5 rounded-xl text-xs font-heading font-black text-white transition-all cursor-pointer flex items-center justify-center gap-1.5 border-2 border-[#1E293B] shadow-[1.5px_1.5px_0px_0px_#1E293B] ${
+                              isDaxCopied
+                                ? 'bg-[#047857]'
+                                : 'bg-[#10B981] hover:bg-[#059669]'
+                            }`}
                             title="Copy ready-to-run Power BI DAX Measure"
                           >
                             {isDaxCopied ? (
@@ -575,7 +579,11 @@ export const SvgVisualMakerPage: React.FC<SvgVisualMakerPageProps> = ({ onNaviga
                             setConverterCopiedDax(true);
                             setTimeout(() => setConverterCopiedDax(false), 2500);
                           }}
-                          className="pop-btn inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-[#8B5CF6] hover:bg-[#7C3AED] text-white text-xs font-heading font-black cursor-pointer shadow-[1.5px_1.5px_0px_0px_#1E293B]"
+                          className={`pop-btn inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-white text-xs font-heading font-black cursor-pointer border-2 border-[#1E293B] shadow-[1.5px_1.5px_0px_0px_#1E293B] ${
+                            converterCopiedDax
+                              ? 'bg-[#047857]'
+                              : 'bg-[#10B981] hover:bg-[#059669]'
+                          }`}
                         >
                           {converterCopiedDax ? (
                             <>
@@ -613,7 +621,7 @@ export const SvgVisualMakerPage: React.FC<SvgVisualMakerPageProps> = ({ onNaviga
                     </span>
                     {converterResult?.sanitizedSvg ? (
                       <div
-                        className="w-full max-w-[180px] max-h-[100px] flex items-center justify-center"
+                        className="w-full max-w-[180px] max-h-[100px] flex items-center justify-center [&>svg]:max-h-[100px] [&>svg]:max-w-[180px] [&>svg]:w-auto [&>svg]:h-auto"
                         dangerouslySetInnerHTML={{
                           __html: converterResult.sanitizedSvg,
                         }}
@@ -765,7 +773,7 @@ export const SvgVisualMakerPage: React.FC<SvgVisualMakerPageProps> = ({ onNaviga
                       }`}
                     >
                       <div
-                        className="w-full max-w-[180px] flex items-center justify-center"
+                        className="w-full max-w-[220px] h-[140px] flex items-center justify-center [&>svg]:max-h-[130px] [&>svg]:max-w-[220px] [&>svg]:w-auto [&>svg]:h-auto"
                         dangerouslySetInnerHTML={{ __html: currentRenderedSvg }}
                       />
                     </div>
@@ -944,7 +952,11 @@ export const SvgVisualMakerPage: React.FC<SvgVisualMakerPageProps> = ({ onNaviga
                         <button
                           type="button"
                           onClick={() => handleCopyDax(currentGeneratedDax, 'modal')}
-                          className="pop-btn inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#8B5CF6] hover:bg-[#7C3AED] text-white text-xs font-heading font-black cursor-pointer shadow-[2px_2px_0px_0px_#1E293B]"
+                          className={`pop-btn inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-white text-xs font-heading font-black cursor-pointer border-2 border-[#1E293B] shadow-[2px_2px_0px_0px_#1E293B] ${
+                            copiedDaxId === 'modal'
+                              ? 'bg-[#047857]'
+                              : 'bg-[#10B981] hover:bg-[#059669]'
+                          }`}
                         >
                           {copiedDaxId === 'modal' ? (
                             <>

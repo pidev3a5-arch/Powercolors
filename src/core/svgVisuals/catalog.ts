@@ -50,7 +50,7 @@ const clamp = (val: number, min: number, max: number) => Math.min(Math.max(val, 
 
 export const SVG_VISUALS_CATALOG: SvgVisualDefinition[] = [
   // =========================================================================
-  // 1. KPI & BADGES
+  // 1. KPI & BADGES (8 visuals)
   // =========================================================================
   {
     id: 'kpi-ring-progress',
@@ -91,13 +91,13 @@ export const SVG_VISUALS_CATALOG: SvgVisualDefinition[] = [
         measureName,
         description: 'Circular ring progress metric with percentage callout.',
         configVars: [
-          { name: '_Actual', value: params.actual ?? 75, type: 'number', comment: 'Replace with [Achievement %] or model measure' },
-          { name: '_Color', value: params.color || '#84CC16', type: 'color', comment: 'Progress ring color' },
-          { name: '_TrackColor', value: params.trackColor || '#E2E8F0', type: 'color', comment: 'Background ring track' },
-          { name: '_Thickness', value: params.strokeWidth ?? 10, type: 'number', comment: 'Ring stroke thickness' },
+          { name: '_Actual', value: params.actual ?? 75, type: 'number', comment: 'Replace with [Achievement %]' },
+          { name: '_Color', value: params.color || '#84CC16', type: 'color' },
+          { name: '_TrackColor', value: params.trackColor || '#E2E8F0', type: 'color' },
+          { name: '_Thickness', value: params.strokeWidth ?? 10, type: 'number' },
         ],
         calcVars: [
-          { name: '_Normalized', expression: 'MIN( 1, MAX( 0, DIVIDE( _Actual, 100, 0 ) ) )', comment: 'Clamp percentage between 0 and 1' },
+          { name: '_Normalized', expression: 'MIN( 1, MAX( 0, DIVIDE( _Actual, 100, 0 ) ) )' },
           { name: '_Radius', expression: '38' },
           { name: '_Circumference', expression: '2 * PI() * _Radius' },
           { name: '_DashOffset', expression: '_Circumference * ( 1 - _Normalized )' },
@@ -159,9 +159,9 @@ export const SVG_VISUALS_CATALOG: SvgVisualDefinition[] = [
         measureName,
         description: 'Circular progress ring that transforms into a solid checkmark badge upon 100% completion.',
         configVars: [
-          { name: '_Actual', value: params.actual ?? 100, type: 'number', comment: 'Actual completion percentage (0-100)' },
-          { name: '_Color', value: params.color || '#84CC16', type: 'color', comment: 'Active progress / checkmark badge color' },
-          { name: '_TrackColor', value: params.trackColor || '#E2E8F0', type: 'color', comment: 'Track background color' },
+          { name: '_Actual', value: params.actual ?? 100, type: 'number' },
+          { name: '_Color', value: params.color || '#84CC16', type: 'color' },
+          { name: '_TrackColor', value: params.trackColor || '#E2E8F0', type: 'color' },
         ],
         calcVars: [
           { name: '_Normalized', expression: 'MIN( 1, MAX( 0, DIVIDE( _Actual, 100, 0 ) ) )' },
@@ -181,7 +181,6 @@ export const SVG_VISUALS_CATALOG: SvgVisualDefinition[] = [
         "<circle cx='50' cy='50' r='" & _Radius & "' fill='none' stroke='" & _Color & "' stroke-width='10' stroke-dasharray='" & ROUND( _Circumference, 2 ) & "' stroke-dashoffset='" & ROUND( _DashOffset, 2 ) & "' stroke-linecap='round' transform='rotate(-90 50 50)'/>" &
         "<text x='50' y='57' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='22' font-weight='800' fill='#1E293B'>" & FORMAT( _Actual, "0" ) & "%</text>"
     )`,
-            comment: 'Switches between circular progress ring and checkmark badge',
           },
         ],
         viewBox: '0 0 100 100',
@@ -292,8 +291,8 @@ export const SVG_VISUALS_CATALOG: SvgVisualDefinition[] = [
         measureName,
         description: 'Metric callout with dynamic delta arrow and colored percentage variance.',
         configVars: [
-          { name: '_MetricValue', value: params.value ?? '$1,482K', type: 'text', comment: 'Replace with FORMAT([Sales], "$#,##0K")' },
-          { name: '_DeltaPct', value: params.delta ?? 12.4, type: 'number', comment: 'Replace with [Sales YoY %]' },
+          { name: '_MetricValue', value: params.value ?? '$1,482K', type: 'text' },
+          { name: '_DeltaPct', value: params.delta ?? 12.4, type: 'number' },
           { name: '_Subtext', value: params.subtext ?? 'vs Target', type: 'text' },
           { name: '_PosColor', value: params.positiveColor || '#10B981', type: 'color' },
           { name: '_NegColor', value: params.negativeColor || '#EF4444', type: 'color' },
@@ -345,8 +344,8 @@ export const SVG_VISUALS_CATALOG: SvgVisualDefinition[] = [
         measureName,
         description: 'Rounded status pill badge with indicator dot.',
         configVars: [
-          { name: '_Label', value: params.label ?? 'Active', type: 'text', comment: 'Replace with status column or measure' },
-          { name: '_Color', value: params.color || '#10B981', type: 'color', comment: 'Status badge theme color' },
+          { name: '_Label', value: params.label ?? 'Active', type: 'text' },
+          { name: '_Color', value: params.color || '#10B981', type: 'color' },
         ],
         svgElements: [
           { name: '_BgPill', expression: '"<rect x=\'2\' y=\'2\' width=\'96\' height=\'24\' rx=\'12\' fill=\'" & _Color & "\' fill-opacity=\'0.15\' stroke=\'" & _Color & "\' stroke-width=\'1.5\'/>"' },
@@ -358,8 +357,167 @@ export const SVG_VISUALS_CATALOG: SvgVisualDefinition[] = [
     },
   },
 
+  {
+    id: 'kpi-battery-status',
+    name: 'Battery Capacity Indicator',
+    category: 'kpi',
+    description: 'Horizontal battery charge bar indicating storage, budget or inventory capacity remaining.',
+    tags: ['battery', 'capacity', 'charge', 'storage', 'kpi'],
+    viewBox: '0 0 100 35',
+    recommendedDimensions: { width: 90, height: 32 },
+    pbiTips: {
+      visualType: 'Table / Matrix / Card',
+      recommendedWidth: 90,
+      recommendedHeight: 32,
+      notes: 'Great for capacity tracking, inventory limits, and budget spend percentages.',
+    },
+    params: [
+      { id: 'actual', label: 'Charge (%)', type: 'number', defaultValue: 75, min: 0, max: 100, step: 1, daxVarName: '_Actual' },
+      { id: 'color', label: 'Fill Color', type: 'color', defaultValue: '#10B981', daxVarName: '_Color' },
+    ],
+    renderSvg: (params) => {
+      const actual = clamp(Number(params.actual ?? 75), 0, 100);
+      const color = params.color || '#10B981';
+      const w = actual * 0.76;
+      return `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 35' width='100%' height='100%'>
+  <rect x='4' y='6' width='82' height='23' rx='5' fill='none' stroke='#1E293B' stroke-width='2.5' />
+  <rect x='88' y='12' width='5' height='11' rx='2' fill='#1E293B' />
+  <rect x='7' y='9' width='${w.toFixed(1)}' height='17' rx='3' fill='${color}' />
+  <text x='45' y='21' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='11' font-weight='900' fill='#1E293B'>${Math.round(actual)}%</text>
+</svg>`;
+    },
+    generateDax: (params, measureName = 'SVG_Battery_Indicator') => {
+      return buildDaxMeasure({
+        measureName,
+        description: 'Battery level indicator showing capacity or progress percentage.',
+        configVars: [
+          { name: '_Actual', value: params.actual ?? 75, type: 'number', comment: 'Replace with [Capacity %]' },
+          { name: '_Color', value: params.color || '#10B981', type: 'color' },
+        ],
+        calcVars: [
+          { name: '_Normalized', expression: 'MIN( 1, MAX( 0, DIVIDE( _Actual, 100, 0 ) ) )' },
+          { name: '_FillWidth', expression: 'ROUND( _Normalized * 76, 1 )' },
+        ],
+        svgElements: [
+          { name: '_Shell', expression: '"<rect x=\'4\' y=\'6\' width=\'82\' height=\'23\' rx=\'5\' fill=\'none\' stroke=\'#1E293B\' stroke-width=\'2.5\'/><rect x=\'88\' y=\'12\' width=\'5\' height=\'11\' rx=\'2\' fill=\'#1E293B\'/>"' },
+          { name: '_Bar', expression: '"<rect x=\'7\' y=\'9\' width=\'" & _FillWidth & "\' height=\'17\' rx=\'3\' fill=\'" & _Color & "\'/>"' },
+          { name: '_Label', expression: '"<text x=\'45\' y=\'21\' text-anchor=\'middle\' font-family=\'Segoe UI, sans-serif\' font-size=\'11\' font-weight=\'900\' fill=\'#1E293B\'>" & FORMAT( _Actual, "0" ) & "%</text>"' },
+        ],
+        viewBox: '0 0 100 35',
+      });
+    },
+  },
+
+  {
+    id: 'kpi-thermometer',
+    name: 'Vertical Thermometer',
+    category: 'kpi',
+    description: 'Vertical mercury thermometer showing progress against a scale.',
+    tags: ['thermometer', 'mercury', 'vertical', 'temperature', 'goal'],
+    viewBox: '0 0 45 100',
+    recommendedDimensions: { width: 45, height: 100 },
+    pbiTips: {
+      visualType: 'Table / Matrix / Card',
+      recommendedWidth: 40,
+      recommendedHeight: 80,
+      notes: 'Classic fundraising or sales target thermometer.',
+    },
+    params: [
+      { id: 'actual', label: 'Fill (%)', type: 'number', defaultValue: 65, min: 0, max: 100, step: 1, daxVarName: '_Actual' },
+      { id: 'color', label: 'Mercury Color', type: 'color', defaultValue: '#EF4444', daxVarName: '_Color' },
+    ],
+    renderSvg: (params) => {
+      const actual = clamp(Number(params.actual ?? 65), 0, 100);
+      const color = params.color || '#EF4444';
+      const fillHeight = actual * 0.55;
+      const topY = 65 - fillHeight;
+      return `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 45 100' width='100%' height='100%'>
+  <rect x='17' y='8' width='11' height='62' rx='5.5' fill='#E2E8F0' />
+  <circle cx='22.5' cy='78' r='14' fill='${color}' />
+  <rect x='18' y='${topY.toFixed(1)}' width='9' height='${(78 - topY).toFixed(1)}' fill='${color}' />
+  <circle cx='22.5' cy='78' r='10' fill='${color}' />
+  <text x='22.5' y='82' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='9.5' font-weight='900' fill='#FFFFFF'>${Math.round(actual)}%</text>
+</svg>`;
+    },
+    generateDax: (params, measureName = 'SVG_Thermometer') => {
+      return buildDaxMeasure({
+        measureName,
+        description: 'Vertical mercury thermometer progress visual.',
+        configVars: [
+          { name: '_Actual', value: params.actual ?? 65, type: 'number' },
+          { name: '_Color', value: params.color || '#EF4444', type: 'color' },
+        ],
+        calcVars: [
+          { name: '_Normalized', expression: 'MIN( 1, MAX( 0, DIVIDE( _Actual, 100, 0 ) ) )' },
+          { name: '_TopY', expression: 'ROUND( 65 - ( _Normalized * 55 ), 1 )' },
+          { name: '_StemHeight', expression: 'ROUND( 78 - _TopY, 1 )' },
+        ],
+        svgElements: [
+          { name: '_Track', expression: '"<rect x=\'17\' y=\'8\' width=\'11\' height=\'62\' rx=\'5.5\' fill=\'#E2E8F0\'/><circle cx=\'22.5\' cy=\'78\' r=\'14\' fill=\'" & _Color & "\'/>"' },
+          { name: '_Stem', expression: '"<rect x=\'18\' y=\'" & _TopY & "\' width=\'9\' height=\'" & _StemHeight & "\' fill=\'" & _Color & "\'/>"' },
+          { name: '_Text', expression: '"<text x=\'22.5\' y=\'82\' text-anchor=\'middle\' font-family=\'Segoe UI, sans-serif\' font-size=\'9.5\' font-weight=\'900\' fill=\'#FFFFFF\'>" & FORMAT( _Actual, "0" ) & "%</text>"' },
+        ],
+        viewBox: '0 0 45 100',
+      });
+    },
+  },
+
+  {
+    id: 'kpi-signal-bars',
+    name: 'Signal Strength Bars',
+    category: 'kpi',
+    description: '4-bar mobile signal strength indicator representing quality, tier or connectivity (1-4 bars).',
+    tags: ['signal', 'bars', 'wifi', 'cellular', 'quality', 'kpi'],
+    viewBox: '0 0 60 40',
+    recommendedDimensions: { width: 60, height: 40 },
+    pbiTips: {
+      visualType: 'Table / Matrix',
+      recommendedWidth: 50,
+      recommendedHeight: 35,
+      notes: 'Clean status visual for connectivity, data freshness, or tier ratings (1 to 4).',
+    },
+    params: [
+      { id: 'bars', label: 'Active Bars (1-4)', type: 'number', defaultValue: 3, min: 0, max: 4, step: 1, daxVarName: '_Bars' },
+      { id: 'color', label: 'Signal Color', type: 'color', defaultValue: '#3B82F6', daxVarName: '_Color' },
+    ],
+    renderSvg: (params) => {
+      const active = clamp(Number(params.bars ?? 3), 0, 4);
+      const color = params.color || '#3B82F6';
+      const heights = [8, 14, 21, 28];
+      const barsSvg = heights.map((h, i) => {
+        const isFilled = i < active;
+        const x = 8 + i * 12;
+        const y = 34 - h;
+        return `<rect x='${x}' y='${y}' width='7' height='${h}' rx='2' fill='${isFilled ? color : '#E2E8F0'}' />`;
+      });
+      return `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 40' width='100%' height='100%'>
+  ${barsSvg.join('\n  ')}
+</svg>`;
+    },
+    generateDax: (params, measureName = 'SVG_Signal_Bars') => {
+      return buildDaxMeasure({
+        measureName,
+        description: '4-bar cellular signal strength visual.',
+        configVars: [
+          { name: '_Bars', value: params.bars ?? 3, type: 'number', comment: 'Replace with score (0 to 4)' },
+          { name: '_Color', value: params.color || '#3B82F6', type: 'color' },
+        ],
+        svgElements: [
+          {
+            name: '_BarsMarkup',
+            expression: `"<rect x='8' y='26' width='7' height='8' rx='2' fill='" & IF( _Bars >= 1, _Color, "#E2E8F0" ) & "'/>" &
+    "<rect x='20' y='20' width='7' height='14' rx='2' fill='" & IF( _Bars >= 2, _Color, "#E2E8F0" ) & "'/>" &
+    "<rect x='32' y='13' width='7' height='21' rx='2' fill='" & IF( _Bars >= 3, _Color, "#E2E8F0" ) & "'/>" &
+    "<rect x='44' y='6' width='7' height='28' rx='2' fill='" & IF( _Bars >= 4, _Color, "#E2E8F0" ) & "'/>"`,
+          },
+        ],
+        viewBox: '0 0 60 40',
+      });
+    },
+  },
+
   // =========================================================================
-  // 2. GAUGES & DIALS (Direct Match to User References 2 & 3)
+  // 2. GAUGES & DIALS (8 visuals)
   // =========================================================================
   {
     id: 'gauge-with-track',
@@ -391,11 +549,8 @@ export const SVG_VISUALS_CATALOG: SvgVisualDefinition[] = [
       const fillOffset = arcLength * (1 - actual / 100);
 
       return `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 65' width='100%' height='100%'>
-  <!-- Background Track Arc -->
   <path d='M 14,48 A 36 36 0 0 1 86,48' fill='none' stroke='${trackColor}' stroke-width='${thickness}' stroke-linecap='round' />
-  <!-- Progress Fill Arc -->
   <path d='M 14,48 A 36 36 0 0 1 86,48' fill='none' stroke='${color}' stroke-width='${thickness}' stroke-dasharray='${arcLength.toFixed(2)}' stroke-dashoffset='${fillOffset.toFixed(2)}' stroke-linecap='round' />
-  <!-- Center Percentage Text -->
   <text x='50' y='60' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='17' font-weight='900' fill='#1E293B'>${Math.round(actual)}%</text>
 </svg>`;
     },
@@ -405,8 +560,8 @@ export const SVG_VISUALS_CATALOG: SvgVisualDefinition[] = [
         description: 'Semicircular gauge with background track and bold percentage callout.',
         configVars: [
           { name: '_Actual', value: params.actual ?? 55, type: 'number', comment: 'Actual percentage (0 to 100)' },
-          { name: '_Color', value: params.color || '#FACC15', type: 'color', comment: 'Fill arc color (e.g. #EF4444 for 40%, #FACC15 for 55%, #6366F1 for 80%)' },
-          { name: '_TrackColor', value: params.trackColor || '#E2E8F0', type: 'color', comment: 'Track background color' },
+          { name: '_Color', value: params.color || '#FACC15', type: 'color' },
+          { name: '_TrackColor', value: params.trackColor || '#E2E8F0', type: 'color' },
           { name: '_Thickness', value: params.thickness ?? 10, type: 'number' },
         ],
         calcVars: [
@@ -461,14 +616,10 @@ export const SVG_VISUALS_CATALOG: SvgVisualDefinition[] = [
       const ny = 50 - needleLength * Math.sin(angleRad);
 
       return `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 68' width='100%' height='100%'>
-  <!-- Outer Outline Rim -->
   <path d='M 14,50 A 36 36 0 0 1 86,50' fill='none' stroke='${outlineColor}' stroke-width='3.5' stroke-linecap='round' />
-  <!-- Tinted Shaded Sector -->
   <path d='M 14,50 A 36 36 0 0 1 86,50' fill='none' stroke='${color}' stroke-width='10' stroke-dasharray='${arcLength.toFixed(2)}' stroke-dashoffset='${fillOffset.toFixed(2)}' stroke-linecap='round' opacity='0.7' />
-  <!-- Center Needle Pointer -->
   <line x1='50' y1='50' x2='${nx.toFixed(1)}' y2='${ny.toFixed(1)}' stroke='${needleColor}' stroke-width='2.5' stroke-linecap='round' />
   <circle cx='50' cy='50' r='3.5' fill='${needleColor}' />
-  <!-- Centered Percentage Text -->
   <text x='50' y='64' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='15' font-weight='900' fill='#1E293B'>${Math.round(actual)}%</text>
 </svg>`;
     },
@@ -477,10 +628,10 @@ export const SVG_VISUALS_CATALOG: SvgVisualDefinition[] = [
         measureName,
         description: 'Semicircular gauge with outline rim, tinted progress sector, dynamic needle, and percentage callout.',
         configVars: [
-          { name: '_Actual', value: params.actual ?? 55, type: 'number', comment: 'Actual score percentage (0-100)' },
-          { name: '_Color', value: params.color || '#FEF08A', type: 'color', comment: 'Tinted sector color' },
-          { name: '_RimColor', value: params.outlineColor || '#64748B', type: 'color', comment: 'Outer rim outline color' },
-          { name: '_NeedleColor', value: params.needleColor || '#0F172A', type: 'color', comment: 'Needle indicator color' },
+          { name: '_Actual', value: params.actual ?? 55, type: 'number' },
+          { name: '_Color', value: params.color || '#FEF08A', type: 'color' },
+          { name: '_RimColor', value: params.outlineColor || '#64748B', type: 'color' },
+          { name: '_NeedleColor', value: params.needleColor || '#0F172A', type: 'color' },
         ],
         calcVars: [
           { name: '_Normalized', expression: 'MIN( 1, MAX( 0, DIVIDE( _Actual, 100, 0 ) ) )' },
@@ -549,8 +700,8 @@ export const SVG_VISUALS_CATALOG: SvgVisualDefinition[] = [
         measureName,
         description: 'Half-dial KPI gauge with progress arc and benchmark target tick line.',
         configVars: [
-          { name: '_Actual', value: params.actual ?? 40, type: 'number', comment: 'Replace with [Actual %]' },
-          { name: '_Target', value: params.target ?? 53, type: 'number', comment: 'Replace with [Target %]' },
+          { name: '_Actual', value: params.actual ?? 40, type: 'number' },
+          { name: '_Target', value: params.target ?? 53, type: 'number' },
           { name: '_Color', value: params.color || '#38BDF8', type: 'color' },
         ],
         calcVars: [
@@ -702,8 +853,189 @@ export const SVG_VISUALS_CATALOG: SvgVisualDefinition[] = [
     },
   },
 
+  {
+    id: 'gauge-horseshoe-270',
+    name: '270° Horseshoe Dial',
+    category: 'gauge',
+    description: 'Wide 270-degree radial dial wrapping three-quarters of a circle with center percentage.',
+    tags: ['gauge', 'horseshoe', 'dial', '270', 'radial', 'kpi'],
+    viewBox: '0 0 100 100',
+    recommendedDimensions: { width: 70, height: 70 },
+    pbiTips: {
+      visualType: 'New Card / Table',
+      recommendedWidth: 70,
+      recommendedHeight: 70,
+      notes: 'Provides a larger visual sweep than a 180-degree half gauge.',
+    },
+    params: [
+      { id: 'actual', label: 'Actual (%)', type: 'number', defaultValue: 70, min: 0, max: 100, step: 1, daxVarName: '_Actual' },
+      { id: 'color', label: 'Dial Color', type: 'color', defaultValue: '#F97316', daxVarName: '_Color' },
+    ],
+    renderSvg: (params) => {
+      const actual = clamp(Number(params.actual ?? 70), 0, 100);
+      const color = params.color || '#F97316';
+      const r = 36;
+      const c = 2 * Math.PI * r * 0.75; // 270 deg
+      const fullCircumference = 2 * Math.PI * r;
+      const offset = fullCircumference * 0.75 * (1 - actual / 100);
+
+      return `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' width='100%' height='100%'>
+  <circle cx='50' cy='50' r='${r}' fill='none' stroke='#E2E8F0' stroke-width='8' stroke-dasharray='${c.toFixed(2)} ${fullCircumference.toFixed(2)}' stroke-linecap='round' transform='rotate(135 50 50)' />
+  <circle cx='50' cy='50' r='${r}' fill='none' stroke='${color}' stroke-width='8' stroke-dasharray='${c.toFixed(2)} ${fullCircumference.toFixed(2)}' stroke-dashoffset='${offset.toFixed(2)}' stroke-linecap='round' transform='rotate(135 50 50)' />
+  <text x='50' y='57' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='19' font-weight='900' fill='#1E293B'>${Math.round(actual)}%</text>
+</svg>`;
+    },
+    generateDax: (params, measureName = 'SVG_Horseshoe_Dial') => {
+      return buildDaxMeasure({
+        measureName,
+        description: '270-degree horseshoe dial with center percentage metric.',
+        configVars: [
+          { name: '_Actual', value: params.actual ?? 70, type: 'number' },
+          { name: '_Color', value: params.color || '#F97316', type: 'color' },
+        ],
+        calcVars: [
+          { name: '_Normalized', expression: 'MIN( 1, MAX( 0, DIVIDE( _Actual, 100, 0 ) ) )' },
+          { name: '_Radius', expression: '36' },
+          { name: '_FullCircumference', expression: '2 * PI() * _Radius' },
+          { name: '_ArcSweep', expression: '_FullCircumference * 0.75' },
+          { name: '_DashOffset', expression: '_ArcSweep * ( 1 - _Normalized )' },
+        ],
+        svgElements: [
+          { name: '_Track', expression: '"<circle cx=\'50\' cy=\'50\' r=\'" & _Radius & "\' fill=\'none\' stroke=\'#E2E8F0\' stroke-width=\'8\' stroke-dasharray=\'" & ROUND( _ArcSweep, 2 ) & " " & ROUND( _FullCircumference, 2 ) & "\' stroke-linecap=\'round\' transform=\'rotate(135 50 50)\'/>"' },
+          { name: '_Arc', expression: '"<circle cx=\'50\' cy=\'50\' r=\'" & _Radius & "\' fill=\'none\' stroke=\'" & _Color & "\' stroke-width=\'8\' stroke-dasharray=\'" & ROUND( _ArcSweep, 2 ) & " " & ROUND( _FullCircumference, 2 ) & "\' stroke-dashoffset=\'" & ROUND( _DashOffset, 2 ) & "\' stroke-linecap=\'round\' transform=\'rotate(135 50 50)\'/>"' },
+          { name: '_Text', expression: '"<text x=\'50\' y=\'57\' text-anchor=\'middle\' font-family=\'Segoe UI, sans-serif\' font-size=\'19\' font-weight=\'900\' fill=\'#1E293B\'>" & FORMAT( _Actual, "0" ) & "%</text>"' },
+        ],
+        viewBox: '0 0 100 100',
+      });
+    },
+  },
+
+  {
+    id: 'gauge-dual-needle',
+    name: 'Dual Needle Comparison Gauge',
+    category: 'gauge',
+    description: 'Semicircular dial with two needle indicators comparing Actual performance against Target.',
+    tags: ['gauge', 'needle', 'comparison', 'target', 'actual', 'dial'],
+    viewBox: '0 0 100 68',
+    recommendedDimensions: { width: 100, height: 68 },
+    pbiTips: {
+      visualType: 'New Card / Table',
+      recommendedWidth: 90,
+      recommendedHeight: 65,
+      notes: 'Black needle shows Actual; colored needle shows Target or Benchmark.',
+    },
+    params: [
+      { id: 'actual', label: 'Actual (%)', type: 'number', defaultValue: 62, min: 0, max: 100, step: 1, daxVarName: '_Actual' },
+      { id: 'target', label: 'Target (%)', type: 'number', defaultValue: 80, min: 0, max: 100, step: 1, daxVarName: '_Target' },
+      { id: 'actualColor', label: 'Actual Color', type: 'color', defaultValue: '#0F172A', daxVarName: '_ActualColor' },
+      { id: 'targetColor', label: 'Target Color', type: 'color', defaultValue: '#EF4444', daxVarName: '_TargetColor' },
+    ],
+    renderSvg: (params) => {
+      const actual = clamp(Number(params.actual ?? 62), 0, 100);
+      const target = clamp(Number(params.target ?? 80), 0, 100);
+      const aColor = params.actualColor || '#0F172A';
+      const tColor = params.targetColor || '#EF4444';
+
+      const aRad = (180 - actual * 1.8) * (Math.PI / 180);
+      const tRad = (180 - target * 1.8) * (Math.PI / 180);
+      const ax = 50 + 36 * Math.cos(aRad);
+      const ay = 52 - 36 * Math.sin(aRad);
+      const tx = 50 + 32 * Math.cos(tRad);
+      const ty = 52 - 32 * Math.sin(tRad);
+
+      return `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 68' width='100%' height='100%'>
+  <path d='M 14,52 A 36 36 0 0 1 86,52' fill='none' stroke='#E2E8F0' stroke-width='6' stroke-linecap='round' />
+  <line x1='50' y1='52' x2='${tx.toFixed(1)}' y2='${ty.toFixed(1)}' stroke='${tColor}' stroke-width='2' stroke-linecap='round' stroke-dasharray='2,2' />
+  <line x1='50' y1='52' x2='${ax.toFixed(1)}' y2='${ay.toFixed(1)}' stroke='${aColor}' stroke-width='2.8' stroke-linecap='round' />
+  <circle cx='50' cy='52' r='4' fill='${aColor}' />
+  <text x='50' y='65' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='11' font-weight='800' fill='#1E293B'>Act: ${Math.round(actual)}% | Tgt: ${Math.round(target)}%</text>
+</svg>`;
+    },
+    generateDax: (params, measureName = 'SVG_Dual_Needle_Gauge') => {
+      return buildDaxMeasure({
+        measureName,
+        description: 'Dual needle gauge comparing Actual vs Target pointers.',
+        configVars: [
+          { name: '_Actual', value: params.actual ?? 62, type: 'number' },
+          { name: '_Target', value: params.target ?? 80, type: 'number' },
+          { name: '_ActualColor', value: params.actualColor || '#0F172A', type: 'color' },
+          { name: '_TargetColor', value: params.targetColor || '#EF4444', type: 'color' },
+        ],
+        calcVars: [
+          { name: '_ARad', expression: '( 180 - ( MIN( 1, DIVIDE( _Actual, 100, 0 ) ) * 180 ) ) * ( PI() / 180 )' },
+          { name: '_TRad', expression: '( 180 - ( MIN( 1, DIVIDE( _Target, 100, 0 ) ) * 180 ) ) * ( PI() / 180 )' },
+          { name: '_AX', expression: 'ROUND( 50 + 36 * COS( _ARad ), 1 )' },
+          { name: '_AY', expression: 'ROUND( 52 - 36 * SIN( _ARad ), 1 )' },
+          { name: '_TX', expression: 'ROUND( 50 + 32 * COS( _TRad ), 1 )' },
+          { name: '_TY', expression: 'ROUND( 52 - 32 * SIN( _TRad ), 1 )' },
+        ],
+        svgElements: [
+          { name: '_Track', expression: '"<path d=\'M 14,52 A 36 36 0 0 1 86,52\' fill=\'none\' stroke=\'#E2E8F0\' stroke-width=\'6\' stroke-linecap=\'round\'/>"' },
+          { name: '_TargetNeedle', expression: '"<line x1=\'50\' y1=\'52\' x2=\'" & _TX & "\' y2=\'" & _TY & "\' stroke=\'" & _TargetColor & "\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-dasharray=\'2,2\'/>"' },
+          { name: '_ActualNeedle', expression: '"<line x1=\'50\' y1=\'52\' x2=\'" & _AX & "\' y2=\'" & _AY & "\' stroke=\'" & _ActualColor & "\' stroke-width=\'2.8\' stroke-linecap=\'round\'/><circle cx=\'50\' cy=\'52\' r=\'4\' fill=\'" & _ActualColor & "\'/>"' },
+          { name: '_Label', expression: '"<text x=\'50\' y=\'65\' text-anchor=\'middle\' font-family=\'Segoe UI, sans-serif\' font-size=\'11\' font-weight=\'800\' fill=\'#1E293B\'>Act: " & FORMAT( _Actual, "0" ) & "% | Tgt: " & FORMAT( _Target, "0" ) & "%</text>"' },
+        ],
+        viewBox: '0 0 100 68',
+      });
+    },
+  },
+
+  {
+    id: 'gauge-linear-slider',
+    name: 'Horizontal Linear Gauge',
+    category: 'gauge',
+    description: 'Horizontal linear slider meter with gradient track, pointer indicator, and numerical value.',
+    tags: ['linear', 'gauge', 'slider', 'meter', 'horizontal'],
+    viewBox: '0 0 120 36',
+    recommendedDimensions: { width: 120, height: 36 },
+    pbiTips: {
+      visualType: 'Table / Matrix',
+      recommendedWidth: 110,
+      recommendedHeight: 36,
+      notes: 'Compact linear gauge alternative to semicircular dials.',
+    },
+    params: [
+      { id: 'actual', label: 'Actual (%)', type: 'number', defaultValue: 65, min: 0, max: 100, step: 1, daxVarName: '_Actual' },
+      { id: 'color', label: 'Pointer Color', type: 'color', defaultValue: '#8B5CF6', daxVarName: '_Color' },
+    ],
+    renderSvg: (params) => {
+      const actual = clamp(Number(params.actual ?? 65), 0, 100);
+      const color = params.color || '#8B5CF6';
+      const pointerX = 10 + actual * 0.8;
+
+      return `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 36' width='100%' height='100%'>
+  <rect x='10' y='14' width='80' height='8' rx='4' fill='#E2E8F0' />
+  <rect x='10' y='14' width='${(actual * 0.8).toFixed(1)}' height='8' rx='4' fill='${color}' />
+  <polygon points='${pointerX},7 ${pointerX - 4},13 ${pointerX + 4},13' fill='#1E293B' />
+  <text x='100' y='21' font-family='Segoe UI, sans-serif' font-size='12' font-weight='900' fill='#1E293B'>${Math.round(actual)}%</text>
+</svg>`;
+    },
+    generateDax: (params, measureName = 'SVG_Linear_Gauge') => {
+      return buildDaxMeasure({
+        measureName,
+        description: 'Horizontal linear gauge meter with pointer.',
+        configVars: [
+          { name: '_Actual', value: params.actual ?? 65, type: 'number' },
+          { name: '_Color', value: params.color || '#8B5CF6', type: 'color' },
+        ],
+        calcVars: [
+          { name: '_Normalized', expression: 'MIN( 1, MAX( 0, DIVIDE( _Actual, 100, 0 ) ) )' },
+          { name: '_BarWidth', expression: 'ROUND( _Normalized * 80, 1 )' },
+          { name: '_PX', expression: '10 + _BarWidth' },
+        ],
+        svgElements: [
+          { name: '_Track', expression: '"<rect x=\'10\' y=\'14\' width=\'80\' height=\'8\' rx=\'4\' fill=\'#E2E8F0\'/>"' },
+          { name: '_Fill', expression: '"<rect x=\'10\' y=\'14\' width=\'" & _BarWidth & "\' height=\'8\' rx=\'4\' fill=\'" & _Color & "\'/>"' },
+          { name: '_Pointer', expression: '"<polygon points=\'" & _PX & ",7 " & ( _PX - 4 ) & ",13 " & ( _PX + 4 ) & ",13\' fill=\'#1E293B\'/>"' },
+          { name: '_Text', expression: '"<text x=\'100\' y=\'21\' font-family=\'Segoe UI, sans-serif\' font-size=\'12\' font-weight=\'900\' fill=\'#1E293B\'>" & FORMAT( _Actual, "0" ) & "%</text>"' },
+        ],
+        viewBox: '0 0 120 36',
+      });
+    },
+  },
+
   // =========================================================================
-  // 3. LINES & SPARKLINES (Image 4 References)
+  // 3. LINES & SPARKLINES (7 visuals)
   // =========================================================================
   {
     id: 'sparkline-min-max',
@@ -920,8 +1252,152 @@ export const SVG_VISUALS_CATALOG: SvgVisualDefinition[] = [
     },
   },
 
+  {
+    id: 'sparkline-stepped',
+    name: 'Stepped Trend Staircase',
+    category: 'line',
+    description: 'Step-after discrete staircase sparkline ideal for pricing tiers or rate changes.',
+    tags: ['stepped', 'sparkline', 'stairs', 'discrete', 'trend'],
+    viewBox: '0 0 120 40',
+    recommendedDimensions: { width: 120, height: 40 },
+    pbiTips: {
+      visualType: 'Table / Matrix',
+      recommendedWidth: 120,
+      recommendedHeight: 40,
+      notes: 'Best for discrete stage transitions or interest rate history.',
+    },
+    params: [
+      { id: 'color', label: 'Step Line Color', type: 'color', defaultValue: '#059669', daxVarName: '_Color' },
+    ],
+    renderSvg: (params) => {
+      const color = params.color || '#059669';
+      return `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 40' width='100%' height='100%'>
+  <path d='M 10,32 H 35 V 24 H 65 V 15 H 90 V 8 H 112' fill='none' stroke='${color}' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round' />
+  <circle cx='112' cy='8' r='3.5' fill='${color}' />
+</svg>`;
+    },
+    generateDax: (params, measureName = 'SVG_Stepped_Sparkline') => {
+      return buildDaxMeasure({
+        measureName,
+        description: 'Stepped staircase trend line for discrete rate changes.',
+        configVars: [
+          { name: '_Color', value: params.color || '#059669', type: 'color' },
+        ],
+        svgElements: [
+          { name: '_Stairs', expression: '"<path d=\'M 10,32 H 35 V 24 H 65 V 15 H 90 V 8 H 112\' fill=\'none\' stroke=\'" & _Color & "\' stroke-width=\'2.2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'/><circle cx=\'112\' cy=\'8\' r=\'3.5\' fill=\'" & _Color & "\'/>"' },
+        ],
+        viewBox: '0 0 120 40',
+      });
+    },
+  },
+
+  {
+    id: 'sparkline-endpoints',
+    name: 'Start/End Range Line',
+    category: 'line',
+    description: 'Minimalist sparkline showing starting dot, baseline connecting line, and ending dot with percentage change.',
+    tags: ['endpoints', 'sparkline', 'delta', 'trend', 'minimal'],
+    viewBox: '0 0 120 35',
+    recommendedDimensions: { width: 120, height: 35 },
+    pbiTips: {
+      visualType: 'Table / Matrix',
+      recommendedWidth: 120,
+      recommendedHeight: 35,
+      notes: 'Highlights start-to-end variance clearly without intermediate noise.',
+    },
+    params: [
+      { id: 'delta', label: 'Delta (%)', type: 'number', defaultValue: 18.5, step: 0.1, daxVarName: '_Delta' },
+      { id: 'color', label: 'Line Color', type: 'color', defaultValue: '#3B82F6', daxVarName: '_Color' },
+    ],
+    renderSvg: (params) => {
+      const delta = Number(params.delta ?? 18.5);
+      const color = params.color || '#3B82F6';
+      const isPos = delta >= 0;
+      const endY = isPos ? 10 : 25;
+      return `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 35' width='100%' height='100%'>
+  <line x1='15' y1='22' x2='75' y2='${endY}' stroke='${color}' stroke-width='2' stroke-linecap='round' />
+  <circle cx='15' cy='22' r='3.5' fill='#94A3B8' />
+  <circle cx='75' cy='${endY}' r='4' fill='${color}' />
+  <text x='84' y='${endY + 4}' font-family='Segoe UI, sans-serif' font-size='11' font-weight='900' fill='${color}'>${delta > 0 ? '+' : ''}${delta.toFixed(1)}%</text>
+</svg>`;
+    },
+    generateDax: (params, measureName = 'SVG_Endpoints_Sparkline') => {
+      return buildDaxMeasure({
+        measureName,
+        description: 'Start/End endpoint variance sparkline with delta label.',
+        configVars: [
+          { name: '_Delta', value: params.delta ?? 18.5, type: 'number' },
+          { name: '_Color', value: params.color || '#3B82F6', type: 'color' },
+        ],
+        calcVars: [
+          { name: '_EndY', expression: 'IF( _Delta >= 0, 10, 25 )' },
+          { name: '_Label', expression: 'IF( _Delta > 0, "+", "" ) & FORMAT( _Delta, "0.0" ) & "%"' },
+        ],
+        svgElements: [
+          { name: '_Line', expression: '"<line x1=\'15\' y1=\'22\' x2=\'75\' y2=\'" & _EndY & "\' stroke=\'" & _Color & "\' stroke-width=\'2\' stroke-linecap=\'round\'/><circle cx=\'15\' cy=\'22\' r=\'3.5\' fill=\'#94A3B8\'/><circle cx=\'75\' cy=\'" & _EndY & "\' r=\'4\' fill=\'" & _Color & "\'/>"' },
+          { name: '_Text', expression: '"<text x=\'84\' y=\'" & ( _EndY + 4 ) & "\' font-family=\'Segoe UI, sans-serif\' font-size=\'11\' font-weight=\'900\' fill=\'" & _Color & "\'>" & _Label & "</text>"' },
+        ],
+        viewBox: '0 0 120 35',
+      });
+    },
+  },
+
+  {
+    id: 'sparkline-lollipop',
+    name: 'Lollipop Trend Chart',
+    category: 'line',
+    description: 'Vertical stem lollipop visual with highlighted dots showing category distribution.',
+    tags: ['lollipop', 'stem', 'dots', 'trend', 'distribution'],
+    viewBox: '0 0 120 40',
+    recommendedDimensions: { width: 120, height: 40 },
+    pbiTips: {
+      visualType: 'Table / Matrix',
+      recommendedWidth: 120,
+      recommendedHeight: 40,
+      notes: 'Based on Kurt Buhler / Data Goblins lollipop pattern for variance callouts.',
+    },
+    params: [
+      { id: 'color', label: 'Dot Color', type: 'color', defaultValue: '#EC4899', daxVarName: '_Color' },
+    ],
+    renderSvg: (params) => {
+      const color = params.color || '#EC4899';
+      const points = [
+        { x: 15, y: 18 },
+        { x: 35, y: 26 },
+        { x: 55, y: 12 },
+        { x: 75, y: 22 },
+        { x: 95, y: 8 },
+      ];
+      return `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 40' width='100%' height='100%'>
+  <line x1='8' y1='34' x2='112' y2='34' stroke='#CBD5E1' stroke-width='1.5' />
+  ${points.map((p) => `<line x1='${p.x}' y1='34' x2='${p.x}' y2='${p.y}' stroke='#CBD5E1' stroke-width='1.5' /><circle cx='${p.x}' cy='${p.y}' r='3.5' fill='${color}' />`).join('\n  ')}
+</svg>`;
+    },
+    generateDax: (params, measureName = 'SVG_Lollipop_Trend') => {
+      return buildDaxMeasure({
+        measureName,
+        description: 'Lollipop stem sparkline for discrete trend points.',
+        configVars: [
+          { name: '_Color', value: params.color || '#EC4899', type: 'color' },
+        ],
+        svgElements: [
+          {
+            name: '_Stems',
+            expression: `"<line x1='8' y1='34' x2='112' y2='34' stroke='#CBD5E1' stroke-width='1.5'/>" &
+    "<line x1='15' y1='34' x2='15' y2='18' stroke='#CBD5E1' stroke-width='1.5'/><circle cx='15' cy='18' r='3.5' fill='" & _Color & "'/>" &
+    "<line x1='35' y1='34' x2='35' y2='26' stroke='#CBD5E1' stroke-width='1.5'/><circle cx='35' cy='26' r='3.5' fill='" & _Color & "'/>" &
+    "<line x1='55' y1='34' x2='55' y2='12' stroke='#CBD5E1' stroke-width='1.5'/><circle cx='55' cy='12' r='3.5' fill='" & _Color & "'/>" &
+    "<line x1='75' y1='34' x2='75' y2='22' stroke='#CBD5E1' stroke-width='1.5'/><circle cx='75' cy='22' r='3.5' fill='" & _Color & "'/>" &
+    "<line x1='95' y1='34' x2='95' y2='8' stroke='#CBD5E1' stroke-width='1.5'/><circle cx='95' cy='8' r='3.5' fill='" & _Color & "'/>"`,
+          },
+        ],
+        viewBox: '0 0 120 40',
+      });
+    },
+  },
+
   // =========================================================================
-  // 4. BARS & BULLETS (Image 4 References)
+  // 4. BARS & BULLETS (7 visuals)
   // =========================================================================
   {
     id: 'bullet-chart-target',
@@ -948,13 +1424,11 @@ export const SVG_VISUALS_CATALOG: SvgVisualDefinition[] = [
       const target = clamp(Number(params.target ?? 85), 0, 100);
       const barColor = params.barColor || '#38BDF8';
       const targetColor = params.targetColor || '#0F172A';
-      const actualW = actual;
-      const targetX = target;
 
       return `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 30' width='100%' height='100%'>
   <rect x='10' y='6' width='100' height='18' rx='3' fill='#F1F5F9' />
-  <rect x='10' y='8' width='${actualW}' height='14' rx='2' fill='${barColor}' />
-  <line x1='${10 + targetX}' y1='4' x2='${10 + targetX}' y2='26' stroke='${targetColor}' stroke-width='2.5' />
+  <rect x='10' y='8' width='${actual}' height='14' rx='2' fill='${barColor}' />
+  <line x1='${10 + target}' y1='4' x2='${10 + target}' y2='26' stroke='${targetColor}' stroke-width='2.5' />
 </svg>`;
     },
     generateDax: (params, measureName = 'SVG_IBCS_Bullet_Chart') => {
@@ -1006,7 +1480,7 @@ export const SVG_VISUALS_CATALOG: SvgVisualDefinition[] = [
 
       return `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 24' width='100%' height='100%'>
   <rect x='4' y='6' width='80' height='12' rx='6' fill='#E2E8F0' />
-  <rect x='4' y='6' width='${w}' height='12' rx='6' fill='${color}' />
+  <rect x='4' y='6' width='${w.toFixed(1)}' height='12' rx='6' fill='${color}' />
   <text x='92' y='16' font-family='Segoe UI, sans-serif' font-size='11' font-weight='800' fill='#1E293B'>${Math.round(actual)}%</text>
 </svg>`;
     },
@@ -1093,8 +1567,214 @@ export const SVG_VISUALS_CATALOG: SvgVisualDefinition[] = [
     },
   },
 
+  {
+    id: 'bar-overlapping-benchmark',
+    name: 'Overlapping Actual vs Budget',
+    category: 'bar',
+    description: 'Overlapping bars comparing full budget outline with inner actual progress bar.',
+    tags: ['overlapping', 'budget', 'benchmark', 'bar', 'variance'],
+    viewBox: '0 0 120 30',
+    recommendedDimensions: { width: 120, height: 30 },
+    pbiTips: {
+      visualType: 'Table / Matrix',
+      recommendedWidth: 120,
+      recommendedHeight: 30,
+      notes: 'Based on Kurt Buhler / Data Goblins overlapping bars pattern.',
+    },
+    params: [
+      { id: 'actual', label: 'Actual (%)', type: 'number', defaultValue: 72, min: 0, max: 100, step: 1, daxVarName: '_Actual' },
+      { id: 'budget', label: 'Budget (%)', type: 'number', defaultValue: 90, min: 0, max: 100, step: 1, daxVarName: '_Budget' },
+      { id: 'color', label: 'Actual Bar Color', type: 'color', defaultValue: '#2563EB', daxVarName: '_Color' },
+    ],
+    renderSvg: (params) => {
+      const actual = clamp(Number(params.actual ?? 72), 0, 100);
+      const budget = clamp(Number(params.budget ?? 90), 0, 100);
+      const color = params.color || '#2563EB';
+      return `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 30' width='100%' height='100%'>
+  <rect x='10' y='6' width='${budget}' height='18' rx='4' fill='#E2E8F0' />
+  <rect x='10' y='10' width='${actual}' height='10' rx='2' fill='${color}' />
+</svg>`;
+    },
+    generateDax: (params, measureName = 'SVG_Overlapping_Bars') => {
+      return buildDaxMeasure({
+        measureName,
+        description: 'Overlapping actual vs budget progress bars.',
+        configVars: [
+          { name: '_Actual', value: params.actual ?? 72, type: 'number' },
+          { name: '_Budget', value: params.budget ?? 90, type: 'number' },
+          { name: '_Color', value: params.color || '#2563EB', type: 'color' },
+        ],
+        calcVars: [
+          { name: '_ActualW', expression: 'MIN( 100, MAX( 0, _Actual ) )' },
+          { name: '_BudgetW', expression: 'MIN( 100, MAX( 0, _Budget ) )' },
+        ],
+        svgElements: [
+          { name: '_BudgetBar', expression: '"<rect x=\'10\' y=\'6\' width=\'" & _BudgetW & "\' height=\'18\' rx=\'4\' fill=\'#E2E8F0\'/>"' },
+          { name: '_ActualBar', expression: '"<rect x=\'10\' y=\'10\' width=\'" & _ActualW & "\' height=\'10\' rx=\'2\' fill=\'" & _Color & "\'/>"' },
+        ],
+        viewBox: '0 0 120 30',
+      });
+    },
+  },
+
+  {
+    id: 'bar-stacked-100',
+    name: '100% Stacked Proportion Bar',
+    category: 'bar',
+    description: 'Horizontal two-segment stacked bar showing proportion between 2 metrics (e.g. Online vs Store).',
+    tags: ['stacked', 'proportion', 'part-to-whole', 'bar'],
+    viewBox: '0 0 120 25',
+    recommendedDimensions: { width: 120, height: 25 },
+    pbiTips: {
+      visualType: 'Table / Matrix',
+      recommendedWidth: 120,
+      recommendedHeight: 25,
+      notes: 'Shows clean 2-segment proportional split.',
+    },
+    params: [
+      { id: 'shareA', label: 'Segment A Share (%)', type: 'number', defaultValue: 60, min: 0, max: 100, step: 1, daxVarName: '_ShareA' },
+      { id: 'colorA', label: 'Segment A Color', type: 'color', defaultValue: '#8B5CF6', daxVarName: '_ColorA' },
+      { id: 'colorB', label: 'Segment B Color', type: 'color', defaultValue: '#38BDF8', daxVarName: '_ColorB' },
+    ],
+    renderSvg: (params) => {
+      const shareA = clamp(Number(params.shareA ?? 60), 0, 100);
+      const colorA = params.colorA || '#8B5CF6';
+      const colorB = params.colorB || '#38BDF8';
+      const wA = shareA;
+      const wB = 100 - shareA;
+      return `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 25' width='100%' height='100%'>
+  <rect x='10' y='6' width='${wA}' height='14' rx='3' fill='${colorA}' />
+  <rect x='${10 + wA}' y='6' width='${wB}' height='14' rx='3' fill='${colorB}' />
+</svg>`;
+    },
+    generateDax: (params, measureName = 'SVG_Stacked_Proportion') => {
+      return buildDaxMeasure({
+        measureName,
+        description: '100% stacked two-segment proportion bar.',
+        configVars: [
+          { name: '_ShareA', value: params.shareA ?? 60, type: 'number' },
+          { name: '_ColorA', value: params.colorA || '#8B5CF6', type: 'color' },
+          { name: '_ColorB', value: params.colorB || '#38BDF8', type: 'color' },
+        ],
+        calcVars: [
+          { name: '_WidthA', expression: 'MIN( 100, MAX( 0, _ShareA ) )' },
+          { name: '_WidthB', expression: '100 - _WidthA' },
+        ],
+        svgElements: [
+          { name: '_SegmentA', expression: '"<rect x=\'10\' y=\'6\' width=\'" & _WidthA & "\' height=\'14\' rx=\'3\' fill=\'" & _ColorA & "\'/>"' },
+          { name: '_SegmentB', expression: '"<rect x=\'" & ( 10 + _WidthA ) & "\' y=\'6\' width=\'" & _WidthB & "\' height=\'14\' rx=\'3\' fill=\'" & _ColorB & "\'/>"' },
+        ],
+        viewBox: '0 0 120 25',
+      });
+    },
+  },
+
+  {
+    id: 'bar-dumbbell-chart',
+    name: 'Dumbbell Comparison Chart',
+    category: 'bar',
+    description: 'Dumbbell bar connecting baseline and current values with a connector line and colored circles.',
+    tags: ['dumbbell', 'barbell', 'comparison', 'growth', 'delta'],
+    viewBox: '0 0 120 30',
+    recommendedDimensions: { width: 120, height: 30 },
+    pbiTips: {
+      visualType: 'Table / Matrix',
+      recommendedWidth: 120,
+      recommendedHeight: 30,
+      notes: 'Excellent for showing change from Prior Year to Current Year.',
+    },
+    params: [
+      { id: 'startVal', label: 'Start Value (%)', type: 'number', defaultValue: 35, min: 0, max: 100, step: 1, daxVarName: '_Start' },
+      { id: 'endVal', label: 'End Value (%)', type: 'number', defaultValue: 75, min: 0, max: 100, step: 1, daxVarName: '_End' },
+      { id: 'color', label: 'Current Dot Color', type: 'color', defaultValue: '#10B981', daxVarName: '_Color' },
+    ],
+    renderSvg: (params) => {
+      const s = clamp(Number(params.startVal ?? 35), 0, 100);
+      const e = clamp(Number(params.endVal ?? 75), 0, 100);
+      const color = params.color || '#10B981';
+      const x1 = 10 + s;
+      const x2 = 10 + e;
+      return `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 30' width='100%' height='100%'>
+  <line x1='${x1}' y1='15' x2='${x2}' y2='15' stroke='#94A3B8' stroke-width='3' stroke-linecap='round' />
+  <circle cx='${x1}' cy='15' r='5' fill='#94A3B8' />
+  <circle cx='${x2}' cy='15' r='6' fill='${color}' stroke='#FFFFFF' stroke-width='1.5' />
+</svg>`;
+    },
+    generateDax: (params, measureName = 'SVG_Dumbbell_Chart') => {
+      return buildDaxMeasure({
+        measureName,
+        description: 'Dumbbell comparison visual connecting baseline and current points.',
+        configVars: [
+          { name: '_Start', value: params.startVal ?? 35, type: 'number' },
+          { name: '_End', value: params.endVal ?? 75, type: 'number' },
+          { name: '_Color', value: params.color || '#10B981', type: 'color' },
+        ],
+        calcVars: [
+          { name: '_X1', expression: '10 + MIN( 100, MAX( 0, _Start ) )' },
+          { name: '_X2', expression: '10 + MIN( 100, MAX( 0, _End ) )' },
+        ],
+        svgElements: [
+          { name: '_Connector', expression: '"<line x1=\'" & _X1 & "\' y1=\'15\' x2=\'" & _X2 & "\' y2=\'15\' stroke=\'#94A3B8\' stroke-width=\'3\' stroke-linecap=\'round\'/>"' },
+          { name: '_Dots', expression: '"<circle cx=\'" & _X1 & "\' cy=\'15\' r=\'5\' fill=\'#94A3B8\'/><circle cx=\'" & _X2 & "\' cy=\'15\' r=\'6\' fill=\'" & _Color & "\' stroke=\'#FFFFFF\' stroke-width=\'1.5\'/>"' },
+        ],
+        viewBox: '0 0 120 30',
+      });
+    },
+  },
+
+  {
+    id: 'bar-range-bullet',
+    name: '3-Tier Benchmark Bullet',
+    category: 'bar',
+    description: 'Bullet chart featuring 3 qualitative benchmark background zones (Poor, Good, Excellent) with target and actual bar.',
+    tags: ['bullet', 'qualitative', 'zones', 'benchmark', 'tiers'],
+    viewBox: '0 0 120 30',
+    recommendedDimensions: { width: 120, height: 30 },
+    pbiTips: {
+      visualType: 'Table / Matrix',
+      recommendedWidth: 120,
+      recommendedHeight: 30,
+      notes: 'Classic Stephen Few bullet chart with qualitative shading.',
+    },
+    params: [
+      { id: 'actual', label: 'Actual (%)', type: 'number', defaultValue: 75, min: 0, max: 100, step: 1, daxVarName: '_Actual' },
+      { id: 'target', label: 'Target (%)', type: 'number', defaultValue: 85, min: 0, max: 100, step: 1, daxVarName: '_Target' },
+    ],
+    renderSvg: (params) => {
+      const a = clamp(Number(params.actual ?? 75), 0, 100);
+      const t = clamp(Number(params.target ?? 85), 0, 100);
+      return `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 30' width='100%' height='100%'>
+  <rect x='10' y='6' width='100' height='18' fill='#F1F5F9' />
+  <rect x='10' y='6' width='60' height='18' fill='#E2E8F0' />
+  <rect x='10' y='6' width='30' height='18' fill='#CBD5E1' />
+  <rect x='10' y='10' width='${a}' height='10' rx='1' fill='#1E293B' />
+  <line x1='${10 + t}' y1='4' x2='${10 + t}' y2='26' stroke='#EF4444' stroke-width='2.5' />
+</svg>`;
+    },
+    generateDax: (params, measureName = 'SVG_Tiered_Bullet') => {
+      return buildDaxMeasure({
+        measureName,
+        description: 'Bullet chart with 3 qualitative shaded zones and target marker.',
+        configVars: [
+          { name: '_Actual', value: params.actual ?? 75, type: 'number' },
+          { name: '_Target', value: params.target ?? 85, type: 'number' },
+        ],
+        calcVars: [
+          { name: '_ActualW', expression: 'MIN( 100, MAX( 0, _Actual ) )' },
+          { name: '_TargetX', expression: '10 + MIN( 100, MAX( 0, _Target ) )' },
+        ],
+        svgElements: [
+          { name: '_Zones', expression: '"<rect x=\'10\' y=\'6\' width=\'100\' height=\'18\' fill=\'#F1F5F9\'/><rect x=\'10\' y=\'6\' width=\'60\' height=\'18\' fill=\'#E2E8F0\'/><rect x=\'10\' y=\'6\' width=\'30\' height=\'18\' fill=\'#CBD5E1\'/>"' },
+          { name: '_ActualBar', expression: '"<rect x=\'10\' y=\'10\' width=\'" & _ActualW & "\' height=\'10\' rx=\'1\' fill=\'#1E293B\'/>"' },
+          { name: '_TargetMarker', expression: '"<line x1=\'" & _TargetX & "\' y1=\'4\' x2=\'" & _TargetX & "\' y2=\'26\' stroke=\'#EF4444\' stroke-width=\'2.5\'/>"' },
+        ],
+        viewBox: '0 0 120 30',
+      });
+    },
+  },
+
   // =========================================================================
-  // 5. DONUTS & RADIALS (Image 4 References)
+  // 5. DONUTS & RADIALS (5 visuals)
   // =========================================================================
   {
     id: 'donut-kpi-metric',
@@ -1246,8 +1926,197 @@ export const SVG_VISUALS_CATALOG: SvgVisualDefinition[] = [
     },
   },
 
+  {
+    id: 'donut-concentric-dual',
+    name: 'Concentric Dual Rings',
+    category: 'donut',
+    description: 'Nested dual progress rings (outer ring = Actual, inner ring = Benchmark or Prior Year).',
+    tags: ['concentric', 'dual', 'nested', 'rings', 'donut', 'kpi'],
+    viewBox: '0 0 100 100',
+    recommendedDimensions: { width: 65, height: 65 },
+    pbiTips: {
+      visualType: 'New Card / Table',
+      recommendedWidth: 65,
+      recommendedHeight: 65,
+      notes: 'Compact nested representation of 2 related percentages.',
+    },
+    params: [
+      { id: 'actual', label: 'Outer (Actual %)', type: 'number', defaultValue: 82, min: 0, max: 100, step: 1, daxVarName: '_Actual' },
+      { id: 'target', label: 'Inner (Target %)', type: 'number', defaultValue: 65, min: 0, max: 100, step: 1, daxVarName: '_Target' },
+      { id: 'colorOuter', label: 'Outer Ring Color', type: 'color', defaultValue: '#8B5CF6', daxVarName: '_ColorOut' },
+      { id: 'colorInner', label: 'Inner Ring Color', type: 'color', defaultValue: '#38BDF8', daxVarName: '_ColorIn' },
+    ],
+    renderSvg: (params) => {
+      const a = clamp(Number(params.actual ?? 82), 0, 100);
+      const t = clamp(Number(params.target ?? 65), 0, 100);
+      const cOut = params.colorOuter || '#8B5CF6';
+      const cIn = params.colorInner || '#38BDF8';
+
+      const r1 = 40;
+      const r2 = 27;
+      const c1 = 2 * Math.PI * r1;
+      const c2 = 2 * Math.PI * r2;
+      const off1 = c1 * (1 - a / 100);
+      const off2 = c2 * (1 - t / 100);
+
+      return `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' width='100%' height='100%'>
+  <circle cx='50' cy='50' r='${r1}' fill='none' stroke='#E2E8F0' stroke-width='7' />
+  <circle cx='50' cy='50' r='${r1}' fill='none' stroke='${cOut}' stroke-width='7' stroke-dasharray='${c1.toFixed(2)}' stroke-dashoffset='${off1.toFixed(2)}' stroke-linecap='round' transform='rotate(-90 50 50)' />
+  <circle cx='50' cy='50' r='${r2}' fill='none' stroke='#F1F5F9' stroke-width='6' />
+  <circle cx='50' cy='50' r='${r2}' fill='none' stroke='${cIn}' stroke-width='6' stroke-dasharray='${c2.toFixed(2)}' stroke-dashoffset='${off2.toFixed(2)}' stroke-linecap='round' transform='rotate(-90 50 50)' />
+</svg>`;
+    },
+    generateDax: (params, measureName = 'SVG_Concentric_Dual_Rings') => {
+      return buildDaxMeasure({
+        measureName,
+        description: 'Nested dual progress rings for Actual vs Target.',
+        configVars: [
+          { name: '_Actual', value: params.actual ?? 82, type: 'number' },
+          { name: '_Target', value: params.target ?? 65, type: 'number' },
+          { name: '_ColorOut', value: params.colorOuter || '#8B5CF6', type: 'color' },
+          { name: '_ColorIn', value: params.colorInner || '#38BDF8', type: 'color' },
+        ],
+        calcVars: [
+          { name: '_NormOut', expression: 'MIN( 1, MAX( 0, DIVIDE( _Actual, 100, 0 ) ) )' },
+          { name: '_NormIn', expression: 'MIN( 1, MAX( 0, DIVIDE( _Target, 100, 0 ) ) )' },
+          { name: '_C1', expression: '2 * PI() * 40' },
+          { name: '_C2', expression: '2 * PI() * 27' },
+          { name: '_Off1', expression: '_C1 * ( 1 - _NormOut )' },
+          { name: '_Off2', expression: '_C2 * ( 1 - _NormIn )' },
+        ],
+        svgElements: [
+          { name: '_OutRing', expression: '"<circle cx=\'50\' cy=\'50\' r=\'40\' fill=\'none\' stroke=\'#E2E8F0\' stroke-width=\'7\'/><circle cx=\'50\' cy=\'50\' r=\'40\' fill=\'none\' stroke=\'" & _ColorOut & "\' stroke-width=\'7\' stroke-dasharray=\'" & ROUND( _C1, 2 ) & "\' stroke-dashoffset=\'" & ROUND( _Off1, 2 ) & "\' stroke-linecap=\'round\' transform=\'rotate(-90 50 50)\'/>"' },
+          { name: '_InRing', expression: '"<circle cx=\'50\' cy=\'50\' r=\'27\' fill=\'none\' stroke=\'#F1F5F9\' stroke-width=\'6\'/><circle cx=\'50\' cy=\'50\' r=\'27\' fill=\'none\' stroke=\'" & _ColorIn & "\' stroke-width=\'6\' stroke-dasharray=\'" & ROUND( _C2, 2 ) & "\' stroke-dashoffset=\'" & ROUND( _Off2, 2 ) & "\' stroke-linecap=\'round\' transform=\'rotate(-90 50 50)\'/>"' },
+        ],
+        viewBox: '0 0 100 100',
+      });
+    },
+  },
+
+  {
+    id: 'donut-half-pie',
+    name: 'Semicircular Split Donut',
+    category: 'donut',
+    description: 'Half-circle donut showing percentage split of two parts with labels.',
+    tags: ['donut', 'split', 'semicircle', 'part-to-whole', 'kpi'],
+    viewBox: '0 0 100 65',
+    recommendedDimensions: { width: 90, height: 60 },
+    pbiTips: {
+      visualType: 'Table / Matrix',
+      recommendedWidth: 90,
+      recommendedHeight: 60,
+      notes: 'Shows 2-segment ratio inside a half-circle frame.',
+    },
+    params: [
+      { id: 'shareA', label: 'Share A (%)', type: 'number', defaultValue: 65, min: 0, max: 100, step: 1, daxVarName: '_ShareA' },
+      { id: 'colorA', label: 'Color A', type: 'color', defaultValue: '#3B82F6', daxVarName: '_ColorA' },
+      { id: 'colorB', label: 'Color B', type: 'color', defaultValue: '#F97316', daxVarName: '_ColorB' },
+    ],
+    renderSvg: (params) => {
+      const shareA = clamp(Number(params.shareA ?? 65), 0, 100);
+      const cA = params.colorA || '#3B82F6';
+      const cB = params.colorB || '#F97316';
+      const r = 36;
+      const arcLen = Math.PI * r;
+      const offA = arcLen * (1 - shareA / 100);
+
+      return `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 65' width='100%' height='100%'>
+  <path d='M 14,48 A 36 36 0 0 1 86,48' fill='none' stroke='${cB}' stroke-width='10' stroke-linecap='round' />
+  <path d='M 14,48 A 36 36 0 0 1 86,48' fill='none' stroke='${cA}' stroke-width='10' stroke-dasharray='${arcLen.toFixed(2)}' stroke-dashoffset='${offA.toFixed(2)}' stroke-linecap='round' />
+  <text x='50' y='60' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='15' font-weight='900' fill='#1E293B'>${Math.round(shareA)}% / ${100 - Math.round(shareA)}%</text>
+</svg>`;
+    },
+    generateDax: (params, measureName = 'SVG_Half_Split_Donut') => {
+      return buildDaxMeasure({
+        measureName,
+        description: 'Semicircular split donut showing two-segment distribution.',
+        configVars: [
+          { name: '_ShareA', value: params.shareA ?? 65, type: 'number' },
+          { name: '_ColorA', value: params.colorA || '#3B82F6', type: 'color' },
+          { name: '_ColorB', value: params.colorB || '#F97316', type: 'color' },
+        ],
+        calcVars: [
+          { name: '_NormA', expression: 'MIN( 1, MAX( 0, DIVIDE( _ShareA, 100, 0 ) ) )' },
+          { name: '_ArcLen', expression: 'PI() * 36' },
+          { name: '_OffA', expression: '_ArcLen * ( 1 - _NormA )' },
+        ],
+        svgElements: [
+          { name: '_SegmentB', expression: '"<path d=\'M 14,48 A 36 36 0 0 1 86,48\' fill=\'none\' stroke=\'" & _ColorB & "\' stroke-width=\'10\' stroke-linecap=\'round\'/>"' },
+          { name: '_SegmentA', expression: '"<path d=\'M 14,48 A 36 36 0 0 1 86,48\' fill=\'none\' stroke=\'" & _ColorA & "\' stroke-width=\'10\' stroke-dasharray=\'" & ROUND( _ArcLen, 2 ) & "\' stroke-dashoffset=\'" & ROUND( _OffA, 2 ) & "\' stroke-linecap=\'round\'/>"' },
+          { name: '_Label', expression: '"<text x=\'50\' y=\'60\' text-anchor=\'middle\' font-family=\'Segoe UI, sans-serif\' font-size=\'15\' font-weight=\'900\' fill=\'#1E293B\'>" & FORMAT( _ShareA, "0" ) & "% / " & FORMAT( 100 - _ShareA, "0" ) & "%</text>"' },
+        ],
+        viewBox: '0 0 100 65',
+      });
+    },
+  },
+
+  {
+    id: 'donut-multi-ring',
+    name: 'Triple Activity Ring',
+    category: 'donut',
+    description: 'Apple Fitness-style 3 concentric progress rings for tracking multiple goals simultaneously.',
+    tags: ['activity', 'fitness', 'triple', 'concentric', 'goals', 'donut'],
+    viewBox: '0 0 100 100',
+    recommendedDimensions: { width: 70, height: 70 },
+    pbiTips: {
+      visualType: 'New Card / Table',
+      recommendedWidth: 70,
+      recommendedHeight: 70,
+      notes: 'Tracks 3 related KPIs (e.g. Sales, Profit, Leads) in one single compact circle.',
+    },
+    params: [
+      { id: 'ring1', label: 'Ring 1 (%)', type: 'number', defaultValue: 90, min: 0, max: 100, step: 1, daxVarName: '_R1' },
+      { id: 'ring2', label: 'Ring 2 (%)', type: 'number', defaultValue: 65, min: 0, max: 100, step: 1, daxVarName: '_R2' },
+      { id: 'ring3', label: 'Ring 3 (%)', type: 'number', defaultValue: 45, min: 0, max: 100, step: 1, daxVarName: '_R3' },
+    ],
+    renderSvg: (params) => {
+      const v1 = clamp(Number(params.ring1 ?? 90), 0, 100);
+      const v2 = clamp(Number(params.ring2 ?? 65), 0, 100);
+      const v3 = clamp(Number(params.ring3 ?? 45), 0, 100);
+
+      const r1 = 41; const r2 = 31; const r3 = 21;
+      const c1 = 2 * Math.PI * r1;
+      const c2 = 2 * Math.PI * r2;
+      const c3 = 2 * Math.PI * r3;
+
+      return `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' width='100%' height='100%'>
+  <circle cx='50' cy='50' r='${r1}' fill='none' stroke='#EF4444' stroke-opacity='0.25' stroke-width='6' />
+  <circle cx='50' cy='50' r='${r1}' fill='none' stroke='#EF4444' stroke-width='6' stroke-dasharray='${c1.toFixed(2)}' stroke-dashoffset='${(c1 * (1 - v1 / 100)).toFixed(2)}' stroke-linecap='round' transform='rotate(-90 50 50)' />
+  <circle cx='50' cy='50' r='${r2}' fill='none' stroke='#10B981' stroke-opacity='0.25' stroke-width='6' />
+  <circle cx='50' cy='50' r='${r2}' fill='none' stroke='#10B981' stroke-width='6' stroke-dasharray='${c2.toFixed(2)}' stroke-dashoffset='${(c2 * (1 - v2 / 100)).toFixed(2)}' stroke-linecap='round' transform='rotate(-90 50 50)' />
+  <circle cx='50' cy='50' r='${r3}' fill='none' stroke='#38BDF8' stroke-opacity='0.25' stroke-width='6' />
+  <circle cx='50' cy='50' r='${r3}' fill='none' stroke='#38BDF8' stroke-width='6' stroke-dasharray='${c3.toFixed(2)}' stroke-dashoffset='${(c3 * (1 - v3 / 100)).toFixed(2)}' stroke-linecap='round' transform='rotate(-90 50 50)' />
+</svg>`;
+    },
+    generateDax: (params, measureName = 'SVG_Triple_Activity_Ring') => {
+      return buildDaxMeasure({
+        measureName,
+        description: '3 concentric activity rings tracking three goals simultaneously.',
+        configVars: [
+          { name: '_R1', value: params.ring1 ?? 90, type: 'number' },
+          { name: '_R2', value: params.ring2 ?? 65, type: 'number' },
+          { name: '_R3', value: params.ring3 ?? 45, type: 'number' },
+        ],
+        calcVars: [
+          { name: '_C1', expression: '2 * PI() * 41' },
+          { name: '_C2', expression: '2 * PI() * 31' },
+          { name: '_C3', expression: '2 * PI() * 21' },
+          { name: '_Off1', expression: '_C1 * ( 1 - MIN( 1, DIVIDE( _R1, 100, 0 ) ) )' },
+          { name: '_Off2', expression: '_C2 * ( 1 - MIN( 1, DIVIDE( _R2, 100, 0 ) ) )' },
+          { name: '_Off3', expression: '_C3 * ( 1 - MIN( 1, DIVIDE( _R3, 100, 0 ) ) )' },
+        ],
+        svgElements: [
+          { name: '_Ring1', expression: '"<circle cx=\'50\' cy=\'50\' r=\'41\' fill=\'none\' stroke=\'#EF4444\' stroke-opacity=\'0.25\' stroke-width=\'6\'/><circle cx=\'50\' cy=\'50\' r=\'41\' fill=\'none\' stroke=\'#EF4444\' stroke-width=\'6\' stroke-dasharray=\'" & ROUND( _C1, 2 ) & "\' stroke-dashoffset=\'" & ROUND( _Off1, 2 ) & "\' stroke-linecap=\'round\' transform=\'rotate(-90 50 50)\'/>"' },
+          { name: '_Ring2', expression: '"<circle cx=\'50\' cy=\'50\' r=\'31\' fill=\'none\' stroke=\'#10B981\' stroke-opacity=\'0.25\' stroke-width=\'6\'/><circle cx=\'50\' cy=\'50\' r=\'31\' fill=\'none\' stroke=\'#10B981\' stroke-width=\'6\' stroke-dasharray=\'" & ROUND( _C2, 2 ) & "\' stroke-dashoffset=\'" & ROUND( _Off2, 2 ) & "\' stroke-linecap=\'round\' transform=\'rotate(-90 50 50)\'/>"' },
+          { name: '_Ring3', expression: '"<circle cx=\'50\' cy=\'50\' r=\'21\' fill=\'none\' stroke=\'#38BDF8\' stroke-opacity=\'0.25\' stroke-width=\'6\'/><circle cx=\'50\' cy=\'50\' r=\'21\' fill=\'none\' stroke=\'#38BDF8\' stroke-width=\'6\' stroke-dasharray=\'" & ROUND( _C3, 2 ) & "\' stroke-dashoffset=\'" & ROUND( _Off3, 2 ) & "\' stroke-linecap=\'round\' transform=\'rotate(-90 50 50)\'/>"' },
+        ],
+        viewBox: '0 0 100 100',
+      });
+    },
+  },
+
   // =========================================================================
-  // 6. WAFFLES, RATINGS & DISCRETE INDICATORS (Image 4 References)
+  // 6. WAFFLES, RATINGS & DISCRETE INDICATORS (7 visuals)
   // =========================================================================
   {
     id: 'waffle-10x10-grid',
@@ -1324,6 +2193,73 @@ export const SVG_VISUALS_CATALOG: SvgVisualDefinition[] = [
   },
 
   {
+    id: 'waffle-5x5-grid',
+    name: '5x5 Micro Waffle Grid',
+    category: 'waffle',
+    description: 'Compact 25-dot waffle percentage grid designed for tighter table and matrix rows.',
+    tags: ['waffle', '5x5', 'dots', 'compact', 'matrix'],
+    viewBox: '0 0 60 60',
+    recommendedDimensions: { width: 40, height: 40 },
+    pbiTips: {
+      visualType: 'Table / Matrix',
+      recommendedWidth: 40,
+      recommendedHeight: 40,
+      notes: 'Compact 25-unit grid (each dot represents 4%).',
+    },
+    params: [
+      { id: 'actual', label: 'Progress (%)', type: 'number', defaultValue: 68, min: 0, max: 100, step: 1, daxVarName: '_Actual' },
+      { id: 'color', label: 'Dot Color', type: 'color', defaultValue: '#8B5CF6', daxVarName: '_Color' },
+    ],
+    renderSvg: (params) => {
+      const actual = clamp(Number(params.actual ?? 68), 0, 100);
+      const color = params.color || '#8B5CF6';
+      const activeCount = Math.round((actual / 100) * 25);
+      const dots: string[] = [];
+      for (let r = 0; r < 5; r++) {
+        for (let c = 0; c < 5; c++) {
+          const idx = r * 5 + c + 1;
+          const isActive = idx <= activeCount;
+          dots.push(`<circle cx='${8 + c * 11}' cy='${8 + r * 11}' r='4' fill='${isActive ? color : '#E2E8F0'}' />`);
+        }
+      }
+      return `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 60' width='100%' height='100%'>
+  ${dots.join('\n  ')}
+</svg>`;
+    },
+    generateDax: (params, measureName = 'SVG_Waffle_5x5') => {
+      return buildDaxMeasure({
+        measureName,
+        description: '5x5 compact 25-dot micro waffle chart.',
+        configVars: [
+          { name: '_Actual', value: params.actual ?? 68, type: 'number' },
+          { name: '_Color', value: params.color || '#8B5CF6', type: 'color' },
+        ],
+        calcVars: [
+          { name: '_ActiveDots', expression: 'ROUND( ( MIN( 1, MAX( 0, DIVIDE( _Actual, 100, 0 ) ) ) ) * 25, 0 )' },
+        ],
+        svgElements: [
+          {
+            name: '_Dots',
+            expression: `CONCATENATEX(
+        GENERATESERIES( 1, 25, 1 ),
+        VAR _Idx = [Value]
+        VAR _Col = MOD( _Idx - 1, 5 )
+        VAR _Row = INT( ( _Idx - 1 ) / 5 )
+        VAR _X = 8 + ( _Col * 11 )
+        VAR _Y = 8 + ( _Row * 11 )
+        VAR _Fill = IF( _Idx <= _ActiveDots, _Color, "#E2E8F0" )
+        RETURN
+            "<circle cx='" & _X & "' cy='" & _Y & "' r='4' fill='" & _Fill & "'/>",
+        ""
+    )`,
+          },
+        ],
+        viewBox: '0 0 60 60',
+      });
+    },
+  },
+
+  {
     id: 'rating-5-stars',
     name: '5-Star Rating Visual',
     category: 'waffle',
@@ -1388,6 +2324,63 @@ export const SVG_VISUALS_CATALOG: SvgVisualDefinition[] = [
           },
         ],
         viewBox: '0 0 120 28',
+      });
+    },
+  },
+
+  {
+    id: 'rating-5-circles',
+    name: '5-Dot Rating Scale',
+    category: 'waffle',
+    description: 'Discrete 5-circle indicator bar for feedback scores or priority levels.',
+    tags: ['rating', 'circles', 'dots', 'score', 'priority'],
+    viewBox: '0 0 100 24',
+    recommendedDimensions: { width: 100, height: 24 },
+    pbiTips: {
+      visualType: 'Table / Matrix',
+      recommendedWidth: 90,
+      recommendedHeight: 24,
+      notes: 'Minimalist alternative to stars for executive ratings.',
+    },
+    params: [
+      { id: 'score', label: 'Score (1 to 5)', type: 'number', defaultValue: 3, min: 0, max: 5, step: 1, daxVarName: '_Score' },
+      { id: 'color', label: 'Dot Color', type: 'color', defaultValue: '#3B82F6', daxVarName: '_Color' },
+    ],
+    renderSvg: (params) => {
+      const score = clamp(Number(params.score ?? 3), 0, 5);
+      const color = params.color || '#3B82F6';
+      const dots: string[] = [];
+      for (let i = 1; i <= 5; i++) {
+        const isActive = i <= score;
+        dots.push(`<circle cx='${10 + (i - 1) * 20}' cy='12' r='6' fill='${isActive ? color : '#E2E8F0'}' />`);
+      }
+      return `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 24' width='100%' height='100%'>
+  ${dots.join('\n  ')}
+</svg>`;
+    },
+    generateDax: (params, measureName = 'SVG_Dot_Rating') => {
+      return buildDaxMeasure({
+        measureName,
+        description: '5-dot discrete rating scale.',
+        configVars: [
+          { name: '_Score', value: params.score ?? 3, type: 'number' },
+          { name: '_Color', value: params.color || '#3B82F6', type: 'color' },
+        ],
+        svgElements: [
+          {
+            name: '_Dots',
+            expression: `CONCATENATEX(
+        GENERATESERIES( 1, 5, 1 ),
+        VAR _Idx = [Value]
+        VAR _Fill = IF( _Idx <= _Score, _Color, "#E2E8F0" )
+        VAR _CX = 10 + ( _Idx - 1 ) * 20
+        RETURN
+            "<circle cx='" & _CX & "' cy='12' r='6' fill='" & _Fill & "'/>",
+        ""
+    )`,
+          },
+        ],
+        viewBox: '0 0 100 24',
       });
     },
   },
@@ -1518,6 +2511,56 @@ export const SVG_VISUALS_CATALOG: SvgVisualDefinition[] = [
           },
         ],
         viewBox: '0 0 120 28',
+      });
+    },
+  },
+
+  {
+    id: 'status-traffic-light',
+    name: '3-Light Traffic Signal',
+    category: 'waffle',
+    description: 'Vertical traffic light signal illuminating Red, Yellow, or Green according to metric status.',
+    tags: ['traffic-light', 'status', 'signal', 'alert', 'discrete'],
+    viewBox: '0 0 35 85',
+    recommendedDimensions: { width: 35, height: 85 },
+    pbiTips: {
+      visualType: 'Table / Matrix',
+      recommendedWidth: 30,
+      recommendedHeight: 70,
+      notes: 'Classic executive stoplight status indicator.',
+    },
+    params: [
+      { id: 'status', label: 'Signal State (1=Red, 2=Yellow, 3=Green)', type: 'number', defaultValue: 3, min: 1, max: 3, step: 1, daxVarName: '_State' },
+    ],
+    renderSvg: (params) => {
+      const state = Number(params.status ?? 3);
+      const rFill = state === 1 ? '#EF4444' : '#334155';
+      const yFill = state === 2 ? '#EAB308' : '#334155';
+      const gFill = state === 3 ? '#10B981' : '#334155';
+      return `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 35 85' width='100%' height='100%'>
+  <rect x='5' y='5' width='25' height='75' rx='12.5' fill='#0F172A' stroke='#334155' stroke-width='2' />
+  <circle cx='17.5' cy='20' r='7.5' fill='${rFill}' />
+  <circle cx='17.5' cy='42.5' r='7.5' fill='${yFill}' />
+  <circle cx='17.5' cy='65' r='7.5' fill='${gFill}' />
+</svg>`;
+    },
+    generateDax: (params, measureName = 'SVG_Traffic_Signal') => {
+      return buildDaxMeasure({
+        measureName,
+        description: 'Vertical 3-lamp traffic light signal (1=Red, 2=Yellow, 3=Green).',
+        configVars: [
+          { name: '_State', value: params.status ?? 3, type: 'number', comment: '1 for Red, 2 for Yellow, 3 for Green' },
+        ],
+        svgElements: [
+          {
+            name: '_Lights',
+            expression: `"<rect x='5' y='5' width='25' height='75' rx='12.5' fill='#0F172A' stroke='#334155' stroke-width='2'/>" &
+    "<circle cx='17.5' cy='20' r='7.5' fill='" & IF( _State = 1, "#EF4444", "#334155" ) & "'/>" &
+    "<circle cx='17.5' cy='42.5' r='7.5' fill='" & IF( _State = 2, "#EAB308", "#334155" ) & "'/>" &
+    "<circle cx='17.5' cy='65' r='7.5' fill='" & IF( _State = 3, "#10B981", "#334155" ) & "'/>"`,
+          },
+        ],
+        viewBox: '0 0 35 85',
       });
     },
   },

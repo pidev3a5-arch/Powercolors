@@ -15,8 +15,8 @@ describe('SVG Visuals Catalog & DAX Generator (Phase 8)', () => {
     expect(catIds).toContain('waffle');
   });
 
-  it('should contain at least 15 rich micro-visuals in the catalog', () => {
-    expect(SVG_VISUALS_CATALOG.length).toBeGreaterThanOrEqual(15);
+  it('should contain at least 40 rich micro-visuals in the catalog', () => {
+    expect(SVG_VISUALS_CATALOG.length).toBeGreaterThanOrEqual(40);
   });
 
   it('every visual should render valid SVG XML with default parameters', () => {
