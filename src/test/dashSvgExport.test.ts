@@ -479,6 +479,8 @@ describe('Dash SVG Canvas Export & Layout Engine', () => {
     expect(svg).toContain('<!-- KPI Icon Badge (dollar at top-right) -->');
     expect(svg).toContain('fill="#2563EB"');
     expect(svg).toContain('fill-opacity="0.5"');
+    // Ensure black border is removed from badge circle
+    expect(svg).toContain('<circle cx="448" cy="102" r="13.5" fill="#2563EB" fill-opacity="0.5" />');
     expect(svg).toContain('>$</text>');
 
     expect(svg).toContain('<!-- KPI Icon Badge (trending-up at top-right) -->');

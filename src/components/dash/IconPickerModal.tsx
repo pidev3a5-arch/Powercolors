@@ -7,6 +7,8 @@ interface IconPickerModalProps {
   currentIcon: string;
   onSelectIcon: (iconName: string) => void;
   onClose: () => void;
+  title?: string;
+  description?: string;
 }
 
 export const IconPickerModal: React.FC<IconPickerModalProps> = ({
@@ -14,6 +16,8 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
   currentIcon,
   onSelectIcon,
   onClose,
+  title = 'Choose Navigation Icon',
+  description = 'Curated vector icons optimized for Power BI report tabs',
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -46,10 +50,10 @@ export const IconPickerModal: React.FC<IconPickerModalProps> = ({
         <div className="flex items-center justify-between pb-2 border-b-2 border-slate-200 dark:border-slate-800">
           <div>
             <h3 className="text-xl font-heading font-black text-[#1E293B] dark:text-white">
-              Choose Navigation Icon
+              {title}
             </h3>
             <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-              Curated vector icons optimized for Power BI report tabs
+              {description}
             </p>
           </div>
           <button

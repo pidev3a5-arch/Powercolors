@@ -504,8 +504,7 @@ export function renderKpiIconBadge(c: VisualContainerConfig): string[] {
 
   const badge: string[] = [
     `  <!-- KPI Icon Badge (${iconType} at ${pos}) -->`,
-    `  <circle cx="${Math.round(cx + 1.5)}" cy="${Math.round(cy + 1.5)}" r="${radius}" fill="#0F172A" opacity="0.25" />`,
-    `  <circle cx="${Math.round(cx)}" cy="${Math.round(cy)}" r="${radius}" fill="${bgColor}" fill-opacity="0.5" stroke="#1E293B" stroke-width="1.5" />`,
+    `  <circle cx="${Math.round(cx)}" cy="${Math.round(cy)}" r="${radius}" fill="${bgColor}" fill-opacity="0.5" />`,
   ];
 
   switch (iconType) {

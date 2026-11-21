@@ -10,7 +10,8 @@ import {
   ChevronUp,
   Sparkles,
 } from 'lucide-react';
-import { VisualContainerConfig, AVAILABLE_NAV_ICONS } from '../../core/dashTypes';
+import { VisualContainerConfig, getNavIconPath } from '../../core/dashTypes';
+import { IconPickerModal } from './IconPickerModal';
 
 interface DashContainerConfigProps {
   containers: VisualContainerConfig[];
@@ -30,6 +31,7 @@ export const DashContainerConfig: React.FC<DashContainerConfigProps> = ({
   onAutoArrange,
 }) => {
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [editingIconContainerId, setEditingIconContainerId] = useState<string | null>(null);
 
   return (
     <div className="space-y-6">
@@ -373,94 +375,49 @@ export const DashContainerConfig: React.FC<DashContainerConfigProps> = ({
 
                 {container.showKpiIcon && (
                   <div className="space-y-2.5 pt-1 border-t border-dashed border-slate-200 dark:border-slate-700">
-                    {/* Icon Pack Dropdown Selector (Requirement 3) */}
+                    {/* Choose Icon Popup Button (Requirement 1: popup method like menu buttons) */}
                     <div className="space-y-1">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[9.5px] font-bold text-slate-500 block">
-                          Icon Pack Selection (Dropdown)
-                        </span>
-                        <span className="text-[9.5px] font-mono font-bold text-[#8B5CF6]">
-                          {container.kpiIconType || 'dollar'}
-                        </span>
-                      </div>
-                      <select
-                        value={container.kpiIconType || 'dollar'}
-                        onChange={(e) => onUpdateContainer(container.id, { kpiIconType: e.target.value })}
-                        className="w-full px-2.5 py-1.5 rounded-lg border border-[#1E293B] bg-white dark:bg-slate-900 text-xs font-bold text-[#1E293B] dark:text-white outline-none cursor-pointer focus:border-[#8B5CF6]"
-                      >
-                        <optgroup label="Popular KPI Icons">
-                          <option value="dollar">Dollar ($) - Revenue</option>
-                          <option value="percent">Percent (%) - Margins</option>
-                          <option value="trending-up">Trending Up (↗) - Growth</option>
-                          <option value="users">Users / Customers</option>
-                          <option value="bar-chart">Bar Chart - Analytics</option>
-                          <option value="target">Target - Goals</option>
-                          <option value="activity">Activity - Realtime</option>
-                          <option value="award">Award / Star</option>
-                          <option value="shopping-cart">Shopping Cart</option>
-                          <option value="calendar">Calendar - Period</option>
-                        </optgroup>
-                        <optgroup label="Analytics & Metrics">
-                          {AVAILABLE_NAV_ICONS.filter((i) => i.category === 'analytics').map((i) => (
-                            <option key={`opt-${i.name}`} value={i.name}>
-                              {i.label} ({i.name})
-                            </option>
-                          ))}
-                        </optgroup>
-                        <optgroup label="Commerce & Sales">
-                          {AVAILABLE_NAV_ICONS.filter((i) => i.category === 'commerce').map((i) => (
-                            <option key={`opt-${i.name}`} value={i.name}>
-                              {i.label} ({i.name})
-                            </option>
-                          ))}
-                        </optgroup>
-                        <optgroup label="Navigation & Layout">
-                          {AVAILABLE_NAV_ICONS.filter((i) => i.category === 'navigation').map((i) => (
-                            <option key={`opt-${i.name}`} value={i.name}>
-                              {i.label} ({i.name})
-                            </option>
-                          ))}
-                        </optgroup>
-                        <optgroup label="General & Tools">
-                          {AVAILABLE_NAV_ICONS.filter((i) => i.category === 'general').map((i) => (
-                            <option key={`opt-${i.name}`} value={i.name}>
-                              {i.label} ({i.name})
-                            </option>
-                          ))}
-                        </optgroup>
-                      </select>
-                    </div>
-
-                    {/* Quick Shortcut Buttons */}
-                    <div className="space-y-1">
-                      <span className="text-[9.5px] font-bold text-slate-500 block">Quick Pick</span>
-                      <div className="grid grid-cols-5 gap-1">
-                        {[
-                          { id: 'dollar', label: '$', title: 'Dollar / Revenue' },
-                          { id: 'trending-up', label: '↗', title: 'Growth / Trends' },
-                          { id: 'users', label: '👥', title: 'Customers / Cohorts' },
-                          { id: 'percent', label: '%', title: 'Margin / Percent' },
-                          { id: 'bar-chart', label: '📊', title: 'Analytics / Metrics' },
-                          { id: 'target', label: '🎯', title: 'Target / Goal' },
-                          { id: 'shopping-cart', label: '🛒', title: 'Orders / Retail' },
-                          { id: 'activity', label: '⚡', title: 'Activity / Pulse' },
-                          { id: 'award', label: '⭐', title: 'Performance / Score' },
-                          { id: 'calendar', label: '📅', title: 'Period / Time' },
-                        ].map((ic) => (
-                          <button
-                            key={ic.id}
-                            type="button"
-                            onClick={() => onUpdateContainer(container.id, { kpiIconType: ic.id })}
-                            className={`py-1 rounded text-xs font-bold border border-[#1E293B] flex items-center justify-center cursor-pointer transition-all ${
-                              (container.kpiIconType || 'dollar') === ic.id
-                                ? 'bg-[#8B5CF6] text-white shadow-[1px_1px_0px_0px_#1E293B]'
-                                : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-100'
-                            }`}
-                            title={ic.title}
+                      <span className="text-[9.5px] font-bold text-slate-500 block">
+                        Indicator Icon
+                      </span>
+                      <div className="flex items-center justify-between p-2 rounded-xl border-2 border-[#1E293B] bg-white dark:bg-slate-900 shadow-[1.5px_1.5px_0px_0px_#1E293B]">
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <div
+                            className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                            style={{
+                              backgroundColor: container.kpiIconBgColor || '#2563EB',
+                              opacity: 0.85,
+                            }}
                           >
-                            {ic.label}
-                          </button>
-                        ))}
+                            <svg
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke={container.kpiIconColor || '#FFFFFF'}
+                              strokeWidth="2.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="w-4 h-4"
+                            >
+                              <path d={getNavIconPath(container.kpiIconType || 'dollar')} />
+                            </svg>
+                          </div>
+                          <div className="truncate min-w-0">
+                            <div className="text-[11px] font-heading font-black text-[#1E293B] dark:text-white capitalize truncate">
+                              {container.kpiIconType || 'dollar'}
+                            </div>
+                            <div className="text-[9.5px] font-bold text-slate-400">
+                              Vector Icon Pack
+                            </div>
+                          </div>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => setEditingIconContainerId(container.id)}
+                          className="pop-btn px-3 py-1.5 rounded-lg text-xs font-heading font-black bg-[#8B5CF6] text-white hover:bg-[#7C3AED] border-2 border-[#1E293B] shadow-[2px_2px_0px_0px_#1E293B] cursor-pointer flex-shrink-0"
+                        >
+                          Change Icon
+                        </button>
                       </div>
                     </div>
 
@@ -700,6 +657,22 @@ export const DashContainerConfig: React.FC<DashContainerConfigProps> = ({
           </div>
         )}
       </div>
+
+      {/* KPI Icon Picker Popup Modal (Requirement 1: popup method like menu buttons) */}
+      <IconPickerModal
+        isOpen={editingIconContainerId !== null}
+        title="Choose KPI Icon"
+        description="Curated vector icon pack for your visual KPI card"
+        currentIcon={
+          containers.find((c) => c.id === editingIconContainerId)?.kpiIconType || 'dollar'
+        }
+        onSelectIcon={(iconName) => {
+          if (editingIconContainerId) {
+            onUpdateContainer(editingIconContainerId, { kpiIconType: iconName });
+          }
+        }}
+        onClose={() => setEditingIconContainerId(null)}
+      />
     </div>
   );
 };
