@@ -333,15 +333,15 @@ describe('Dash SVG Canvas Export & Layout Engine', () => {
     expect(READY_DESIGN_PRESETS.find((p) => p.id === 'emerald-growth')).toBeUndefined();
     expect(READY_DESIGN_PRESETS.find((p) => p.id === 'pure-no-nav')).toBeUndefined();
 
-    // Requirement 4: 3 new distinct left nav presets exist
-    const tealPreset = READY_DESIGN_PRESETS.find((p) => p.id === 'teal-executive');
-    const amberPreset = READY_DESIGN_PRESETS.find((p) => p.id === 'amber-sunset');
+    // Ready design presets check
+    const citronPreset = READY_DESIGN_PRESETS.find((p) => p.id === 'citron-obsidian');
+    const pastelPreset = READY_DESIGN_PRESETS.find((p) => p.id === 'pastel-horizon');
     const cobaltPreset = READY_DESIGN_PRESETS.find((p) => p.id === 'cobalt-sapphire');
 
-    expect(tealPreset).toBeDefined();
-    expect(tealPreset?.navType).toBe('left');
-    expect(amberPreset).toBeDefined();
-    expect(amberPreset?.navType).toBe('left');
+    expect(citronPreset).toBeDefined();
+    expect(citronPreset?.navType).toBe('left');
+    expect(pastelPreset).toBeDefined();
+    expect(pastelPreset?.navType).toBe('left');
     expect(cobaltPreset).toBeDefined();
     expect(cobaltPreset?.navType).toBe('left');
 
