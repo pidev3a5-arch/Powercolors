@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { SVG_VISUALS_CATALOG, SVG_CATEGORIES } from '../core/svgVisuals/catalog';
 import { convertRawSvgToDax } from '../core/svgVisuals/svgToDaxConverter';
 import { buildDaxMeasure, sanitizeSvgForDax } from '../core/svgVisuals/daxGenerator';
+import { getPaginationRange } from '../core/svgVisuals/pagination';
 
 describe('SVG Visuals Catalog & DAX Generator (Phase 8)', () => {
   it('should have all expected categories configured', () => {
@@ -124,5 +125,23 @@ describe('SVG Visuals Catalog & DAX Generator (Phase 8)', () => {
     const resInvalid = convertRawSvgToDax('<div>Not an svg</div>');
     expect(resInvalid.error).toBeDefined();
     expect(resInvalid.daxCode).toBe('');
+  });
+
+  it('getPaginationRange should compute accurate pagination pages and ellipsis matching reference design', () => {
+    // Small page counts: all pages visible
+    expect(getPaginationRange(1, 1)).toEqual([1]);
+    expect(getPaginationRange(1, 6)).toEqual([1, 2, 3, 4, 5, 6]);
+
+    // Many pages, on first page
+    const firstRange = getPaginationRange(1, 20);
+    expect(firstRange).toEqual([1, 2, 3, 4, 5, 6, 7, '...', 20]);
+
+    // Many pages, on middle page
+    const middleRange = getPaginationRange(10, 25);
+    expect(middleRange).toEqual([1, '...', 8, 9, 10, 11, 12, '...', 25]);
+
+    // Many pages, on last page
+    const lastRange = getPaginationRange(20, 20);
+    expect(lastRange).toEqual([1, '...', 14, 15, 16, 17, 18, 19, 20]);
   });
 });

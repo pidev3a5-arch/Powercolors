@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import {
   Search,
   X,
@@ -13,11 +13,16 @@ import {
   Code2,
   CheckCircle2,
   RefreshCw,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  Filter,
 } from 'lucide-react';
 import { AppPage } from '../core/types';
 import { VisualCategory, SvgVisualDefinition } from '../core/svgVisuals/types';
 import { SVG_VISUALS_CATALOG, SVG_CATEGORIES } from '../core/svgVisuals/catalog';
 import { convertRawSvgToDax } from '../core/svgVisuals/svgToDaxConverter';
+import { getPaginationRange } from '../core/svgVisuals/pagination';
 
 interface SvgVisualMakerPageProps {
   onNavigate: (page: AppPage) => void;
@@ -30,6 +35,13 @@ export const SvgVisualMakerPage: React.FC<SvgVisualMakerPageProps> = ({ onNaviga
   // Search & category filtering
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<VisualCategory | 'all'>('all');
+  const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
+  const categoryDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Pagination state (8 visuals per page to prevent a long scrollable page)
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [itemsPerPage, setItemsPerPage] = useState<number>(8);
+  const galleryTopRef = useRef<HTMLDivElement>(null);
 
   // Customizer state
   const [selectedVisual, setSelectedVisual] = useState<SvgVisualDefinition | null>(null);
@@ -62,6 +74,65 @@ export const SvgVisualMakerPage: React.FC<SvgVisualMakerPageProps> = ({ onNaviga
       return matchesCategory && matchesSearch;
     });
   }, [selectedCategory, searchQuery]);
+
+  // Close category dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        categoryDropdownRef.current &&
+        !categoryDropdownRef.current.contains(e.target as Node)
+      ) {
+        setIsCategoryDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Close category dropdown on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsCategoryDropdownOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Selected category object
+  const selectedCategoryObj = useMemo(() => {
+    return SVG_CATEGORIES.find((c) => c.id === selectedCategory);
+  }, [selectedCategory]);
+
+  // Total pages
+  const totalPages = Math.max(1, Math.ceil(filteredVisuals.length / itemsPerPage));
+
+  // Reset or clamp current page if filtered results shrink
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(1);
+    }
+  }, [currentPage, totalPages]);
+
+  // Paginated visuals slice
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = Math.min(startIndex + itemsPerPage, filteredVisuals.length);
+  const paginatedVisuals = useMemo(() => {
+    return filteredVisuals.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredVisuals, startIndex, itemsPerPage]);
+
+  // Pagination range array (e.g. [1, 2, 3, 4, 5, 6] or [1, '...', 8, 9, 10, '...', 25])
+  const paginationRange = useMemo(() => {
+    return getPaginationRange(currentPage, totalPages);
+  }, [currentPage, totalPages]);
+
+  // Handle page navigation with smooth scroll
+  const handlePageChange = (page: number) => {
+    if (page < 1 || page > totalPages || page === currentPage) return;
+    setCurrentPage(page);
+    galleryTopRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   // Open customizer for a specific visual
   const handleOpenCustomizer = (visual: SvgVisualDefinition) => {
@@ -242,63 +313,168 @@ export const SvgVisualMakerPage: React.FC<SvgVisualMakerPageProps> = ({ onNaviga
         {activeTab === 'gallery' && (
           <div className="space-y-6">
             {/* Search and Category Filters Bar */}
-            <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 p-4 rounded-2xl bg-white dark:bg-slate-800/80 border-2 border-[#1E293B] shadow-[3px_3px_0px_0px_#1E293B]">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-4 rounded-2xl bg-white dark:bg-slate-800/80 border-2 border-[#1E293B] shadow-[3px_3px_0px_0px_#1E293B]">
               {/* Search Box */}
-              <div className="relative flex-1 max-w-md">
+              <div className="relative flex-1">
                 <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 stroke-[2.5]" />
                 <input
                   type="text"
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setCurrentPage(1);
+                  }}
                   placeholder="Search visuals (gauge, ring, sparkline, bullet, ibcs)..."
                   className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-[#FFFDF5] dark:bg-slate-900 border-2 border-[#1E293B] text-xs sm:text-sm font-bold text-[#1E293B] dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#8B5CF6]"
                 />
                 {searchQuery && (
                   <button
                     type="button"
-                    onClick={() => setSearchQuery('')}
+                    onClick={() => {
+                      setSearchQuery('');
+                      setCurrentPage(1);
+                    }}
                     className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full text-slate-400 hover:text-[#1E293B] dark:hover:text-white cursor-pointer"
+                    title="Clear search"
                   >
                     <X className="w-3.5 h-3.5 stroke-[2.5]" />
                   </button>
                 )}
               </div>
 
-              {/* Category Chips */}
-              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
-                {SVG_CATEGORIES.map((cat) => {
-                  const count =
-                    cat.id === 'all'
-                      ? SVG_VISUALS_CATALOG.length
-                      : SVG_VISUALS_CATALOG.filter((v) => v.category === cat.id).length;
-                  const isSelected = selectedCategory === cat.id;
-
-                  return (
-                    <button
-                      key={cat.id}
-                      type="button"
-                      onClick={() => setSelectedCategory(cat.id as VisualCategory | 'all')}
-                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-heading font-black whitespace-nowrap transition-all cursor-pointer ${
-                        isSelected
-                          ? 'bg-[#8B5CF6] text-white border-2 border-[#1E293B] shadow-[2px_2px_0px_0px_#1E293B]'
-                          : 'bg-[#FFFDF5] dark:bg-slate-900 text-[#1E293B] dark:text-slate-300 border-2 border-[#1E293B]/20 hover:bg-[#FBBF24] hover:text-[#1E293B]'
+              {/* Category Filter Dropdown */}
+              <div className="relative min-w-[220px] sm:min-w-[260px]" ref={categoryDropdownRef}>
+                <button
+                  type="button"
+                  onClick={() => setIsCategoryDropdownOpen((prev) => !prev)}
+                  className="w-full pop-btn flex items-center justify-between gap-2.5 px-3.5 py-2.5 rounded-xl bg-[#FFFDF5] dark:bg-slate-900 border-2 border-[#1E293B] shadow-[2px_2px_0px_0px_#1E293B] font-heading font-black text-xs sm:text-sm text-[#1E293B] dark:text-white cursor-pointer hover:bg-purple-50 dark:hover:bg-slate-800 transition-colors"
+                  aria-haspopup="listbox"
+                  aria-expanded={isCategoryDropdownOpen}
+                  title="Filter visuals by category"
+                >
+                  <div className="flex items-center gap-2 truncate">
+                    <Filter className="w-4 h-4 text-[#8B5CF6] shrink-0 stroke-[2.5]" />
+                    <span className="truncate">
+                      {selectedCategoryObj?.label || 'All Visuals'}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#8B5CF6] text-white">
+                      {selectedCategory === 'all'
+                        ? SVG_VISUALS_CATALOG.length
+                        : SVG_VISUALS_CATALOG.filter((v) => v.category === selectedCategory).length}
+                    </span>
+                    <ChevronDown
+                      className={`w-4 h-4 text-slate-500 transition-transform duration-200 stroke-[2.5] ${
+                        isCategoryDropdownOpen ? 'rotate-180' : ''
                       }`}
-                    >
-                      <span>{cat.label}</span>
-                      <span
-                        className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
-                          isSelected
-                            ? 'bg-white/25 text-white'
-                            : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
-                        }`}
-                      >
-                        {count}
-                      </span>
-                    </button>
-                  );
-                })}
+                    />
+                  </div>
+                </button>
+
+                {/* Dropdown Menu Popover */}
+                {isCategoryDropdownOpen && (
+                  <div className="absolute right-0 top-full mt-2 w-full sm:w-72 bg-white dark:bg-slate-900 border-2 border-[#1E293B] rounded-2xl shadow-[4px_4px_0px_0px_#1E293B] p-1.5 z-40 space-y-1 animate-in fade-in zoom-in-95 duration-100">
+                    <div className="px-2.5 py-1 text-[10px] font-heading font-black text-slate-400 uppercase tracking-wider">
+                      Filter by Category
+                    </div>
+                    {SVG_CATEGORIES.map((cat) => {
+                      const count =
+                        cat.id === 'all'
+                          ? SVG_VISUALS_CATALOG.length
+                          : SVG_VISUALS_CATALOG.filter((v) => v.category === cat.id).length;
+                      const isSelected = selectedCategory === cat.id;
+
+                      return (
+                        <button
+                          key={cat.id}
+                          type="button"
+                          onClick={() => {
+                            setSelectedCategory(cat.id as VisualCategory | 'all');
+                            setCurrentPage(1);
+                            setIsCategoryDropdownOpen(false);
+                          }}
+                          className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-heading font-black transition-all cursor-pointer ${
+                            isSelected
+                              ? 'bg-[#8B5CF6] text-white shadow-sm'
+                              : 'text-[#1E293B] dark:text-slate-200 hover:bg-[#FBBF24]/30 dark:hover:bg-slate-800'
+                          }`}
+                          role="option"
+                          aria-selected={isSelected}
+                        >
+                          <div className="flex items-center gap-2">
+                            {isSelected ? (
+                              <Check className="w-3.5 h-3.5 stroke-[3] text-white" />
+                            ) : (
+                              <div className="w-3.5 h-3.5 rounded-full border border-slate-300 dark:border-slate-600" />
+                            )}
+                            <span>{cat.label}</span>
+                          </div>
+                          <span
+                            className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                              isSelected
+                                ? 'bg-white/25 text-white'
+                                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'
+                            }`}
+                          >
+                            {count}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             </div>
+
+            {/* Scroll Anchor for smooth pagination transition */}
+            <div ref={galleryTopRef} className="scroll-mt-6" />
+
+            {/* Gallery Info Bar (Count & Per Page selector) */}
+            {filteredVisuals.length > 0 && (
+              <div className="flex items-center justify-between px-1 text-xs font-bold text-slate-500 dark:text-slate-400">
+                <div>
+                  Showing{' '}
+                  <span className="font-heading font-black text-[#1E293B] dark:text-white">
+                    {startIndex + 1}–{endIndex}
+                  </span>{' '}
+                  of{' '}
+                  <span className="font-heading font-black text-[#1E293B] dark:text-white">
+                    {filteredVisuals.length}
+                  </span>{' '}
+                  visuals
+                  {totalPages > 1 && (
+                    <span className="hidden sm:inline">
+                      {' '}
+                      · Page{' '}
+                      <span className="font-heading font-black text-[#1E293B] dark:text-white">
+                        {currentPage}
+                      </span>{' '}
+                      of {totalPages}
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-1.5">
+                  <span className="hidden sm:inline">Per page:</span>
+                  <select
+                    value={itemsPerPage}
+                    onChange={(e) => {
+                      setItemsPerPage(Number(e.target.value));
+                      setCurrentPage(1);
+                    }}
+                    className="px-2.5 py-1 rounded-xl bg-white dark:bg-slate-800 border-2 border-[#1E293B] text-[11px] font-heading font-black text-[#1E293B] dark:text-white cursor-pointer shadow-[1px_1px_0px_0px_#1E293B] focus:outline-none"
+                    title="Change visuals per page"
+                  >
+                    <option value={8}>8 per page</option>
+                    <option value={12}>12 per page</option>
+                    <option value={16}>16 per page</option>
+                    <option value={24}>24 per page</option>
+                    <option value={48}>All ({filteredVisuals.length})</option>
+                  </select>
+                </div>
+              </div>
+            )}
 
             {/* Visuals Gallery Grid */}
             {filteredVisuals.length === 0 ? (
@@ -323,7 +499,7 @@ export const SvgVisualMakerPage: React.FC<SvgVisualMakerPageProps> = ({ onNaviga
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-                {filteredVisuals.map((visual) => {
+                {paginatedVisuals.map((visual) => {
                   // Generate default SVG preview
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   const defaultParams: Record<string, any> = {};
@@ -440,6 +616,91 @@ export const SvgVisualMakerPage: React.FC<SvgVisualMakerPageProps> = ({ onNaviga
                     </div>
                   );
                 })}
+              </div>
+            )}
+
+            {/* Navigation Menu Number Buttons (Pagination matching reference design) */}
+            {totalPages > 1 && (
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-4 px-5 rounded-2xl bg-white dark:bg-slate-800/90 border-2 border-[#1E293B] shadow-[3px_3px_0px_0px_#1E293B]">
+                {/* Left Page Summary */}
+                <div className="text-xs font-bold text-slate-500 dark:text-slate-400">
+                  Page <span className="font-heading font-black text-[#1E293B] dark:text-white">{currentPage}</span> of{' '}
+                  <span className="font-heading font-black text-[#1E293B] dark:text-white">{totalPages}</span>
+                </div>
+
+                {/* Number Navigation Buttons (matching uploaded reference) */}
+                <div className="flex items-center gap-1 sm:gap-2">
+                  {/* Previous Button (<) */}
+                  <button
+                    type="button"
+                    disabled={currentPage === 1}
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    className="w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center font-black text-sm text-[#1E293B] dark:text-white hover:bg-[#FBBF24] hover:text-[#1E293B] disabled:opacity-25 disabled:hover:bg-transparent disabled:cursor-not-allowed cursor-pointer transition-all border-2 border-transparent hover:border-[#1E293B]"
+                    title="Previous page"
+                    aria-label="Previous page"
+                  >
+                    <ChevronLeft className="w-4 h-4 stroke-[3]" />
+                  </button>
+
+                  {/* Numbered Page Buttons */}
+                  {paginationRange.map((page, idx) => {
+                    if (page === '...') {
+                      return (
+                        <span
+                          key={`dots-${idx}`}
+                          className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center text-xs font-black text-slate-400 tracking-wider select-none"
+                        >
+                          ...
+                        </span>
+                      );
+                    }
+
+                    const isCurrent = page === currentPage;
+                    return (
+                      <button
+                        key={`page-${page}`}
+                        type="button"
+                        onClick={() => handlePageChange(page as number)}
+                        className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center font-heading font-black text-xs sm:text-sm transition-all cursor-pointer ${
+                          isCurrent
+                            ? 'bg-[#F43F5E] text-white border-2 border-[#1E293B] shadow-[2px_2px_0px_0px_#1E293B] scale-105'
+                            : 'text-[#1E293B] dark:text-slate-200 hover:bg-[#FBBF24] hover:text-[#1E293B] hover:border-2 hover:border-[#1E293B]'
+                        }`}
+                        aria-current={isCurrent ? 'page' : undefined}
+                      >
+                        {page}
+                      </button>
+                    );
+                  })}
+
+                  {/* Next Button (>) */}
+                  <button
+                    type="button"
+                    disabled={currentPage === totalPages}
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    className="w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center font-black text-sm text-[#1E293B] dark:text-white hover:bg-[#FBBF24] hover:text-[#1E293B] disabled:opacity-25 disabled:hover:bg-transparent disabled:cursor-not-allowed cursor-pointer transition-all border-2 border-transparent hover:border-[#1E293B]"
+                    title="Next page"
+                    aria-label="Next page"
+                  >
+                    <ChevronRight className="w-4 h-4 stroke-[3]" />
+                  </button>
+                </div>
+
+                {/* Right Side Quick Jump */}
+                <div className="flex items-center gap-1.5 text-xs font-bold text-slate-500 dark:text-slate-400">
+                  <span>Go to:</span>
+                  <select
+                    value={currentPage}
+                    onChange={(e) => handlePageChange(Number(e.target.value))}
+                    className="px-2.5 py-1 rounded-xl bg-[#FFFDF5] dark:bg-slate-900 border-2 border-[#1E293B] text-[11px] font-heading font-black text-[#1E293B] dark:text-white cursor-pointer shadow-[1px_1px_0px_0px_#1E293B]"
+                  >
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                      <option key={p} value={p}>
+                        Page {p}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
             )}
           </div>
