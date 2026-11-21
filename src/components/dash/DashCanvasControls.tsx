@@ -606,8 +606,8 @@ export const DashCanvasControls: React.FC<DashCanvasControlsProps> = ({
             <label className="text-[11px] font-heading font-black text-slate-500 uppercase">
               Border Thickness
             </label>
-            <div className="grid grid-cols-4 gap-1.5">
-              {[1, 1.5, 2, 3].map((w) => (
+            <div className="grid grid-cols-5 gap-1.5">
+              {[0.5, 1, 1.5, 2, 3].map((w) => (
                 <button
                   key={w}
                   type="button"
@@ -671,10 +671,11 @@ export const DashCanvasControls: React.FC<DashCanvasControlsProps> = ({
           <label className="text-xs font-heading font-black text-slate-500 uppercase">
             Corner Radius
           </label>
-          <div className="grid grid-cols-4 gap-1.5">
+          <div className="grid grid-cols-5 gap-1.5">
             {[
               { label: 'Sharp', val: 0 },
-              { label: 'Subtle', val: 8 },
+              { label: 'Subtle', val: 4 },
+              { label: 'Smooth', val: 8 },
               { label: 'Standard', val: 14 },
               { label: 'Round', val: 20 },
             ].map((r) => (
