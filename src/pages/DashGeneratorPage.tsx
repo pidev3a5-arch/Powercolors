@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   Download,
   Copy,
@@ -35,11 +35,15 @@ import { AppPage } from '../core/types';
 
 interface DashGeneratorPageProps {
   onNavigate: (page: AppPage) => void;
+  onRegisterDownloadSvg?: (downloadFn: () => void) => void;
 }
 
 type DashTab = 'canvas' | 'nav' | 'containers';
 
-export const DashGeneratorPage: React.FC<DashGeneratorPageProps> = ({ onNavigate }) => {
+export const DashGeneratorPage: React.FC<DashGeneratorPageProps> = ({
+  onNavigate,
+  onRegisterDownloadSvg,
+}) => {
   const [activeTab, setActiveTab] = useState<DashTab>('canvas');
   const [copied, setCopied] = useState(false);
 
@@ -401,9 +405,21 @@ export const DashGeneratorPage: React.FC<DashGeneratorPageProps> = ({ onNavigate
   };
 
   // Download SVG File (automatically named: ReportTitle_PageHeaderTitle.svg with single underscore)
-  const handleDownloadSvg = () => {
+  const handleDownloadSvg = useCallback(() => {
     downloadDashSvg(dashState);
-  };
+  }, [dashState]);
+
+  // Expose download trigger to top navigation header
+  useEffect(() => {
+    onRegisterDownloadSvg?.(handleDownloadSvg);
+  }, [handleDownloadSvg, onRegisterDownloadSvg]);
+
+  // Also support custom event from header or shortcuts
+  useEffect(() => {
+    const onEvent = () => handleDownloadSvg();
+    window.addEventListener('powerlab:download-dash-svg', onEvent);
+    return () => window.removeEventListener('powerlab:download-dash-svg', onEvent);
+  }, [handleDownloadSvg]);
 
   return (
     <main className="flex-1 max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 w-full space-y-8">

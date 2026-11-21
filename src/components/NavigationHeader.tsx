@@ -12,6 +12,8 @@ interface NavigationHeaderProps {
   onCopyJson?: () => void;
   jsonCopied?: boolean;
   onDownloadJson?: () => void;
+  // Dash canvas action handlers (active when on dash-generator)
+  onDownloadSvg?: () => void;
 }
 
 export const NavigationHeader: React.FC<NavigationHeaderProps> = ({
@@ -23,6 +25,7 @@ export const NavigationHeader: React.FC<NavigationHeaderProps> = ({
   onCopyJson,
   jsonCopied,
   onDownloadJson,
+  onDownloadSvg,
 }) => {
   const navItems: Array<{ id: AppPage; label: string; icon: React.ComponentType<{ className?: string }> }> = [
     { id: 'landing', label: 'Home', icon: Home },
@@ -132,6 +135,20 @@ export const NavigationHeader: React.FC<NavigationHeaderProps> = ({
                 </button>
               )}
             </>
+          ) : null}
+
+          {/* Dash Canvas-specific Actions */}
+          {currentPage === 'dash-generator' && onDownloadSvg ? (
+            <button
+              type="button"
+              onClick={onDownloadSvg}
+              className="pop-btn inline-flex items-center gap-1.5 px-2.5 sm:px-4 py-1.5 rounded-full text-xs sm:text-xs font-heading font-black bg-[#8B5CF6] hover:bg-[#7C3AED] text-white transition-all cursor-pointer shadow-[2.5px_2.5px_0px_0px_#1E293B]"
+              title="Download Power BI Canvas wallpaper SVG"
+            >
+              <Download className="w-3.5 h-3.5 stroke-[2.5]" />
+              <span className="hidden sm:inline">Download SVG</span>
+              <span className="sm:hidden font-extrabold">SVG</span>
+            </button>
           ) : null}
         </div>
       </div>
