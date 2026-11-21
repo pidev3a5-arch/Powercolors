@@ -98,8 +98,8 @@ export const DashSvgCanvas: React.FC<DashSvgCanvasProps> = ({ state }) => {
     e.preventDefault();
     const dx = e.clientX - dragStartRef.current.x;
     const dy = e.clientY - dragStartRef.current.y;
-    viewportRef.current.scrollLeft = dragStartRef.current.scrollLeft - dx;
-    viewportRef.current.scrollTop = dragStartRef.current.scrollTop - dy;
+    viewportRef.current.scrollLeft = Math.max(0, dragStartRef.current.scrollLeft - dx);
+    viewportRef.current.scrollTop = Math.max(0, dragStartRef.current.scrollTop - dy);
   };
 
   const handleMouseUp = () => {
@@ -203,10 +203,10 @@ export const DashSvgCanvas: React.FC<DashSvgCanvasProps> = ({ state }) => {
               type="button"
               onClick={() => setIsRealSizePopupOpen(true)}
               className="pop-btn inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-white dark:bg-slate-800 border-2 border-[#1E293B] dark:border-slate-700 text-xs font-heading font-black text-[#1E293B] dark:text-white shadow-[2px_2px_0px_0px_#1E293B] hover:bg-[#FBBF24] hover:text-[#1E293B] transition-all cursor-pointer"
-              title="Open canvas wallpaper at 1:1 real pixel size in a popup"
+              title="Open canvas wallpaper in a clear, high-resolution preview popup"
             >
               <Eye className="w-3.5 h-3.5 text-[#8B5CF6]" />
-              <span>Real Size Popup</span>
+              <span>Preview Popup</span>
             </button>
 
             <button
@@ -230,30 +230,36 @@ export const DashSvgCanvas: React.FC<DashSvgCanvasProps> = ({ state }) => {
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseUp}
-          className={`w-full max-h-[700px] overflow-auto rounded-2xl border-2 border-[#1E293B] dark:border-slate-700 bg-[#E2E8F0]/40 dark:bg-slate-950 p-3 sm:p-6 flex items-center justify-center select-none ${
+          className={`w-full max-h-[700px] overflow-auto rounded-2xl border-2 border-[#1E293B] dark:border-slate-700 bg-[#E2E8F0]/40 dark:bg-slate-950 p-3 sm:p-6 select-none ${
             isFitMode
-              ? 'cursor-default'
+              ? 'flex items-center justify-center cursor-default'
               : isDragging
               ? 'cursor-grabbing'
               : 'cursor-grab'
           }`}
           title={!isFitMode ? 'Click and drag with hand cursor to pan canvas' : undefined}
         >
-          {/* Dashboard Canvas Container: Corner Radius 0px, 1px contour border, flush left edge */}
+          {/* Scroll wrapper ensuring left edge (x=0) is fully accessible when zoomed */}
           <div
-            className="transition-transform duration-75 shadow-2xl rounded-none overflow-hidden border border-[#1E293B] flex-shrink-0"
-            style={{
-              width: isFitMode ? '100%' : `${(width * zoomPercent) / 100}px`,
-              maxWidth: isFitMode ? '100%' : 'none',
-              aspectRatio: aspectRatio,
-              backgroundColor: state.backgroundColor,
-            }}
-            dangerouslySetInnerHTML={{ __html: svgMarkup }}
-          />
+            className={isFitMode ? 'w-full flex items-center justify-center' : 'min-w-full flex items-center'}
+            style={!isFitMode ? { width: 'fit-content', margin: '0 auto' } : undefined}
+          >
+            {/* Dashboard Canvas Container: Corner Radius 0px, 1px contour border, flush left edge */}
+            <div
+              className="transition-transform duration-75 shadow-2xl rounded-none overflow-hidden border border-[#1E293B] flex-shrink-0"
+              style={{
+                width: isFitMode ? '100%' : `${(width * zoomPercent) / 100}px`,
+                maxWidth: isFitMode ? '100%' : 'none',
+                aspectRatio: aspectRatio,
+                backgroundColor: state.backgroundColor,
+              }}
+              dangerouslySetInnerHTML={{ __html: svgMarkup }}
+            />
+          </div>
         </div>
       </div>
 
-      {/* Real Size 1:1 Scale Popup Modal (Requirement 1) */}
+      {/* Clear Fitted Preview Popup Modal (Requirement 1) */}
       {isRealSizePopupOpen && (
         <div
           role="dialog"
@@ -262,7 +268,7 @@ export const DashSvgCanvas: React.FC<DashSvgCanvasProps> = ({ state }) => {
           onClick={() => setIsRealSizePopupOpen(false)}
         >
           <div
-            className="relative w-full max-w-[96vw] h-[92vh] flex flex-col bg-slate-100 dark:bg-slate-900 rounded-3xl border-3 border-[#1E293B] dark:border-slate-700 shadow-[8px_8px_0px_0px_#1E293B] overflow-hidden"
+            className="relative w-full max-w-6xl max-h-[92vh] flex flex-col bg-slate-100 dark:bg-slate-900 rounded-3xl border-3 border-[#1E293B] dark:border-slate-700 shadow-[8px_8px_0px_0px_#1E293B] overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
@@ -272,12 +278,12 @@ export const DashSvgCanvas: React.FC<DashSvgCanvasProps> = ({ state }) => {
                 <span className="w-3 h-3 rounded-full bg-amber-400 border border-[#1E293B]" />
                 <span className="w-3 h-3 rounded-full bg-emerald-400 border border-[#1E293B]" />
                 <h3 className="text-sm sm:text-base font-heading font-black text-[#1E293B] dark:text-white ml-1">
-                  Real Size Preview (1:1 Native Resolution — {width} × {height} px)
+                  Canvas Wallpaper Preview ({width} × {height} px)
                 </h3>
               </div>
               <div className="flex items-center gap-3">
                 <span className="text-[11px] font-mono font-bold text-slate-500 bg-slate-100 dark:bg-slate-900 px-2.5 py-1 rounded-full border border-slate-300 dark:border-slate-700 hidden sm:inline">
-                  100% Scale Actual Pixels
+                  Fitted Vector Preview
                 </span>
                 <button
                   type="button"
@@ -290,13 +296,14 @@ export const DashSvgCanvas: React.FC<DashSvgCanvasProps> = ({ state }) => {
               </div>
             </div>
 
-            {/* Scrollable Container with exact 1:1 Pixel Dimensions */}
-            <div className="flex-1 overflow-auto p-6 sm:p-10 flex items-center justify-center bg-[#E2E8F0]/50 dark:bg-slate-950">
+            {/* Clear, fitted preview display without needing to scroll around */}
+            <div className="flex-1 p-4 sm:p-8 flex items-center justify-center bg-[#E2E8F0]/50 dark:bg-slate-950 overflow-hidden">
               <div
                 className="shadow-2xl border border-[#1E293B] flex-shrink-0 rounded-none overflow-hidden"
                 style={{
-                  width: `${width}px`,
-                  height: `${height}px`,
+                  width: '100%',
+                  maxWidth: `min(90vw, calc((84vh - 80px) * (${width} / ${height})))`,
+                  aspectRatio: `${width} / ${height}`,
                   backgroundColor: state.backgroundColor,
                 }}
                 dangerouslySetInnerHTML={{ __html: svgMarkup }}

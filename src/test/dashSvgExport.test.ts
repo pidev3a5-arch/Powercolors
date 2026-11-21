@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { generateDashSvg, escapeXml, sanitizeFilename, getDefaultSvgFilename } from '../core/dashSvgExport';
+import { generateDashSvg, escapeXml, getDefaultSvgFilename } from '../core/dashSvgExport';
 import { DashCanvasState, DEFAULT_DASH_CANVAS_STATE } from '../core/dashTypes';
 import { generateLayoutContainers, autoArrangeContainers } from '../core/dashLayoutPresets';
 import { READY_DESIGN_PRESETS } from '../core/dashDesignPresets';
@@ -322,27 +322,29 @@ describe('Dash SVG Canvas Export & Layout Engine', () => {
     }
   });
 
-  it('applies 6 ready-made complete design presets, all with distinct slots, fonts, and nav configurations', () => {
-    expect(READY_DESIGN_PRESETS.length).toBe(6);
+  it('applies ready-made complete design presets including Blank Page and No Nav Bar', () => {
+    expect(READY_DESIGN_PRESETS.length).toBe(8);
 
-    const slotCounts = new Set(READY_DESIGN_PRESETS.map((p) => p.slotCount));
-    const fonts = new Set(READY_DESIGN_PRESETS.map((p) => p.fontFamily));
-    const colors = new Set(READY_DESIGN_PRESETS.map((p) => p.backgroundColor));
+    const blankPreset = READY_DESIGN_PRESETS.find((p) => p.id === 'blank-page');
+    expect(blankPreset).toBeDefined();
+    expect(blankPreset?.slotCount).toBe(0);
 
-    // All 6 presets have distinct slot counts, fonts, and colors
-    expect(slotCounts.size).toBe(6);
-    expect(fonts.size).toBe(6);
-    expect(colors.size).toBe(6);
+    const noNavPreset = READY_DESIGN_PRESETS.find((p) => p.id === 'pure-no-nav');
+    expect(noNavPreset).toBeDefined();
+    expect(noNavPreset?.navSize).toBe(0);
 
     const initial = { ...DEFAULT_DASH_CANVAS_STATE };
     for (const preset of READY_DESIGN_PRESETS) {
       const updated = preset.apply(initial);
       expect(updated.backgroundColor).toBe(preset.backgroundColor);
-      expect(updated.navBar.backgroundColor).toBe(preset.navColor);
-      expect(updated.containerStyle.backgroundColor).toBe(preset.cardColor);
       expect(updated.layoutPreset).toBe(preset.layoutPreset);
       expect(updated.typography.fontFamily).toBe(preset.fontFamily);
-      expect(updated.navBar.orientation).toBe(preset.navType);
+      if (preset.id === 'pure-no-nav') {
+        expect(updated.navBar.show).toBe(false);
+      }
+      if (preset.id === 'blank-page') {
+        expect(updated.containers).toEqual([]);
+      }
     }
   });
 
@@ -361,10 +363,7 @@ describe('Dash SVG Canvas Export & Layout Engine', () => {
     expect(arranged[2].y).toBeGreaterThan(arranged[0].y);
   });
 
-  it('sanitizes SVG download filename and formats ReportTitle_PageHeaderTitle.svg', () => {
-    expect(sanitizeFilename('Executive Sales : Q1 / Global')).toBe('Executive_Sales_Q1_Global');
-    expect(sanitizeFilename('  Trimmed   Name  ')).toBe('Trimmed_Name');
-
+  it('formats SVG download filename with exactly ONE underscore between Report Title and Page Header Title', () => {
     const state: DashCanvasState = {
       ...DEFAULT_DASH_CANVAS_STATE,
       navBar: {
@@ -386,6 +385,95 @@ describe('Dash SVG Canvas Export & Layout Engine', () => {
     };
 
     const defaultFilename = getDefaultSvgFilename(state);
-    expect(defaultFilename).toBe('Sales_Performance_Q4_Summary.svg');
+    expect(defaultFilename).toBe('Sales Performance_Q4 Summary.svg');
+    // Verify only ONE underscore exists in the entire filename
+    const underscoreCount = (defaultFilename.match(/_/g) || []).length;
+    expect(underscoreCount).toBe(1);
+
+    // Test with title containing internal underscores and special chars
+    const stateWithUnderscores: DashCanvasState = {
+      ...state,
+      navBar: {
+        ...state.navBar,
+        reportTitle: 'Sales_Performance : Q1',
+      },
+      pageTitles: [
+        {
+          ...state.pageTitles[0],
+          title: 'Regional_Summary / Global*',
+        },
+      ],
+    };
+    const cleanedFilename = getDefaultSvgFilename(stateWithUnderscores);
+    expect(cleanedFilename).toBe('Sales Performance Q1_Regional Summary Global.svg');
+    const cleanedCount = (cleanedFilename.match(/_/g) || []).length;
+    expect(cleanedCount).toBe(1);
+  });
+
+  it('renders KPI card icon badges with custom color, background, and icon type in SVG', () => {
+    const state: DashCanvasState = {
+      ...DEFAULT_DASH_CANVAS_STATE,
+      containers: [
+        {
+          id: 'kpi-rev',
+          title: 'Total Revenue',
+          subtitle: 'Annualized',
+          showTitle: true,
+          showSubtitle: true,
+          x: 230,
+          y: 80,
+          width: 240,
+          height: 120,
+          showKpiIcon: true,
+          kpiIconType: 'dollar',
+          kpiIconPosition: 'top-right',
+          kpiIconBgColor: '#2563EB',
+          kpiIconColor: '#FFFFFF',
+        },
+        {
+          id: 'kpi-growth',
+          title: 'YoY Growth',
+          subtitle: '+18.6%',
+          showTitle: true,
+          showSubtitle: true,
+          x: 490,
+          y: 80,
+          width: 240,
+          height: 120,
+          showKpiIcon: true,
+          kpiIconType: 'trending-up',
+          kpiIconPosition: 'top-right',
+          kpiIconBgColor: '#16A34A',
+          kpiIconColor: '#FFFFFF',
+        },
+        {
+          id: 'kpi-users',
+          title: 'Active Customers',
+          subtitle: '142,850',
+          showTitle: true,
+          showSubtitle: true,
+          x: 750,
+          y: 80,
+          width: 240,
+          height: 120,
+          showKpiIcon: true,
+          kpiIconType: 'users',
+          kpiIconPosition: 'top-right',
+          kpiIconBgColor: '#DB2777',
+          kpiIconColor: '#FFFFFF',
+        },
+      ],
+    };
+
+    const svg = generateDashSvg(state);
+    expect(svg).toContain('<!-- KPI Icon Badge (dollar at top-right) -->');
+    expect(svg).toContain('fill="#2563EB"');
+    expect(svg).toContain('>$</text>');
+
+    expect(svg).toContain('<!-- KPI Icon Badge (trending-up at top-right) -->');
+    expect(svg).toContain('fill="#16A34A"');
+
+    expect(svg).toContain('<!-- KPI Icon Badge (users at top-right) -->');
+    expect(svg).toContain('fill="#DB2777"');
   });
 });

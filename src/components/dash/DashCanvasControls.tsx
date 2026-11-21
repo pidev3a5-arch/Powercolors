@@ -97,7 +97,7 @@ export const DashCanvasControls: React.FC<DashCanvasControlsProps> = ({
           <div>
             <h4 className="text-sm font-heading font-black text-[#1E293B] dark:text-white flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-[#F472B6]" />
-              <span>Ready Design Presets (6)</span>
+              <span>Ready Design Presets ({READY_DESIGN_PRESETS.length})</span>
             </h4>
             <p className="text-[11px] text-slate-500 font-medium">
               Distinct slot counts, layouts, fonts & nav orientations

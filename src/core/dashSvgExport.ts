@@ -1,4 +1,4 @@
-import { DashCanvasState, getNavIconPath } from './dashTypes';
+import { DashCanvasState, getNavIconPath, VisualContainerConfig } from './dashTypes';
 
 /**
  * Escapes characters for XML compliance
@@ -121,6 +121,11 @@ export function generateDashSvg(state: DashCanvasState, forPreview = false): str
           )}" y2="${Math.round(dividerY)}" stroke="${dividerColor}" stroke-width="${dividerThickness}" stroke-dasharray="4 2" />`
         );
       }
+    }
+
+    // KPI Icon Badge (if enabled)
+    if (c.showKpiIcon) {
+      parts.push(...renderKpiIconBadge(c));
     }
   }
 
@@ -469,7 +474,147 @@ export function generateDashSvg(state: DashCanvasState, forPreview = false): str
 }
 
 /**
- * Sanitizes a string into a safe file name
+ * Renders a circular badge with an icon for KPI card slots
+ */
+export function renderKpiIconBadge(c: VisualContainerConfig): string[] {
+  const pos = c.kpiIconPosition || 'top-right';
+  const radius = 13.5;
+  const padding = 22;
+
+  let cx = c.x + c.width - padding;
+  let cy = c.y + padding;
+
+  if (pos === 'top-left') {
+    cx = c.x + padding;
+    cy = c.y + padding;
+  } else if (pos === 'bottom-right') {
+    cx = c.x + c.width - padding;
+    cy = c.y + c.height - padding;
+  } else if (pos === 'bottom-left') {
+    cx = c.x + padding;
+    cy = c.y + c.height - padding;
+  }
+
+  const bgColor = c.kpiIconBgColor || '#2563EB';
+  const iconColor = c.kpiIconColor || '#FFFFFF';
+  const iconType = c.kpiIconType || 'dollar';
+
+  const badge: string[] = [
+    `  <!-- KPI Icon Badge (${iconType} at ${pos}) -->`,
+    `  <circle cx="${Math.round(cx + 1.5)}" cy="${Math.round(cy + 1.5)}" r="${radius}" fill="#0F172A" opacity="0.25" />`,
+    `  <circle cx="${Math.round(cx)}" cy="${Math.round(cy)}" r="${radius}" fill="${bgColor}" stroke="#1E293B" stroke-width="1.5" />`,
+  ];
+
+  switch (iconType) {
+    case 'dollar':
+      badge.push(
+        `  <text x="${Math.round(cx)}" y="${Math.round(cy + 4.5)}" font-size="14" font-weight="900" font-family="sans-serif" text-anchor="middle" fill="${iconColor}">$</text>`
+      );
+      break;
+
+    case 'percent':
+      badge.push(
+        `  <text x="${Math.round(cx)}" y="${Math.round(cy + 4)}" font-size="12" font-weight="900" font-family="sans-serif" text-anchor="middle" fill="${iconColor}">%</text>`
+      );
+      break;
+
+    case 'trending-up':
+      badge.push(
+        `  <g transform="translate(${Math.round(cx - 7)}, ${Math.round(cy - 7)})">`,
+        `    <polyline points="2 10 6 6 9 9 13 4" fill="none" stroke="${iconColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`,
+        `    <polyline points="9 4 13 4 13 8" fill="none" stroke="${iconColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`,
+        `  </g>`
+      );
+      break;
+
+    case 'users':
+      badge.push(
+        `  <g transform="translate(${Math.round(cx - 7)}, ${Math.round(cy - 7)})">`,
+        `    <path d="M11 12.5v-1a2.5 2.5 0 0 0-2.5-2.5h-3A2.5 2.5 0 0 0 3 11.5v1" fill="none" stroke="${iconColor}" stroke-width="1.6" stroke-linecap="round"/>`,
+        `    <circle cx="7" cy="4.5" r="2.2" fill="none" stroke="${iconColor}" stroke-width="1.6"/>`,
+        `  </g>`
+      );
+      break;
+
+    case 'bar-chart':
+      badge.push(
+        `  <g transform="translate(${Math.round(cx - 6)}, ${Math.round(cy - 6)})">`,
+        `    <line x1="2" y1="11" x2="2" y2="6" stroke="${iconColor}" stroke-width="1.8" stroke-linecap="round"/>`,
+        `    <line x1="6" y1="11" x2="6" y2="2" stroke="${iconColor}" stroke-width="1.8" stroke-linecap="round"/>`,
+        `    <line x1="10" y1="11" x2="10" y2="8" stroke="${iconColor}" stroke-width="1.8" stroke-linecap="round"/>`,
+        `  </g>`
+      );
+      break;
+
+    case 'target':
+      badge.push(
+        `  <circle cx="${Math.round(cx)}" cy="${Math.round(cy)}" r="6" fill="none" stroke="${iconColor}" stroke-width="1.6"/>`,
+        `  <circle cx="${Math.round(cx)}" cy="${Math.round(cy)}" r="2" fill="${iconColor}"/>`
+      );
+      break;
+
+    case 'shopping-cart':
+      badge.push(
+        `  <g transform="translate(${Math.round(cx - 6)}, ${Math.round(cy - 6)})">`,
+        `    <circle cx="4" cy="10" r="1.2" fill="${iconColor}"/>`,
+        `    <circle cx="9" cy="10" r="1.2" fill="${iconColor}"/>`,
+        `    <path d="M1 1h1.8l1.4 6h5.2l1.2-4.5H3" fill="none" stroke="${iconColor}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>`,
+        `  </g>`
+      );
+      break;
+
+    case 'activity':
+      badge.push(
+        `  <g transform="translate(${Math.round(cx - 6)}, ${Math.round(cy - 6)})">`,
+        `    <polyline points="1 6 3.5 6 5 2 7.5 10 9 6 11 6" fill="none" stroke="${iconColor}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>`,
+        `  </g>`
+      );
+      break;
+
+    case 'award':
+      badge.push(
+        `  <g transform="translate(${Math.round(cx - 6)}, ${Math.round(cy - 6)})">`,
+        `    <polygon points="6 1 7.8 4.6 11.5 5.1 8.8 7.6 9.5 11.3 6 9.4 2.5 11.3 3.2 7.6 0.5 5.1 4.2 4.6" fill="${iconColor}" stroke="${iconColor}" stroke-width="0.5"/>`,
+        `  </g>`
+      );
+      break;
+
+    case 'calendar':
+      badge.push(
+        `  <g transform="translate(${Math.round(cx - 6)}, ${Math.round(cy - 6)})">`,
+        `    <rect x="1" y="2" width="10" height="9" rx="1.5" fill="none" stroke="${iconColor}" stroke-width="1.5"/>`,
+        `    <line x1="1" y1="5" x2="11" y2="5" stroke="${iconColor}" stroke-width="1.5"/>`,
+        `    <line x1="3.5" y1="0.5" x2="3.5" y2="2.5" stroke="${iconColor}" stroke-width="1.5" stroke-linecap="round"/>`,
+        `    <line x1="8.5" y1="0.5" x2="8.5" y2="2.5" stroke="${iconColor}" stroke-width="1.5" stroke-linecap="round"/>`,
+        `  </g>`
+      );
+      break;
+
+    default:
+      badge.push(
+        `  <text x="${Math.round(cx)}" y="${Math.round(cy + 4.5)}" font-size="14" font-weight="900" font-family="sans-serif" text-anchor="middle" fill="${iconColor}">$</text>`
+      );
+      break;
+  }
+
+  return badge;
+}
+
+/**
+ * Sanitizes a title segment for the filename:
+ * Strips filesystem-invalid characters, replaces underscores with spaces,
+ * collapses multiple spaces to a single space, and trims, ensuring NO internal underscores.
+ */
+export function sanitizeTitlePart(str: string): string {
+  if (!str) return '';
+  return str
+    .replace(/[<>:"/\\|?*\x00-\x1F_]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/**
+ * Sanitizes a string into a safe file name (legacy helper kept for compatibility)
  */
 export function sanitizeFilename(str: string): string {
   if (!str) return '';
@@ -480,11 +625,12 @@ export function sanitizeFilename(str: string): string {
 }
 
 /**
- * Computes default SVG filename starting with Report Title_Page Header Title
+ * Computes automatic SVG filename with exactly ONE underscore between
+ * Report Title and Page Header Title: `${Report Title}_${Page Header Title}.svg`
  */
 export function getDefaultSvgFilename(state: DashCanvasState): string {
-  const rep = sanitizeFilename(state.navBar.reportTitle || 'Report') || 'Report';
-  const page = sanitizeFilename(state.pageTitles[0]?.title || 'Overview') || 'Overview';
+  const rep = sanitizeTitlePart(state.navBar.reportTitle) || 'Report';
+  const page = sanitizeTitlePart(state.pageTitles[0]?.title) || 'Overview';
   return `${rep}_${page}.svg`;
 }
 

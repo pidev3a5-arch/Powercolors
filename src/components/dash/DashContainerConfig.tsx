@@ -343,6 +343,171 @@ export const DashContainerConfig: React.FC<DashContainerConfigProps> = ({
                 )}
               </div>
 
+              {/* KPI Icon Badge Configuration (Requirement 5) */}
+              <div className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[11px] font-heading font-black text-slate-700 dark:text-slate-300">
+                      KPI Card Icon Badge
+                    </span>
+                    <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300">
+                      KPI
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      onUpdateContainer(container.id, {
+                        showKpiIcon: !container.showKpiIcon,
+                      })
+                    }
+                    className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border border-[#1E293B] transition-colors cursor-pointer ${
+                      container.showKpiIcon
+                        ? 'bg-[#34D399] text-[#1E293B]'
+                        : 'bg-slate-200 dark:bg-slate-700 text-slate-400'
+                    }`}
+                  >
+                    {container.showKpiIcon ? 'Active' : 'Off'}
+                  </button>
+                </div>
+
+                {container.showKpiIcon && (
+                  <div className="space-y-2.5 pt-1 border-t border-dashed border-slate-200 dark:border-slate-700">
+                    {/* Icon Type Selection */}
+                    <div className="space-y-1">
+                      <span className="text-[9.5px] font-bold text-slate-500 block">Icon Type</span>
+                      <div className="grid grid-cols-5 gap-1">
+                        {[
+                          { id: 'dollar', label: '$', title: 'Dollar / Revenue' },
+                          { id: 'trending-up', label: '↗', title: 'Growth / Trends' },
+                          { id: 'users', label: '👥', title: 'Customers / Cohorts' },
+                          { id: 'percent', label: '%', title: 'Margin / Percent' },
+                          { id: 'bar-chart', label: '📊', title: 'Analytics / Metrics' },
+                          { id: 'target', label: '🎯', title: 'Target / Goal' },
+                          { id: 'shopping-cart', label: '🛒', title: 'Orders / Retail' },
+                          { id: 'activity', label: '⚡', title: 'Activity / Pulse' },
+                          { id: 'award', label: '⭐', title: 'Performance / Score' },
+                          { id: 'calendar', label: '📅', title: 'Period / Time' },
+                        ].map((ic) => (
+                          <button
+                            key={ic.id}
+                            type="button"
+                            onClick={() => onUpdateContainer(container.id, { kpiIconType: ic.id })}
+                            className={`py-1 rounded text-xs font-bold border border-[#1E293B] flex items-center justify-center cursor-pointer transition-all ${
+                              (container.kpiIconType || 'dollar') === ic.id
+                                ? 'bg-[#8B5CF6] text-white shadow-[1px_1px_0px_0px_#1E293B]'
+                                : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-100'
+                            }`}
+                            title={ic.title}
+                          >
+                            {ic.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Position Selection */}
+                    <div className="space-y-1">
+                      <span className="text-[9.5px] font-bold text-slate-500 block">Badge Position</span>
+                      <div className="grid grid-cols-4 gap-1">
+                        {[
+                          { id: 'top-right', label: 'Top-R' },
+                          { id: 'top-left', label: 'Top-L' },
+                          { id: 'bottom-right', label: 'Bot-R' },
+                          { id: 'bottom-left', label: 'Bot-L' },
+                        ].map((pos) => (
+                          <button
+                            key={pos.id}
+                            type="button"
+                            onClick={() => onUpdateContainer(container.id, { kpiIconPosition: pos.id as any })}
+                            className={`py-1 rounded text-[9.5px] font-mono font-bold border border-[#1E293B] cursor-pointer ${
+                              (container.kpiIconPosition || 'top-right') === pos.id
+                                ? 'bg-[#8B5CF6] text-white shadow-[1px_1px_0px_0px_#1E293B]'
+                                : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-100'
+                            }`}
+                          >
+                            {pos.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Badge Fill Color & Icon Color */}
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="space-y-0.5">
+                        <span className="text-[9.5px] font-bold text-slate-500 block">Badge Color</span>
+                        <div className="flex items-center gap-1 p-0.5 rounded border border-[#1E293B] bg-white dark:bg-slate-900">
+                          <input
+                            type="color"
+                            value={container.kpiIconBgColor || '#2563EB'}
+                            onChange={(e) =>
+                              onUpdateContainer(container.id, { kpiIconBgColor: e.target.value })
+                            }
+                            className="w-4 h-4 rounded cursor-pointer"
+                          />
+                          <span className="font-mono text-[9px] font-bold truncate">
+                            {container.kpiIconBgColor || '#2563EB'}
+                          </span>
+                        </div>
+                        {/* Quick Presets matching uploaded image */}
+                        <div className="flex gap-1 pt-0.5">
+                          {[
+                            { color: '#2563EB', title: 'Blue (Revenue)' },
+                            { color: '#16A34A', title: 'Green (Growth)' },
+                            { color: '#DB2777', title: 'Pink (Users)' },
+                            { color: '#D97706', title: 'Amber (Margin)' },
+                            { color: '#8B5CF6', title: 'Purple' },
+                          ].map((preset) => (
+                            <button
+                              key={preset.color}
+                              type="button"
+                              onClick={() => onUpdateContainer(container.id, { kpiIconBgColor: preset.color })}
+                              className="w-3.5 h-3.5 rounded-full border border-[#1E293B] cursor-pointer flex-shrink-0"
+                              style={{ backgroundColor: preset.color }}
+                              title={preset.title}
+                            />
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="space-y-0.5">
+                        <span className="text-[9.5px] font-bold text-slate-500 block">Icon Color</span>
+                        <div className="flex items-center gap-1 p-0.5 rounded border border-[#1E293B] bg-white dark:bg-slate-900">
+                          <input
+                            type="color"
+                            value={container.kpiIconColor || '#FFFFFF'}
+                            onChange={(e) =>
+                              onUpdateContainer(container.id, { kpiIconColor: e.target.value })
+                            }
+                            className="w-4 h-4 rounded cursor-pointer"
+                          />
+                          <span className="font-mono text-[9px] font-bold truncate">
+                            {container.kpiIconColor || '#FFFFFF'}
+                          </span>
+                        </div>
+                        <div className="flex gap-1 pt-0.5">
+                          {[
+                            { color: '#FFFFFF', title: 'White' },
+                            { color: '#1E293B', title: 'Dark Navy' },
+                            { color: '#FBBF24', title: 'Gold' },
+                            { color: '#38BDF8', title: 'Sky Blue' },
+                          ].map((preset) => (
+                            <button
+                              key={preset.color}
+                              type="button"
+                              onClick={() => onUpdateContainer(container.id, { kpiIconColor: preset.color })}
+                              className="w-3.5 h-3.5 rounded-full border border-[#1E293B] cursor-pointer flex-shrink-0"
+                              style={{ backgroundColor: preset.color }}
+                              title={preset.title}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
               {/* Expanded Advanced Styling: Custom Background, Border, Width, and Placement (Requirement 4 & 7) */}
               {isExpanded && (
                 <div className="pt-2 border-t border-slate-200 dark:border-slate-800 space-y-3">

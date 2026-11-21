@@ -55,6 +55,12 @@ export interface VisualContainerConfig {
   titleSize?: number;
   subtitleColor?: string;
   subtitleSize?: number;
+  // KPI Card Icon Configuration
+  showKpiIcon?: boolean;
+  kpiIconType?: string; // 'dollar' | 'trending-up' | 'users' | 'percent' | 'bar-chart' | 'target' | 'shopping-cart' | 'activity' | 'award' | 'calendar'
+  kpiIconPosition?: 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';
+  kpiIconColor?: string;
+  kpiIconBgColor?: string;
 }
 
 export interface DashCanvasContainerStyle {
