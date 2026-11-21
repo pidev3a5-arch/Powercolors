@@ -184,6 +184,30 @@ export const AVAILABLE_NAV_ICONS: NavIconDefinition[] = [
     path: 'M12 1v22 M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6',
   },
   {
+    name: 'dollar',
+    label: 'Dollar ($)',
+    category: 'commerce',
+    path: 'M12 1v22 M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6',
+  },
+  {
+    name: 'percent',
+    label: 'Margin (%)',
+    category: 'analytics',
+    path: 'M19 5L5 19 M7 9a2 2 0 1 0 0-4 2 2 0 0 0 0 4z M17 19a2 2 0 1 0 0-4 2 2 0 0 0 0 4z',
+  },
+  {
+    name: 'award',
+    label: 'Award / Star',
+    category: 'general',
+    path: 'M12 15l-2 5l2-1l2 1z M8.21 13.89L7 23l5-3l5 3l-1.21-9.12 M12 15a7 7 0 1 0 0-14a7 7 0 0 0 0 14z',
+  },
+  {
+    name: 'shopping-cart',
+    label: 'Shopping Cart',
+    category: 'commerce',
+    path: 'M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6',
+  },
+  {
     name: 'shopping-bag',
     label: 'Orders',
     category: 'commerce',

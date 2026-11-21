@@ -132,8 +132,8 @@ export const NavigationHeader: React.FC<NavigationHeaderProps> = ({
                 </button>
               )}
             </>
-          ) : (
-            /* Quick CTA when on Landing or Dash Generator */
+          ) : currentPage === 'landing' ? (
+            /* Quick CTA when on Landing */
             <button
               type="button"
               onClick={() => onNavigate('theme-generator')}
@@ -142,7 +142,7 @@ export const NavigationHeader: React.FC<NavigationHeaderProps> = ({
               <Palette className="w-3.5 h-3.5 stroke-[2.5]" />
               <span>Theme Studio</span>
             </button>
-          )}
+          ) : null}
         </div>
       </div>
 

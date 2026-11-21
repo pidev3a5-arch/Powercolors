@@ -10,7 +10,7 @@ import {
   ChevronUp,
   Sparkles,
 } from 'lucide-react';
-import { VisualContainerConfig } from '../../core/dashTypes';
+import { VisualContainerConfig, AVAILABLE_NAV_ICONS } from '../../core/dashTypes';
 
 interface DashContainerConfigProps {
   containers: VisualContainerConfig[];
@@ -373,9 +373,67 @@ export const DashContainerConfig: React.FC<DashContainerConfigProps> = ({
 
                 {container.showKpiIcon && (
                   <div className="space-y-2.5 pt-1 border-t border-dashed border-slate-200 dark:border-slate-700">
-                    {/* Icon Type Selection */}
+                    {/* Icon Pack Dropdown Selector (Requirement 3) */}
                     <div className="space-y-1">
-                      <span className="text-[9.5px] font-bold text-slate-500 block">Icon Type</span>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[9.5px] font-bold text-slate-500 block">
+                          Icon Pack Selection (Dropdown)
+                        </span>
+                        <span className="text-[9.5px] font-mono font-bold text-[#8B5CF6]">
+                          {container.kpiIconType || 'dollar'}
+                        </span>
+                      </div>
+                      <select
+                        value={container.kpiIconType || 'dollar'}
+                        onChange={(e) => onUpdateContainer(container.id, { kpiIconType: e.target.value })}
+                        className="w-full px-2.5 py-1.5 rounded-lg border border-[#1E293B] bg-white dark:bg-slate-900 text-xs font-bold text-[#1E293B] dark:text-white outline-none cursor-pointer focus:border-[#8B5CF6]"
+                      >
+                        <optgroup label="Popular KPI Icons">
+                          <option value="dollar">Dollar ($) - Revenue</option>
+                          <option value="percent">Percent (%) - Margins</option>
+                          <option value="trending-up">Trending Up (↗) - Growth</option>
+                          <option value="users">Users / Customers</option>
+                          <option value="bar-chart">Bar Chart - Analytics</option>
+                          <option value="target">Target - Goals</option>
+                          <option value="activity">Activity - Realtime</option>
+                          <option value="award">Award / Star</option>
+                          <option value="shopping-cart">Shopping Cart</option>
+                          <option value="calendar">Calendar - Period</option>
+                        </optgroup>
+                        <optgroup label="Analytics & Metrics">
+                          {AVAILABLE_NAV_ICONS.filter((i) => i.category === 'analytics').map((i) => (
+                            <option key={`opt-${i.name}`} value={i.name}>
+                              {i.label} ({i.name})
+                            </option>
+                          ))}
+                        </optgroup>
+                        <optgroup label="Commerce & Sales">
+                          {AVAILABLE_NAV_ICONS.filter((i) => i.category === 'commerce').map((i) => (
+                            <option key={`opt-${i.name}`} value={i.name}>
+                              {i.label} ({i.name})
+                            </option>
+                          ))}
+                        </optgroup>
+                        <optgroup label="Navigation & Layout">
+                          {AVAILABLE_NAV_ICONS.filter((i) => i.category === 'navigation').map((i) => (
+                            <option key={`opt-${i.name}`} value={i.name}>
+                              {i.label} ({i.name})
+                            </option>
+                          ))}
+                        </optgroup>
+                        <optgroup label="General & Tools">
+                          {AVAILABLE_NAV_ICONS.filter((i) => i.category === 'general').map((i) => (
+                            <option key={`opt-${i.name}`} value={i.name}>
+                              {i.label} ({i.name})
+                            </option>
+                          ))}
+                        </optgroup>
+                      </select>
+                    </div>
+
+                    {/* Quick Shortcut Buttons */}
+                    <div className="space-y-1">
+                      <span className="text-[9.5px] font-bold text-slate-500 block">Quick Pick</span>
                       <div className="grid grid-cols-5 gap-1">
                         {[
                           { id: 'dollar', label: '$', title: 'Dollar / Revenue' },

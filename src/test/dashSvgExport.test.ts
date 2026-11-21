@@ -322,16 +322,28 @@ describe('Dash SVG Canvas Export & Layout Engine', () => {
     }
   });
 
-  it('applies ready-made complete design presets including Blank Page and No Nav Bar', () => {
-    expect(READY_DESIGN_PRESETS.length).toBe(8);
+  it('applies ready-made complete design presets with Blank Canvas first and 3 new left-nav themes', () => {
+    expect(READY_DESIGN_PRESETS.length).toBe(9);
 
-    const blankPreset = READY_DESIGN_PRESETS.find((p) => p.id === 'blank-page');
-    expect(blankPreset).toBeDefined();
-    expect(blankPreset?.slotCount).toBe(0);
+    // Requirement 4: Blank Canvas is the first preset
+    expect(READY_DESIGN_PRESETS[0].id).toBe('blank-page');
+    expect(READY_DESIGN_PRESETS[0].slotCount).toBe(0);
 
-    const noNavPreset = READY_DESIGN_PRESETS.find((p) => p.id === 'pure-no-nav');
-    expect(noNavPreset).toBeDefined();
-    expect(noNavPreset?.navSize).toBe(0);
+    // Requirement 4: emerald-growth and pure-no-nav removed
+    expect(READY_DESIGN_PRESETS.find((p) => p.id === 'emerald-growth')).toBeUndefined();
+    expect(READY_DESIGN_PRESETS.find((p) => p.id === 'pure-no-nav')).toBeUndefined();
+
+    // Requirement 4: 3 new distinct left nav presets exist
+    const tealPreset = READY_DESIGN_PRESETS.find((p) => p.id === 'teal-executive');
+    const amberPreset = READY_DESIGN_PRESETS.find((p) => p.id === 'amber-sunset');
+    const cobaltPreset = READY_DESIGN_PRESETS.find((p) => p.id === 'cobalt-sapphire');
+
+    expect(tealPreset).toBeDefined();
+    expect(tealPreset?.navType).toBe('left');
+    expect(amberPreset).toBeDefined();
+    expect(amberPreset?.navType).toBe('left');
+    expect(cobaltPreset).toBeDefined();
+    expect(cobaltPreset?.navType).toBe('left');
 
     const initial = { ...DEFAULT_DASH_CANVAS_STATE };
     for (const preset of READY_DESIGN_PRESETS) {
@@ -339,11 +351,9 @@ describe('Dash SVG Canvas Export & Layout Engine', () => {
       expect(updated.backgroundColor).toBe(preset.backgroundColor);
       expect(updated.layoutPreset).toBe(preset.layoutPreset);
       expect(updated.typography.fontFamily).toBe(preset.fontFamily);
-      if (preset.id === 'pure-no-nav') {
-        expect(updated.navBar.show).toBe(false);
-      }
       if (preset.id === 'blank-page') {
         expect(updated.containers).toEqual([]);
+        expect(updated.navBar.show).toBe(false);
       }
     }
   });
@@ -468,6 +478,7 @@ describe('Dash SVG Canvas Export & Layout Engine', () => {
     const svg = generateDashSvg(state);
     expect(svg).toContain('<!-- KPI Icon Badge (dollar at top-right) -->');
     expect(svg).toContain('fill="#2563EB"');
+    expect(svg).toContain('fill-opacity="0.5"');
     expect(svg).toContain('>$</text>');
 
     expect(svg).toContain('<!-- KPI Icon Badge (trending-up at top-right) -->');
@@ -475,5 +486,54 @@ describe('Dash SVG Canvas Export & Layout Engine', () => {
 
     expect(svg).toContain('<!-- KPI Icon Badge (users at top-right) -->');
     expect(svg).toContain('fill="#DB2777"');
+  });
+
+  it('offsets title and subtitle horizontally when KPI icon is placed in top-left', () => {
+    const state: DashCanvasState = {
+      ...DEFAULT_DASH_CANVAS_STATE,
+      containers: [
+        {
+          id: 'kpi-top-left',
+          title: 'Left Metric',
+          subtitle: 'Subtitle Info',
+          showTitle: true,
+          showSubtitle: true,
+          x: 100,
+          y: 50,
+          width: 300,
+          height: 140,
+          showKpiIcon: true,
+          kpiIconType: 'dollar',
+          kpiIconPosition: 'top-left',
+          kpiIconBgColor: '#2563EB',
+          kpiIconColor: '#FFFFFF',
+        },
+        {
+          id: 'kpi-top-right',
+          title: 'Right Metric',
+          subtitle: 'Subtitle Info',
+          showTitle: true,
+          showSubtitle: true,
+          x: 450,
+          y: 50,
+          width: 300,
+          height: 140,
+          showKpiIcon: true,
+          kpiIconType: 'dollar',
+          kpiIconPosition: 'top-right',
+          kpiIconBgColor: '#2563EB',
+          kpiIconColor: '#FFFFFF',
+        },
+      ],
+    };
+
+    const svg = generateDashSvg(state);
+    // When icon is in top-left: titleX is 100 + 46 = 146 to avoid overlap with badge
+    expect(svg).toContain('<text x="146" y="74"');
+    expect(svg).toContain('Left Metric</text>');
+
+    // When icon is in top-right: titleX is 450 + 16 = 466 (standard offset)
+    expect(svg).toContain('<text x="466" y="74"');
+    expect(svg).toContain('Right Metric</text>');
   });
 });

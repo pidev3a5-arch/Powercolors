@@ -88,11 +88,14 @@ export function generateDashSvg(state: DashCanvasState, forPreview = false): str
     const slotSubtitleColor = c.subtitleColor || defaultSubtitleColor;
 
     if (hasTitle || hasSubtitle) {
+      // Horizontal offset for title & subtitle if KPI badge is in top-left to avoid overlap
+      const hasTopLeftIcon = c.showKpiIcon && c.kpiIconPosition === 'top-left';
+      const titleX = Math.round(c.x + (hasTopLeftIcon ? 46 : 16));
       let textY = Math.round(c.y + 24);
 
       if (hasTitle) {
         parts.push(
-          `  <text x="${Math.round(c.x + 16)}" y="${textY}" font-size="${slotTitleSize}" font-weight="700" fill="${slotTitleColor}">${escapeXml(
+          `  <text x="${titleX}" y="${textY}" font-size="${slotTitleSize}" font-weight="700" fill="${slotTitleColor}">${escapeXml(
             c.title
           )}</text>`
         );
@@ -101,7 +104,7 @@ export function generateDashSvg(state: DashCanvasState, forPreview = false): str
 
       if (hasSubtitle) {
         parts.push(
-          `  <text x="${Math.round(c.x + 16)}" y="${textY}" font-size="${slotSubtitleSize}" font-weight="500" fill="${slotSubtitleColor}">${escapeXml(
+          `  <text x="${titleX}" y="${textY}" font-size="${slotSubtitleSize}" font-weight="500" fill="${slotSubtitleColor}">${escapeXml(
             c.subtitle
           )}</text>`
         );
@@ -502,7 +505,7 @@ export function renderKpiIconBadge(c: VisualContainerConfig): string[] {
   const badge: string[] = [
     `  <!-- KPI Icon Badge (${iconType} at ${pos}) -->`,
     `  <circle cx="${Math.round(cx + 1.5)}" cy="${Math.round(cy + 1.5)}" r="${radius}" fill="#0F172A" opacity="0.25" />`,
-    `  <circle cx="${Math.round(cx)}" cy="${Math.round(cy)}" r="${radius}" fill="${bgColor}" stroke="#1E293B" stroke-width="1.5" />`,
+    `  <circle cx="${Math.round(cx)}" cy="${Math.round(cy)}" r="${radius}" fill="${bgColor}" fill-opacity="0.5" stroke="#1E293B" stroke-width="1.5" />`,
   ];
 
   switch (iconType) {
@@ -590,11 +593,15 @@ export function renderKpiIconBadge(c: VisualContainerConfig): string[] {
       );
       break;
 
-    default:
+    default: {
+      const pathData = getNavIconPath(iconType);
       badge.push(
-        `  <text x="${Math.round(cx)}" y="${Math.round(cy + 4.5)}" font-size="14" font-weight="900" font-family="sans-serif" text-anchor="middle" fill="${iconColor}">$</text>`
+        `  <g transform="translate(${Math.round(cx - 7.2)}, ${Math.round(cy - 7.2)}) scale(0.6)">`,
+        `    <path d="${pathData}" fill="none" stroke="${iconColor}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
+        `  </g>`
       );
       break;
+    }
   }
 
   return badge;
