@@ -9,54 +9,54 @@ interface FeatureGridProps {
 export const FeatureGrid: React.FC<FeatureGridProps> = ({ onNavigate }) => {
   return (
     <div className="w-full space-y-16 py-6">
-      {/* 2 Core Tools Showcase */}
+      {/* 3 Core Tools Showcase */}
       <section className="space-y-6">
         <div className="text-center space-y-2">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#38BDF8]/20 text-[#0284C7] dark:text-[#38BDF8] text-xs font-heading font-black border border-[#38BDF8]/30">
-            <span>TWO SPECIALIZED WORKSPACES</span>
+            <span>THREE SPECIALIZED WORKSPACES</span>
           </div>
           <h2 className="text-3xl sm:text-4xl font-heading font-black text-[#1E293B] dark:text-white">
             Everything You Need to Style Power BI
           </h2>
           <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 font-medium max-w-xl mx-auto">
-            Switch effortlessly between color harmonization and canvas structural layout design.
+            Switch effortlessly between color harmonization, canvas structural layout design, and SVG DAX micro-visuals.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-4">
           {/* Spotlight 1: Theme Studio */}
-          <div className="pop-card bg-white dark:bg-slate-900 p-7 sm:p-9 rounded-3xl border-3 border-[#1E293B] dark:border-slate-700 shadow-[6px_6px_0px_0px_#1E293B] flex flex-col justify-between space-y-6">
-            <div className="space-y-5">
+          <div className="pop-card bg-white dark:bg-slate-900 p-6 sm:p-7 rounded-3xl border-3 border-[#1E293B] dark:border-slate-700 shadow-[6px_6px_0px_0px_#1E293B] flex flex-col justify-between space-y-5">
+            <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <div className="w-14 h-14 rounded-2xl bg-[#8B5CF6] border-2 border-[#1E293B] flex items-center justify-center text-white shadow-[3px_3px_0px_0px_#1E293B]">
-                  <Palette className="w-7 h-7 stroke-[2.5]" />
+                <div className="w-12 h-12 rounded-2xl bg-[#8B5CF6] border-2 border-[#1E293B] flex items-center justify-center text-white shadow-[2.5px_2.5px_0px_0px_#1E293B]">
+                  <Palette className="w-6 h-6 stroke-[2.5]" />
                 </div>
-                <span className="px-3 py-1 rounded-full text-xs font-heading font-black bg-[#34D399]/20 text-[#059669] dark:text-[#34D399] border border-[#34D399]/40">
+                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-heading font-black bg-[#34D399]/20 text-[#059669] dark:text-[#34D399] border border-[#34D399]/40">
                   Ready to Use
                 </span>
               </div>
 
               <div>
-                <h3 className="text-2xl font-heading font-black text-[#1E293B] dark:text-white">
+                <h3 className="text-xl sm:text-2xl font-heading font-black text-[#1E293B] dark:text-white">
                   Theme Studio
                 </h3>
-                <p className="text-sm text-slate-600 dark:text-slate-400 font-medium mt-2 leading-relaxed">
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium mt-1.5 leading-relaxed">
                   Extract balanced 10-color palettes from company logos or dashboard snapshots. Test instantly on live charts and export official schema-compliant Power BI themes.
                 </p>
               </div>
 
-              <div className="space-y-2.5 pt-2">
-                <div className="flex items-start gap-2.5 text-xs font-bold text-slate-700 dark:text-slate-300">
+              <div className="space-y-2 pt-1">
+                <div className="flex items-start gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
                   <CheckCircle2 className="w-4 h-4 text-[#8B5CF6] flex-shrink-0 mt-0.5" />
                   <span>K-Means clustering with WCAG 2.1 contrast ratio badges</span>
                 </div>
-                <div className="flex items-start gap-2.5 text-xs font-bold text-slate-700 dark:text-slate-300">
+                <div className="flex items-start gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
                   <CheckCircle2 className="w-4 h-4 text-[#8B5CF6] flex-shrink-0 mt-0.5" />
-                  <span>Auto-derived structural colors (background, table accents, KPI status)</span>
+                  <span>Auto-derived structural colors (background, table accents)</span>
                 </div>
-                <div className="flex items-start gap-2.5 text-xs font-bold text-slate-700 dark:text-slate-300">
+                <div className="flex items-start gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
                   <CheckCircle2 className="w-4 h-4 text-[#8B5CF6] flex-shrink-0 mt-0.5" />
-                  <span>100% compliant with Microsoft reportThemeSchema 2.159</span>
+                  <span>100% compliant with Microsoft reportThemeSchema</span>
                 </div>
               </div>
             </div>
@@ -64,7 +64,7 @@ export const FeatureGrid: React.FC<FeatureGridProps> = ({ onNavigate }) => {
             <button
               type="button"
               onClick={() => onNavigate('theme-generator')}
-              className="pop-btn w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full text-sm font-heading font-black bg-[#8B5CF6] hover:bg-[#7C3AED] text-white shadow-[3.5px_3.5px_0px_0px_#1E293B] transition-all cursor-pointer group"
+              className="pop-btn w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full text-xs sm:text-sm font-heading font-black bg-[#8B5CF6] hover:bg-[#7C3AED] text-white shadow-[3px_3px_0px_0px_#1E293B] transition-all cursor-pointer group"
             >
               <span>Open Theme Studio</span>
               <ArrowRight className="w-4 h-4 stroke-[2.5] group-hover:translate-x-1 transition-transform" />
@@ -72,36 +72,36 @@ export const FeatureGrid: React.FC<FeatureGridProps> = ({ onNavigate }) => {
           </div>
 
           {/* Spotlight 2: Dash Generator */}
-          <div className="pop-card bg-white dark:bg-slate-900 p-7 sm:p-9 rounded-3xl border-3 border-[#1E293B] dark:border-slate-700 shadow-[6px_6px_0px_0px_#1E293B] flex flex-col justify-between space-y-6">
-            <div className="space-y-5">
+          <div className="pop-card bg-white dark:bg-slate-900 p-6 sm:p-7 rounded-3xl border-3 border-[#1E293B] dark:border-slate-700 shadow-[6px_6px_0px_0px_#1E293B] flex flex-col justify-between space-y-5">
+            <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <div className="w-14 h-14 rounded-2xl bg-[#F472B6] border-2 border-[#1E293B] flex items-center justify-center text-white shadow-[3px_3px_0px_0px_#1E293B]">
-                  <Layout className="w-7 h-7 stroke-[2.5]" />
+                <div className="w-12 h-12 rounded-2xl bg-[#F472B6] border-2 border-[#1E293B] flex items-center justify-center text-white shadow-[2.5px_2.5px_0px_0px_#1E293B]">
+                  <Layout className="w-6 h-6 stroke-[2.5]" />
                 </div>
-                <span className="px-3 py-1 rounded-full text-xs font-heading font-black bg-[#FBBF24]/20 text-[#D97706] dark:text-[#FBBF24] border border-[#FBBF24]/40">
-                  Preview in Phase 7
+                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-heading font-black bg-[#FBBF24]/20 text-[#D97706] dark:text-[#FBBF24] border border-[#FBBF24]/40">
+                  SVG Wallpaper
                 </span>
               </div>
 
               <div>
-                <h3 className="text-2xl font-heading font-black text-[#1E293B] dark:text-white">
-                  Dash Canvas Generator
+                <h3 className="text-xl sm:text-2xl font-heading font-black text-[#1E293B] dark:text-white">
+                  Dash Canvas
                 </h3>
-                <p className="text-sm text-slate-600 dark:text-slate-400 font-medium mt-2 leading-relaxed">
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium mt-1.5 leading-relaxed">
                   Start from an empty canvas and build pixel-perfect Power BI wallpaper backgrounds in SVG format. Configure navigation ribbons, branding logos, and visual shape slots.
                 </p>
               </div>
 
-              <div className="space-y-2.5 pt-2">
-                <div className="flex items-start gap-2.5 text-xs font-bold text-slate-700 dark:text-slate-300">
+              <div className="space-y-2 pt-1">
+                <div className="flex items-start gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
                   <CheckCircle2 className="w-4 h-4 text-[#F472B6] flex-shrink-0 mt-0.5" />
-                  <span>1280×720, 1920×1080 and custom resolution presets</span>
+                  <span>1920×1080 and 1280×720 aspect ratio presets</span>
                 </div>
-                <div className="flex items-start gap-2.5 text-xs font-bold text-slate-700 dark:text-slate-300">
+                <div className="flex items-start gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
                   <CheckCircle2 className="w-4 h-4 text-[#F472B6] flex-shrink-0 mt-0.5" />
-                  <span>Top or Left navigation bar with logo and custom icon pack</span>
+                  <span>Top & Left navigation ribbons with custom icons</span>
                 </div>
-                <div className="flex items-start gap-2.5 text-xs font-bold text-slate-700 dark:text-slate-300">
+                <div className="flex items-start gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
                   <CheckCircle2 className="w-4 h-4 text-[#F472B6] flex-shrink-0 mt-0.5" />
                   <span>Card and chart container slots with title / subtitle toggles</span>
                 </div>
@@ -111,9 +111,56 @@ export const FeatureGrid: React.FC<FeatureGridProps> = ({ onNavigate }) => {
             <button
               type="button"
               onClick={() => onNavigate('dash-generator')}
-              className="pop-btn w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full text-sm font-heading font-black bg-[#F472B6] hover:bg-[#EC4899] text-white shadow-[3.5px_3.5px_0px_0px_#1E293B] transition-all cursor-pointer group"
+              className="pop-btn w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full text-xs sm:text-sm font-heading font-black bg-[#F472B6] hover:bg-[#EC4899] text-white shadow-[3px_3px_0px_0px_#1E293B] transition-all cursor-pointer group"
             >
               <span>Explore Dash Canvas</span>
+              <ArrowRight className="w-4 h-4 stroke-[2.5] group-hover:translate-x-1 transition-transform" />
+            </button>
+          </div>
+
+          {/* Spotlight 3: SVG Visual Maker */}
+          <div className="pop-card bg-white dark:bg-slate-900 p-6 sm:p-7 rounded-3xl border-3 border-[#1E293B] dark:border-slate-700 shadow-[6px_6px_0px_0px_#1E293B] flex flex-col justify-between space-y-5">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="w-12 h-12 rounded-2xl bg-[#38BDF8] border-2 border-[#1E293B] flex items-center justify-center text-[#1E293B] shadow-[2.5px_2.5px_0px_0px_#1E293B]">
+                  <Sparkles className="w-6 h-6 stroke-[2.5]" />
+                </div>
+                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-heading font-black bg-[#8B5CF6]/20 text-[#8B5CF6] dark:text-purple-300 border border-[#8B5CF6]/40">
+                  New v3.0
+                </span>
+              </div>
+
+              <div>
+                <h3 className="text-xl sm:text-2xl font-heading font-black text-[#1E293B] dark:text-white">
+                  SVG Visual Maker
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium mt-1.5 leading-relaxed">
+                  Generate dozens of error-free Power BI DAX micro-visuals for table and matrix cells. Gauges, progress rings, bullet bars, and custom SVG converters.
+                </p>
+              </div>
+
+              <div className="space-y-2 pt-1">
+                <div className="flex items-start gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
+                  <CheckCircle2 className="w-4 h-4 text-[#38BDF8] flex-shrink-0 mt-0.5" />
+                  <span>Gauges with track, outline & needle (40%, 55%, 80%)</span>
+                </div>
+                <div className="flex items-start gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
+                  <CheckCircle2 className="w-4 h-4 text-[#38BDF8] flex-shrink-0 mt-0.5" />
+                  <span>Traffic-light progress rings and 100% checkmarks</span>
+                </div>
+                <div className="flex items-start gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
+                  <CheckCircle2 className="w-4 h-4 text-[#38BDF8] flex-shrink-0 mt-0.5" />
+                  <span>1-click DAX measures with Image URL data category</span>
+                </div>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => onNavigate('svg-visual-maker')}
+              className="pop-btn w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full text-xs sm:text-sm font-heading font-black bg-[#38BDF8] hover:bg-[#0EA5E9] text-[#1E293B] shadow-[3px_3px_0px_0px_#1E293B] transition-all cursor-pointer group"
+            >
+              <span>Launch Visual Maker</span>
               <ArrowRight className="w-4 h-4 stroke-[2.5] group-hover:translate-x-1 transition-transform" />
             </button>
           </div>

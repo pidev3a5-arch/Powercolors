@@ -4,6 +4,7 @@ import { NavigationHeader } from './components/NavigationHeader';
 import { LandingPage } from './pages/LandingPage';
 import { ThemeGeneratorPage } from './pages/ThemeGeneratorPage';
 import { DashGeneratorPage } from './pages/DashGeneratorPage';
+import { SvgVisualMakerPage } from './pages/SvgVisualMakerPage';
 import { LinkedInIcon, FacebookIcon, YouTubeIcon, GitHubIcon } from './components/SocialIcons';
 import { extractThemeFromImage } from './core/colorEngine';
 import { createColorSwatch, deriveStructuralColors } from './core/colorHarmonics';
@@ -20,19 +21,29 @@ export default function App() {
   // Helper to parse hash route
   const getPageFromHash = (): AppPage | null => {
     const hash = window.location.hash.replace(/^#\/?/, '');
-    if (hash === 'theme-generator' || hash === 'dash-generator' || hash === 'landing') {
+    if (
+      hash === 'theme-generator' ||
+      hash === 'dash-generator' ||
+      hash === 'svg-visual-maker' ||
+      hash === 'landing'
+    ) {
       return hash as AppPage;
     }
     return null;
   };
 
-  // Navigation Page State ('landing' | 'theme-generator' | 'dash-generator')
+  // Navigation Page State ('landing' | 'theme-generator' | 'dash-generator' | 'svg-visual-maker')
   const [currentPage, setCurrentPage] = useState<AppPage>(() => {
     const fromHash = typeof window !== 'undefined' ? getPageFromHash() : null;
     if (fromHash) return fromHash;
     const saved = localStorage.getItem('powerlab_current_page');
-    if (saved === 'theme-generator' || saved === 'dash-generator' || saved === 'landing') {
-      return saved;
+    if (
+      saved === 'theme-generator' ||
+      saved === 'dash-generator' ||
+      saved === 'svg-visual-maker' ||
+      saved === 'landing'
+    ) {
+      return saved as AppPage;
     }
     return 'landing';
   });
@@ -370,6 +381,10 @@ export default function App() {
 
       {currentPage === 'dash-generator' && (
         <DashGeneratorPage onNavigate={handleNavigate} />
+      )}
+
+      {currentPage === 'svg-visual-maker' && (
+        <SvgVisualMakerPage onNavigate={handleNavigate} />
       )}
 
       {/* Playful Footer */}

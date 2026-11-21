@@ -19,7 +19,7 @@ interface LandingHeroProps {
 }
 
 export const LandingHero: React.FC<LandingHeroProps> = ({ onNavigate }) => {
-  const [activeMockup, setActiveMockup] = useState<'dash' | 'theme'>('dash');
+  const [activeMockup, setActiveMockup] = useState<'dash' | 'theme' | 'svg'>('dash');
 
   return (
     <section className="relative w-full max-w-5xl mx-auto text-center pt-2 sm:pt-6 pb-6 sm:pb-12">
@@ -49,26 +49,36 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onNavigate }) => {
           Generate official 10-color themes with verified schema compliance, or craft pixel-perfect SVG canvas layouts with navigation ribbons and card containers.
         </p>
 
-        {/* Tactile Dual CTAs */}
-        <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-5">
+        {/* Tactile Triple CTAs */}
+        <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
           <button
             type="button"
             onClick={() => onNavigate('theme-generator')}
-            className="pop-btn w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-full text-base font-heading font-black bg-[#8B5CF6] hover:bg-[#7C3AED] text-white shadow-[4px_4px_0px_0px_#1E293B] transition-all cursor-pointer group"
+            className="pop-btn w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full text-sm font-heading font-black bg-[#8B5CF6] hover:bg-[#7C3AED] text-white shadow-[3.5px_3.5px_0px_0px_#1E293B] transition-all cursor-pointer group"
           >
-            <Palette className="w-5 h-5 stroke-[2.5]" />
-            <span>Launch Theme Studio</span>
+            <Palette className="w-4 h-4 stroke-[2.5]" />
+            <span>Theme Studio</span>
             <ArrowRight className="w-4 h-4 stroke-[2.5] group-hover:translate-x-1 transition-transform" />
           </button>
 
           <button
             type="button"
             onClick={() => onNavigate('dash-generator')}
-            className="pop-btn w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-full text-base font-heading font-black bg-[#F472B6] hover:bg-[#EC4899] text-white shadow-[4px_4px_0px_0px_#1E293B] transition-all cursor-pointer group"
+            className="pop-btn w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full text-sm font-heading font-black bg-[#F472B6] hover:bg-[#EC4899] text-white shadow-[3.5px_3.5px_0px_0px_#1E293B] transition-all cursor-pointer group"
           >
-            <Layout className="w-5 h-5 stroke-[2.5]" />
-            <span>Build Canvas SVG</span>
-            <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-white/25 border border-white/40">New</span>
+            <Layout className="w-4 h-4 stroke-[2.5]" />
+            <span>Dash Canvas</span>
+            <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-white/25 border border-white/40">SVG</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => onNavigate('svg-visual-maker')}
+            className="pop-btn w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full text-sm font-heading font-black bg-[#38BDF8] hover:bg-[#0EA5E9] text-[#1E293B] shadow-[3.5px_3.5px_0px_0px_#1E293B] transition-all cursor-pointer group"
+          >
+            <Sparkles className="w-4 h-4 stroke-[2.5]" />
+            <span>SVG Visual Maker</span>
+            <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-white/50 border border-[#1E293B]">New</span>
           </button>
         </div>
 
@@ -119,6 +129,22 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onNavigate }) => {
             >
               <Palette className="w-3.5 h-3.5 stroke-[2.5]" />
               <span>Theme Studio (.pbix)</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveMockup('svg')}
+              className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-heading font-black border-2 border-[#1E293B] cursor-pointer transition-all ${
+                activeMockup === 'svg'
+                  ? 'bg-[#38BDF8] text-[#1E293B] shadow-[2.5px_2.5px_0px_0px_#1E293B]'
+                  : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-[#FBBF24] hover:text-[#1E293B]'
+              }`}
+            >
+              <Sparkles className="w-3.5 h-3.5 stroke-[2.5]" />
+              <span>SVG Micro-Visuals</span>
+              <span className="text-[9.5px] px-1.5 py-0.2 rounded-full bg-white/60 text-[#1E293B] font-extrabold uppercase">
+                v3.0
+              </span>
             </button>
           </div>
 
@@ -386,6 +412,113 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onNavigate }) => {
                   className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-heading font-black bg-[#8B5CF6] hover:bg-[#7C3AED] text-white border-2 border-[#1E293B] shadow-[2px_2px_0px_0px_#1E293B] cursor-pointer transition-all"
                 >
                   <span>Open in Theme Studio</span>
+                  <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* SVG Micro-Visuals Mockup Card */}
+          {activeMockup === 'svg' && (
+            <div className="pop-card relative bg-[#FFFDF5] dark:bg-slate-900 rounded-3xl border-3 border-[#1E293B] dark:border-slate-700 shadow-[8px_8px_0px_0px_#1E293B] overflow-hidden text-left p-4 sm:p-6 space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b-2 border-[#1E293B]/10">
+                <div className="flex items-center gap-2">
+                  <span className="w-3.5 h-3.5 rounded-full bg-[#EF4444] border-2 border-[#1E293B]" />
+                  <span className="w-3.5 h-3.5 rounded-full bg-[#FBBF24] border-2 border-[#1E293B]" />
+                  <span className="w-3.5 h-3.5 rounded-full bg-[#34D399] border-2 border-[#1E293B]" />
+                  <span className="text-xs font-mono font-bold text-slate-500 ml-2">
+                    powerbi-table-microvisuals.dax
+                  </span>
+                </div>
+                <span className="px-2.5 py-0.5 rounded-full bg-[#38BDF8]/20 text-[#0284C7] dark:text-[#38BDF8] text-[11px] font-heading font-black border border-[#38BDF8]/40">
+                  Data Category: Image URL
+                </span>
+              </div>
+
+              {/* Grid of Micro-Visual Previews */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {/* Visual 1: Semicircle Gauge with Track */}
+                <div className="p-3 rounded-2xl bg-white dark:bg-slate-800 border-2 border-[#1E293B] shadow-[2px_2px_0px_0px_#1E293B] text-center space-y-1.5">
+                  <div className="text-[10px] font-heading font-black text-slate-500 uppercase truncate">
+                    Gauge with Track
+                  </div>
+                  <div className="h-16 flex items-center justify-center">
+                    <svg viewBox="0 0 100 65" className="w-20 h-14">
+                      <path d="M 14,48 A 36 36 0 0 1 86,48" fill="none" stroke="#E2E8F0" strokeWidth="10" strokeLinecap="round" />
+                      <path d="M 14,48 A 36 36 0 0 1 86,48" fill="none" stroke="#FACC15" strokeWidth="10" strokeDasharray="113.1" strokeDashoffset="50.9" strokeLinecap="round" />
+                      <text x="50" y="60" textAnchor="middle" fontFamily="Segoe UI, sans-serif" fontSize="17" fontWeight="900" fill="#1E293B">55%</text>
+                    </svg>
+                  </div>
+                  <span className="text-[10px] font-bold text-slate-400">Bananas (55%)</span>
+                </div>
+
+                {/* Visual 2: Gauge with Outline & Needle */}
+                <div className="p-3 rounded-2xl bg-white dark:bg-slate-800 border-2 border-[#1E293B] shadow-[2px_2px_0px_0px_#1E293B] text-center space-y-1.5">
+                  <div className="text-[10px] font-heading font-black text-slate-500 uppercase truncate">
+                    Gauge with Needle
+                  </div>
+                  <div className="h-16 flex items-center justify-center">
+                    <svg viewBox="0 0 100 68" className="w-20 h-14">
+                      <path d="M 14,50 A 36 36 0 0 1 86,50" fill="none" stroke="#64748B" strokeWidth="3.5" strokeLinecap="round" />
+                      <path d="M 14,50 A 36 36 0 0 1 86,50" fill="none" stroke="#A78BFA" strokeWidth="10" strokeDasharray="113.1" strokeDashoffset="22.6" strokeLinecap="round" opacity="0.7" />
+                      <line x1="50" y1="50" x2="73" y2="20" stroke="#0F172A" strokeWidth="2.5" strokeLinecap="round" />
+                      <circle cx="50" cy="50" r="3.5" fill="#0F172A" />
+                      <text x="50" y="64" textAnchor="middle" fontFamily="Segoe UI, sans-serif" fontSize="15" fontWeight="900" fill="#1E293B">80%</text>
+                    </svg>
+                  </div>
+                  <span className="text-[10px] font-bold text-slate-400">Carrots (80%)</span>
+                </div>
+
+                {/* Visual 3: Ring with 100% Checkmark */}
+                <div className="p-3 rounded-2xl bg-white dark:bg-slate-800 border-2 border-[#1E293B] shadow-[2px_2px_0px_0px_#1E293B] text-center space-y-1.5">
+                  <div className="text-[10px] font-heading font-black text-slate-500 uppercase truncate">
+                    Progress & Checkmark
+                  </div>
+                  <div className="h-16 flex items-center justify-center">
+                    <svg viewBox="0 0 100 100" className="w-14 h-14">
+                      <circle cx="50" cy="50" r="42" fill="#84CC16" />
+                      <path d="M33 50 L45 62 L67 38" fill="none" stroke="#FFFFFF" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </div>
+                  <span className="text-[10px] font-bold text-slate-400">Complete (100%)</span>
+                </div>
+
+                {/* Visual 4: 10x10 Waffle Grid */}
+                <div className="p-3 rounded-2xl bg-white dark:bg-slate-800 border-2 border-[#1E293B] shadow-[2px_2px_0px_0px_#1E293B] text-center space-y-1.5">
+                  <div className="text-[10px] font-heading font-black text-slate-500 uppercase truncate">
+                    10×10 Waffle Grid
+                  </div>
+                  <div className="h-16 flex items-center justify-center">
+                    <svg viewBox="0 0 100 100" className="w-14 h-14">
+                      {Array.from({ length: 10 }).map((_, r) =>
+                        Array.from({ length: 10 }).map((__, c) => {
+                          const idx = r * 10 + c + 1;
+                          const active = idx <= 93;
+                          return (
+                            <circle
+                              key={`${r}-${c}`}
+                              cx={(7 + c * 9.5).toFixed(1)}
+                              cy={(7 + r * 9.5).toFixed(1)}
+                              r="3.2"
+                              fill={active ? '#0F172A' : '#E2E8F0'}
+                            />
+                          );
+                        })
+                      )}
+                    </svg>
+                  </div>
+                  <span className="text-[10px] font-bold text-slate-400">Progress: 93%</span>
+                </div>
+              </div>
+
+              {/* Action Button */}
+              <div className="pt-2 flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => onNavigate('svg-visual-maker')}
+                  className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-heading font-black bg-[#38BDF8] hover:bg-[#0EA5E9] text-[#1E293B] border-2 border-[#1E293B] shadow-[2px_2px_0px_0px_#1E293B] cursor-pointer transition-all"
+                >
+                  <span>Open SVG Visual Maker</span>
                   <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />
                 </button>
               </div>

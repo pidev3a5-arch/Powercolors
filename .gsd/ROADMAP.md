@@ -1,86 +1,53 @@
 # ROADMAP.md
 
-> **Current Phase**: Milestone v2.0 Completed
-> **Milestone**: v2.0 - Completed
+> **Current Milestone**: v3.0 - SVG Visual Maker & Power BI DAX Studio
+> **Current Phase**: Phase 8: Core SVG Visual Library & DAX Generation Engine
+> **Goal**: Empower Power BI developers to generate dozens of SVG micro-visuals as error-free DAX measures with Image URL category, plus convert imported SVGs into DAX.
 
-## Must-Haves (from SPEC)
-- [x] Client-side image downsampling and RGBA extraction with alpha transparency filter
-- [x] In-browser K-Means clustering producing a balanced 10-color data palette in <100ms
-- [x] Intelligent color harmonics fallback when source images have fewer than 10 colors
-- [x] Auto-derived structural colors (background, foreground, tableAccent, KPI good/bad/neutral)
-- [x] Interactive palette toolbar: swatch editing, reordering, lock, and contrast indicators
-- [x] Realistic Power BI mock canvas with KPI cards, bar chart, line chart, donut chart, and matrix
-- [x] Schema-compliant Power BI Theme JSON generation function, modal inspector, and 1-click download
-- [x] Official site logo added (`public/logo.png`) transparent and borderless
-- [x] Creator & reviewer attribution in footer with LinkedIn link (Rachwen Mosbehi)
-- [x] Site-wide Light and Dark mode with Light Mode as default
-- [x] Rebranded to PowerLab with Playful Geometric design language and official schema compliance
-- [x] Multi-page client-side architecture (Landing Page, Theme Generator, Dash Generator)
-- [x] Playful Geometric Landing Page showcasing both Power BI design tools with engaging CTAs
-- [x] Dash Generator: Canvas resolution presets (1280x720, 1920x1080, custom) and canvas background color
-- [x] Dash Generator: Configurable navigation bar (top or left orientation, custom color, and size)
-- [x] Dash Generator: Report branding with logo upload and report title inside the nav bar
-- [x] Dash Generator: Interactive navigation buttons builder (button count, labels, and Lucide icon picker)
-- [x] Dash Generator: Card slots & visual shapes layout builder with configurable title/subtitle toggles
-- [x] Dash Generator: Real-time SVG canvas live preview and 1-click Power BI background `.svg` export
+## Must-Haves (Milestone v3.0)
+- [x] Curated library of dozens of Power BI SVG visuals across categories: KPI, Gauge, Line, Bar, Donut, Waffle/Rating
+- [x] Gauge with track and Gauge with outline & needle (40%, 55%, 80%) inspired by references
+- [x] Circular ring progress with % and checkmarks inspired by references
+- [x] Real-time parameter customizer (value, target, min/max, colors, dimensions)
+- [x] 1-click Power BI DAX Measure Generator (`VAR _Actual = ...`, properly escaped quotes and `%23` encoding)
+- [x] 1-click Copy DAX Measure, Copy Raw SVG, and Download SVG
+- [x] SVG to DAX Converter tab: import/paste custom SVG and generate copyable DAX measure
+- [x] Search box & category chips filter
+- [x] Full integration into PowerLab header navigation, mobile menu, and landing page
 
 ## Phases
 
 ### Phase 1: Project Scaffolding & Core Color Engine
-**Status**: 🟩 Completed  
-**Objective**: Set up the Vite + React + TypeScript + Tailwind CSS workspace; implement Canvas pixel extraction, fast K-Means quantization, Chroma.js harmonics/palette padding, and structural color derivation.  
-**Requirements**: REQ-02, REQ-03, REQ-04, REQ-05, REQ-12  
+**Status**: 🟩 Completed
 
 ### Phase 2: Palette Management & Customization UI
-**Status**: 🟩 Completed  
-**Objective**: Build image upload zone (drag-and-drop, paste, file dialog, presets), 10-swatch palette strip with HEX/RGB inputs, color picker modal, swatch reordering/swapping, and WCAG contrast status.  
-**Requirements**: REQ-01, REQ-06, REQ-07, REQ-08, REQ-10, REQ-11, REQ-13, REQ-14  
+**Status**: 🟩 Completed
 
 ### Phase 3: Live Power BI Visuals Mock Canvas
-**Status**: 🟩 Completed  
-**Objective**: Create an interactive Power BI report canvas preview simulating real visuals (KPI metric cards, clustered bar chart, line trend, donut breakdown, styled table) with Light/Dark canvas theme toggling.  
-**Requirements**: REQ-09, REQ-10  
+**Status**: 🟩 Completed
 
-### Phase 4: Theme JSON Generator & Export (and Inspector)
-**Status**: 🟩 Completed  
-**Objective**: Modal JSON viewer with syntax highlighting, schema validation status, typography/visualContainer customizations, official site logo, creator attribution, and site light/dark mode.  
-**Requirements**: REQ-11, REQ-12, REQ-13, REQ-14  
+### Phase 4: Theme JSON Generator & Export
+**Status**: 🟩 Completed
 
 ### Phase 5: Polish, Verification & Production Readiness
-**Status**: 🟩 Completed  
-**Objective**: Comprehensive end-to-end verification across all features and test suites, rebrand to PowerLab, and final production delivery.  
-**Requirements**: Full verification across all REQ items  
-
----
+**Status**: 🟩 Completed
 
 ### Phase 6: Multi-Page Navigation & Landing Page
-**Status**: 🟩 Completed  
-**Objective**: Introduce multi-page navigation to support three distinct views: a playful, high-converting Landing Page, the existing Theme Generator studio, and the new Dash Generator.  
-**Depends on**: Phase 5  
+**Status**: 🟩 Completed
 
-**Plans**:
-- [x] **Plan 6.1**: Multi-Page Routing Architecture & Navigation Shell (`.gsd/phases/6/1-PLAN.md`)
-- [x] **Plan 6.2**: High-Converting Playful Geometric Landing Page (`.gsd/phases/6/2-PLAN.md`)
-
-**Verification**:
-- Automated test suite passes (`npm test` 29/29)
-- Production build compiles cleanly (`npm run build`)
-- Visual verification across mobile (360px & 390px) and desktop (1440px) viewports passed.
+### Phase 7: Dashboard SVG Canvas Builder (Dash Generator)
+**Status**: 🟩 Completed
 
 ---
 
-### Phase 7: Dashboard SVG Canvas Builder (Dash Generator)
-**Status**: 🟩 Completed  
-**Objective**: Build an interactive Power BI SVG Canvas Background Generator allowing report authors to configure canvas resolution, top/left navigation bar, logo, page navigation buttons with icon picker, visual card slots with titles/subtitles, and export a pixel-perfect .svg for Power BI page background.  
-**Depends on**: Phase 6  
+### Phase 8: Core SVG Visual Library & DAX Generation Engine
+**Status**: 🟩 Completed
+**Objective**: Build the library of SVG visual templates (gauges, KPI rings, sparklines, bullet bars, waffles), the DAX code serializer with clean VAR substitutions and quote escaping, and the custom SVG-to-DAX parser.
 
-**Plans**:
-- [x] **Plan 7.1**: Dash Generator Core State, Resolution & Navigation Bar Engine (`.gsd/phases/7/1-PLAN.md`)
-- [x] **Plan 7.2**: Canvas Layout Presets & Visual Shapes Grid Builder (`.gsd/phases/7/2-PLAN.md`)
-- [x] **Plan 7.3**: Real-Time Vector SVG Canvas Preview & 1-Click Power BI SVG Export (`.gsd/phases/7/3-PLAN.md`)
+### Phase 9: SVG Visual Maker UI, Gallery & Customizer
+**Status**: 🟩 Completed
+**Objective**: Build `SvgVisualMakerPage.tsx` with Visual Gallery, category filters, search box, live preview parameter sliders, DAX code display, and the Import/Convert SVG tab.
 
-**Verification**:
-- Automated test suite passes (`npm test` 36/36 tests passing)
-- Production build compiles cleanly (`npm run build`)
-- Visual verification across mobile (390px) and desktop (1440px) viewports passed.
-- Exported SVGs validate as well-formed XML and import cleanly in Power BI Desktop as canvas wallpaper.  
+### Phase 10: Routing Integration, Landing Showcase & Verification
+**Status**: 🟩 Completed
+**Objective**: Connect navigation header, mobile menu, and landing page showcases to SVG Visual Maker, and verify across desktop/mobile viewports with automated unit tests.  

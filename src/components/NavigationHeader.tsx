@@ -37,6 +37,7 @@ export const NavigationHeader: React.FC<NavigationHeaderProps> = ({
     { id: 'landing', label: 'Home', icon: Home },
     { id: 'theme-generator', label: 'Theme Studio', icon: Palette },
     { id: 'dash-generator', label: 'Dash Canvas', icon: Layout },
+    { id: 'svg-visual-maker', label: 'SVG Visual Maker', icon: Sparkles },
   ];
 
   const renderNavTabs = (className?: string) => (

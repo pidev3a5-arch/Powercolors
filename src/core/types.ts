@@ -1,4 +1,4 @@
-export type AppPage = 'landing' | 'theme-generator' | 'dash-generator';
+export type AppPage = 'landing' | 'theme-generator' | 'dash-generator' | 'svg-visual-maker';
 
 export type RGB = [number, number, number];
 
