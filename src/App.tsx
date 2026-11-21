@@ -285,9 +285,24 @@ export default function App() {
     setTimeout(() => setJsonCopied(false), 2000);
   };
 
-  // Download Dash Canvas SVG from top navigation header
+  // Dash Canvas actions from top navigation header
+  const [svgCopied, setSvgCopied] = useState(false);
+  const handleCopyDashSvg = useCallback(() => {
+    window.dispatchEvent(new CustomEvent('powerlab:copy-dash-svg'));
+  }, []);
+
   const handleDownloadDashSvg = useCallback(() => {
     window.dispatchEvent(new CustomEvent('powerlab:download-dash-svg'));
+  }, []);
+
+  // Sync SVG copied state across header and page
+  useEffect(() => {
+    const onCopied = () => {
+      setSvgCopied(true);
+      setTimeout(() => setSvgCopied(false), 2000);
+    };
+    window.addEventListener('powerlab:dash-svg-copied', onCopied);
+    return () => window.removeEventListener('powerlab:dash-svg-copied', onCopied);
   }, []);
 
   // Load first sample preset on initial mount
@@ -311,6 +326,8 @@ export default function App() {
         onCopyJson={handleCopyJson}
         jsonCopied={jsonCopied}
         onDownloadJson={handleDownloadJson}
+        onCopySvg={handleCopyDashSvg}
+        svgCopied={svgCopied}
         onDownloadSvg={handleDownloadDashSvg}
       />
 

@@ -8,6 +8,9 @@ import {
   Image as ImageIcon,
   Check,
   Compass,
+  Bold,
+  Italic,
+  Type,
 } from 'lucide-react';
 import {
   NavBarConfig,
@@ -358,9 +361,89 @@ export const DashNavControls: React.FC<DashNavControlsProps> = ({
               </button>
             </div>
 
+            {/* Primary Navigation Buttons Typography Controls */}
+            <div className="p-3.5 rounded-xl border-2 border-[#1E293B] dark:border-slate-700 bg-slate-50 dark:bg-slate-800 space-y-2.5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5">
+                  <Type className="w-3.5 h-3.5 text-[#8B5CF6]" />
+                  <span className="text-xs font-heading font-black text-[#1E293B] dark:text-white">
+                    Primary Buttons Typography
+                  </span>
+                </div>
+                <span className="text-[10px] font-mono font-bold text-slate-500 uppercase">
+                  Font & Style
+                </span>
+              </div>
+
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+                {/* Font Size slider */}
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] font-heading font-black text-slate-600 dark:text-slate-300">
+                    Font Size
+                  </span>
+                  <input
+                    type="range"
+                    min={9}
+                    max={18}
+                    step={0.5}
+                    value={navBar.buttonFontSize ?? (navBar.orientation === 'left' ? 12 : 11.5)}
+                    onChange={(e) =>
+                      onUpdateNavBar({ buttonFontSize: parseFloat(e.target.value) })
+                    }
+                    className="w-24 sm:w-28 accent-[#8B5CF6] cursor-pointer"
+                    title="Adjust button text font size"
+                  />
+                  <span className="font-mono text-xs font-black text-[#1E293B] dark:text-white bg-white dark:bg-slate-900 px-2 py-0.5 rounded-md border border-[#1E293B]">
+                    {navBar.buttonFontSize ?? (navBar.orientation === 'left' ? 12 : 11.5)}px
+                  </span>
+                </div>
+
+                {/* Bold & Italic Style Toggles */}
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      onUpdateNavBar({
+                        buttonFontBold: navBar.buttonFontBold === false ? true : false,
+                      })
+                    }
+                    className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border-2 border-[#1E293B] text-xs font-heading font-black transition-all cursor-pointer ${
+                      navBar.buttonFontBold !== false
+                        ? 'bg-[#8B5CF6] text-white shadow-[1.5px_1.5px_0px_0px_#1E293B]'
+                        : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100'
+                    }`}
+                    title={navBar.buttonFontBold !== false ? 'Bold: Enabled' : 'Bold: Disabled'}
+                  >
+                    <Bold className="w-3.5 h-3.5 stroke-[3]" />
+                    <span>Bold</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      onUpdateNavBar({
+                        buttonFontItalic: !navBar.buttonFontItalic,
+                      })
+                    }
+                    className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border-2 border-[#1E293B] text-xs font-heading font-black transition-all cursor-pointer ${
+                      navBar.buttonFontItalic
+                        ? 'bg-[#8B5CF6] text-white shadow-[1.5px_1.5px_0px_0px_#1E293B]'
+                        : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100'
+                    }`}
+                    title={navBar.buttonFontItalic ? 'Italic: Enabled' : 'Italic: Disabled'}
+                  >
+                    <Italic className="w-3.5 h-3.5 stroke-[2.5]" />
+                    <span>Italic</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
             <div className="space-y-2">
               {menuButtons.map(({ btn, index }) => {
                 const iconPath = getNavIconPath(btn.icon);
+                const isBtnBold = btn.bold !== undefined ? btn.bold : navBar.buttonFontBold !== false;
+                const isBtnItalic = btn.italic !== undefined ? btn.italic : !!navBar.buttonFontItalic;
                 return (
                   <div
                     key={btn.id}
@@ -389,9 +472,48 @@ export const DashNavControls: React.FC<DashNavControlsProps> = ({
                       type="text"
                       value={btn.label}
                       onChange={(e) => onUpdateButton(btn.id, { label: e.target.value })}
-                      className="flex-1 min-w-0 px-2 py-1 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold text-[#1E293B] dark:text-white outline-none focus:border-[#8B5CF6]"
+                      className={`flex-1 min-w-0 px-2 py-1 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs text-[#1E293B] dark:text-white outline-none focus:border-[#8B5CF6] ${
+                        isBtnBold ? 'font-bold' : 'font-normal'
+                      } ${isBtnItalic ? 'italic' : ''}`}
                       placeholder="Page label"
                     />
+
+                    {/* Per-button Bold & Italic Style Toggles */}
+                    <div className="flex items-center gap-0.5 flex-shrink-0">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          onUpdateButton(btn.id, {
+                            bold: !isBtnBold,
+                          })
+                        }
+                        className={`p-1.5 rounded-lg border text-[11px] font-black cursor-pointer transition-all ${
+                          isBtnBold
+                            ? 'bg-[#8B5CF6] text-white border-[#1E293B]'
+                            : 'bg-white dark:bg-slate-900 text-slate-400 border-slate-300 dark:border-slate-700'
+                        }`}
+                        title={isBtnBold ? 'Bold: Enabled' : 'Bold: Disabled'}
+                      >
+                        <Bold className="w-3 h-3 stroke-[3]" />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          onUpdateButton(btn.id, {
+                            italic: !isBtnItalic,
+                          })
+                        }
+                        className={`p-1.5 rounded-lg border text-[11px] font-bold cursor-pointer transition-all ${
+                          isBtnItalic
+                            ? 'bg-[#8B5CF6] text-white border-[#1E293B]'
+                            : 'bg-white dark:bg-slate-900 text-slate-400 border-slate-300 dark:border-slate-700'
+                        }`}
+                        title={isBtnItalic ? 'Italic: Enabled' : 'Italic: Disabled'}
+                      >
+                        <Italic className="w-3 h-3 stroke-[2.5]" />
+                      </button>
+                    </div>
 
                     <button
                       type="button"
@@ -470,6 +592,8 @@ export const DashNavControls: React.FC<DashNavControlsProps> = ({
             <div className="space-y-2">
               {generalButtons.map(({ btn, index }) => {
                 const iconPath = getNavIconPath(btn.icon);
+                const isBtnBold = btn.bold !== undefined ? btn.bold : navBar.buttonFontBold !== false;
+                const isBtnItalic = btn.italic !== undefined ? btn.italic : !!navBar.buttonFontItalic;
                 return (
                   <div
                     key={btn.id}
@@ -498,9 +622,48 @@ export const DashNavControls: React.FC<DashNavControlsProps> = ({
                       type="text"
                       value={btn.label}
                       onChange={(e) => onUpdateButton(btn.id, { label: e.target.value })}
-                      className="flex-1 min-w-0 px-2 py-1 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs font-bold text-[#1E293B] dark:text-white outline-none focus:border-[#8B5CF6]"
+                      className={`flex-1 min-w-0 px-2 py-1 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs text-[#1E293B] dark:text-white outline-none focus:border-[#8B5CF6] ${
+                        isBtnBold ? 'font-bold' : 'font-normal'
+                      } ${isBtnItalic ? 'italic' : ''}`}
                       placeholder="Utility label"
                     />
+
+                    {/* Per-button Bold & Italic Style Toggles */}
+                    <div className="flex items-center gap-0.5 flex-shrink-0">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          onUpdateButton(btn.id, {
+                            bold: !isBtnBold,
+                          })
+                        }
+                        className={`p-1.5 rounded-lg border text-[11px] font-black cursor-pointer transition-all ${
+                          isBtnBold
+                            ? 'bg-[#8B5CF6] text-white border-[#1E293B]'
+                            : 'bg-white dark:bg-slate-900 text-slate-400 border-slate-300 dark:border-slate-700'
+                        }`}
+                        title={isBtnBold ? 'Bold: Enabled' : 'Bold: Disabled'}
+                      >
+                        <Bold className="w-3 h-3 stroke-[3]" />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          onUpdateButton(btn.id, {
+                            italic: !isBtnItalic,
+                          })
+                        }
+                        className={`p-1.5 rounded-lg border text-[11px] font-bold cursor-pointer transition-all ${
+                          isBtnItalic
+                            ? 'bg-[#8B5CF6] text-white border-[#1E293B]'
+                            : 'bg-white dark:bg-slate-900 text-slate-400 border-slate-300 dark:border-slate-700'
+                        }`}
+                        title={isBtnItalic ? 'Italic: Enabled' : 'Italic: Disabled'}
+                      >
+                        <Italic className="w-3 h-3 stroke-[2.5]" />
+                      </button>
+                    </div>
 
                     <button
                       type="button"

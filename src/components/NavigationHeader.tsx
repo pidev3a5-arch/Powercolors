@@ -13,6 +13,8 @@ interface NavigationHeaderProps {
   jsonCopied?: boolean;
   onDownloadJson?: () => void;
   // Dash canvas action handlers (active when on dash-generator)
+  onCopySvg?: () => void;
+  svgCopied?: boolean;
   onDownloadSvg?: () => void;
 }
 
@@ -25,6 +27,8 @@ export const NavigationHeader: React.FC<NavigationHeaderProps> = ({
   onCopyJson,
   jsonCopied,
   onDownloadJson,
+  onCopySvg,
+  svgCopied,
   onDownloadSvg,
 }) => {
   const navItems: Array<{ id: AppPage; label: string; icon: React.ComponentType<{ className?: string }> }> = [
@@ -138,17 +142,37 @@ export const NavigationHeader: React.FC<NavigationHeaderProps> = ({
           ) : null}
 
           {/* Dash Canvas-specific Actions */}
-          {currentPage === 'dash-generator' && onDownloadSvg ? (
-            <button
-              type="button"
-              onClick={onDownloadSvg}
-              className="pop-btn inline-flex items-center gap-1.5 px-2.5 sm:px-4 py-1.5 rounded-full text-xs sm:text-xs font-heading font-black bg-[#8B5CF6] hover:bg-[#7C3AED] text-white transition-all cursor-pointer shadow-[2.5px_2.5px_0px_0px_#1E293B]"
-              title="Download Power BI Canvas wallpaper SVG"
-            >
-              <Download className="w-3.5 h-3.5 stroke-[2.5]" />
-              <span className="hidden sm:inline">Download SVG</span>
-              <span className="sm:hidden font-extrabold">SVG</span>
-            </button>
+          {currentPage === 'dash-generator' ? (
+            <>
+              {onCopySvg && (
+                <button
+                  type="button"
+                  onClick={onCopySvg}
+                  className="pop-btn inline-flex items-center gap-1.5 p-1.5 sm:px-3 sm:py-1.5 rounded-full text-xs font-heading font-extrabold bg-white dark:bg-slate-800 text-[#1E293B] dark:text-white hover:bg-[#34D399] hover:text-[#1E293B] transition-all cursor-pointer"
+                  title="Copy canvas wallpaper SVG to clipboard"
+                >
+                  {svgCopied ? (
+                    <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600 stroke-[3]" />
+                  ) : (
+                    <Copy className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2.5]" />
+                  )}
+                  <span className="hidden sm:inline">{svgCopied ? 'Copied SVG!' : 'Copy SVG'}</span>
+                </button>
+              )}
+
+              {onDownloadSvg && (
+                <button
+                  type="button"
+                  onClick={onDownloadSvg}
+                  className="pop-btn inline-flex items-center gap-1.5 px-2.5 sm:px-4 py-1.5 rounded-full text-xs sm:text-xs font-heading font-black bg-[#8B5CF6] hover:bg-[#7C3AED] text-white transition-all cursor-pointer shadow-[2.5px_2.5px_0px_0px_#1E293B]"
+                  title="Download Power BI Canvas wallpaper SVG"
+                >
+                  <Download className="w-3.5 h-3.5 stroke-[2.5]" />
+                  <span className="hidden sm:inline">Download SVG</span>
+                  <span className="sm:hidden font-extrabold">SVG</span>
+                </button>
+              )}
+            </>
           ) : null}
         </div>
       </div>

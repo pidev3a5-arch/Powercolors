@@ -389,21 +389,29 @@ export const DashGeneratorPage: React.FC<DashGeneratorPageProps> = ({ onNavigate
   };
 
   // Copy SVG Code
-  const handleCopySvg = async () => {
+  const handleCopySvg = useCallback(async () => {
     try {
       const markup = generateDashSvg(dashState, false);
       await navigator.clipboard.writeText(markup);
       setCopied(true);
+      window.dispatchEvent(new CustomEvent('powerlab:dash-svg-copied'));
       setTimeout(() => setCopied(false), 2000);
     } catch {
       alert('Could not copy to clipboard.');
     }
-  };
+  }, [dashState]);
 
   // Download SVG File (automatically named: ReportTitle_PageHeaderTitle.svg with single underscore)
   const handleDownloadSvg = useCallback(() => {
     downloadDashSvg(dashState);
   }, [dashState]);
+
+  // Listen for copy event triggered by header button
+  useEffect(() => {
+    const onCopyEvent = () => handleCopySvg();
+    window.addEventListener('powerlab:copy-dash-svg', onCopyEvent);
+    return () => window.removeEventListener('powerlab:copy-dash-svg', onCopyEvent);
+  }, [handleCopySvg]);
 
   // Listen for download event triggered by the header button or shortcuts
   useEffect(() => {

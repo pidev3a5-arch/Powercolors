@@ -180,6 +180,11 @@ export function generateDashSvg(state: DashCanvasState, forPreview = false): str
       const btnW = navBar.size - 28;
       const globalShowIcons = navBar.showButtonIcons !== false;
 
+      // Typography config for buttons
+      const defaultBtnFontSize = navBar.buttonFontSize ?? 12;
+      const defaultBtnBold = navBar.buttonFontBold !== false;
+      const defaultBtnItalic = !!navBar.buttonFontItalic;
+
       // Section 1: MENU
       let btnY = 94;
       if (menuButtons.length > 0) {
@@ -193,6 +198,12 @@ export function generateDashSvg(state: DashCanvasState, forPreview = false): str
           const isActive = !!btn.isActive;
           const showIcon = btn.showIcon !== undefined ? btn.showIcon : globalShowIcons;
           const iconPath = getNavIconPath(btn.icon);
+
+          const btnFontSize = btn.fontSize ?? defaultBtnFontSize;
+          const isBold = btn.bold !== undefined ? btn.bold : defaultBtnBold;
+          const isItalic = btn.italic !== undefined ? btn.italic : defaultBtnItalic;
+          const fontWeight = isBold ? (isActive ? '700' : '600') : '400';
+          const fontStyleAttr = isItalic ? ' font-style="italic"' : '';
 
           if (isActive) {
             parts.push(
@@ -209,15 +220,11 @@ export function generateDashSvg(state: DashCanvasState, forPreview = false): str
               `  <g transform="translate(24, ${btnY + 9}) scale(0.83)" fill="none" stroke="${iconColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="${textOpacity}">`,
               `    <path d="${iconPath}" />`,
               `  </g>`,
-              `  <text x="52" y="${btnY + 24}" font-size="12" font-weight="${
-                isActive ? '700' : '600'
-              }" fill="${textColor}" opacity="${textOpacity}">${escapeXml(btn.label)}</text>`
+              `  <text x="52" y="${btnY + 24}" font-size="${btnFontSize}" font-weight="${fontWeight}"${fontStyleAttr} fill="${textColor}" opacity="${textOpacity}">${escapeXml(btn.label)}</text>`
             );
           } else {
             parts.push(
-              `  <text x="24" y="${btnY + 24}" font-size="12" font-weight="${
-                isActive ? '700' : '600'
-              }" fill="${textColor}" opacity="${textOpacity}">${escapeXml(btn.label)}</text>`
+              `  <text x="24" y="${btnY + 24}" font-size="${btnFontSize}" font-weight="${fontWeight}"${fontStyleAttr} fill="${textColor}" opacity="${textOpacity}">${escapeXml(btn.label)}</text>`
             );
           }
 
@@ -243,6 +250,12 @@ export function generateDashSvg(state: DashCanvasState, forPreview = false): str
           const showIcon = btn.showIcon !== undefined ? btn.showIcon : globalShowIcons;
           const iconPath = getNavIconPath(btn.icon);
 
+          const btnFontSize = btn.fontSize ?? defaultBtnFontSize;
+          const isBold = btn.bold !== undefined ? btn.bold : defaultBtnBold;
+          const isItalic = btn.italic !== undefined ? btn.italic : defaultBtnItalic;
+          const fontWeight = isBold ? (isActive ? '700' : '600') : '400';
+          const fontStyleAttr = isItalic ? ' font-style="italic"' : '';
+
           if (isActive) {
             parts.push(
               `  <rect x="14" y="${btnY}" width="${btnW}" height="${btnH}" rx="8" fill="${navBar.accentColor}" />`
@@ -258,15 +271,11 @@ export function generateDashSvg(state: DashCanvasState, forPreview = false): str
               `  <g transform="translate(24, ${btnY + 9}) scale(0.83)" fill="none" stroke="${iconColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="${textOpacity}">`,
               `    <path d="${iconPath}" />`,
               `  </g>`,
-              `  <text x="52" y="${btnY + 24}" font-size="12" font-weight="${
-                isActive ? '700' : '600'
-              }" fill="${textColor}" opacity="${textOpacity}">${escapeXml(btn.label)}</text>`
+              `  <text x="52" y="${btnY + 24}" font-size="${btnFontSize}" font-weight="${fontWeight}"${fontStyleAttr} fill="${textColor}" opacity="${textOpacity}">${escapeXml(btn.label)}</text>`
             );
           } else {
             parts.push(
-              `  <text x="24" y="${btnY + 24}" font-size="12" font-weight="${
-                isActive ? '700' : '600'
-              }" fill="${textColor}" opacity="${textOpacity}">${escapeXml(btn.label)}</text>`
+              `  <text x="24" y="${btnY + 24}" font-size="${btnFontSize}" font-weight="${fontWeight}"${fontStyleAttr} fill="${textColor}" opacity="${textOpacity}">${escapeXml(btn.label)}</text>`
             );
           }
 
@@ -315,11 +324,22 @@ export function generateDashSvg(state: DashCanvasState, forPreview = false): str
       const btnY = centerY - btnH / 2;
       const globalShowIcons = navBar.showButtonIcons !== false;
 
+      // Typography config for buttons
+      const defaultBtnFontSize = navBar.buttonFontSize ?? 11.5;
+      const defaultBtnBold = navBar.buttonFontBold !== false;
+      const defaultBtnItalic = !!navBar.buttonFontItalic;
+
       // Menu Buttons
       for (const btn of menuButtons) {
         const isActive = !!btn.isActive;
         const showIcon = btn.showIcon !== undefined ? btn.showIcon : globalShowIcons;
         const iconPath = getNavIconPath(btn.icon);
+
+        const btnFontSize = btn.fontSize ?? defaultBtnFontSize;
+        const isBold = btn.bold !== undefined ? btn.bold : defaultBtnBold;
+        const isItalic = btn.italic !== undefined ? btn.italic : defaultBtnItalic;
+        const fontWeight = isBold ? (isActive ? '700' : '600') : '400';
+        const fontStyleAttr = isItalic ? ' font-style="italic"' : '';
 
         if (isActive) {
           parts.push(
@@ -336,15 +356,11 @@ export function generateDashSvg(state: DashCanvasState, forPreview = false): str
             `  <g transform="translate(${btnX + 10}, ${btnY + 8}) scale(0.75)" fill="none" stroke="${iconColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="${textOpacity}">`,
             `    <path d="${iconPath}" />`,
             `  </g>`,
-            `  <text x="${btnX + 34}" y="${btnY + 22}" font-size="11.5" font-weight="${
-              isActive ? '700' : '600'
-            }" fill="${textColor}" opacity="${textOpacity}">${escapeXml(btn.label)}</text>`
+            `  <text x="${btnX + 34}" y="${btnY + 22}" font-size="${btnFontSize}" font-weight="${fontWeight}"${fontStyleAttr} fill="${textColor}" opacity="${textOpacity}">${escapeXml(btn.label)}</text>`
           );
         } else {
           parts.push(
-            `  <text x="${Math.round(btnX + btnW / 2)}" y="${btnY + 22}" font-size="11.5" font-weight="${
-              isActive ? '700' : '600'
-            }" text-anchor="middle" fill="${textColor}" opacity="${textOpacity}">${escapeXml(btn.label)}</text>`
+            `  <text x="${Math.round(btnX + btnW / 2)}" y="${btnY + 22}" font-size="${btnFontSize}" font-weight="${fontWeight}"${fontStyleAttr} text-anchor="middle" fill="${textColor}" opacity="${textOpacity}">${escapeXml(btn.label)}</text>`
           );
         }
 
@@ -365,6 +381,12 @@ export function generateDashSvg(state: DashCanvasState, forPreview = false): str
           const showIcon = btn.showIcon !== undefined ? btn.showIcon : globalShowIcons;
           const iconPath = getNavIconPath(btn.icon);
 
+          const btnFontSize = btn.fontSize ?? defaultBtnFontSize;
+          const isBold = btn.bold !== undefined ? btn.bold : defaultBtnBold;
+          const isItalic = btn.italic !== undefined ? btn.italic : defaultBtnItalic;
+          const fontWeight = isBold ? (isActive ? '700' : '600') : '400';
+          const fontStyleAttr = isItalic ? ' font-style="italic"' : '';
+
           if (isActive) {
             parts.push(
               `  <rect x="${btnX}" y="${btnY}" width="${btnW}" height="${btnH}" rx="7" fill="${navBar.accentColor}" />`
@@ -380,15 +402,11 @@ export function generateDashSvg(state: DashCanvasState, forPreview = false): str
               `  <g transform="translate(${btnX + 10}, ${btnY + 8}) scale(0.75)" fill="none" stroke="${iconColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="${textOpacity}">`,
               `    <path d="${iconPath}" />`,
               `  </g>`,
-              `  <text x="${btnX + 34}" y="${btnY + 22}" font-size="11.5" font-weight="${
-                isActive ? '700' : '600'
-              }" fill="${textColor}" opacity="${textOpacity}">${escapeXml(btn.label)}</text>`
+              `  <text x="${btnX + 34}" y="${btnY + 22}" font-size="${btnFontSize}" font-weight="${fontWeight}"${fontStyleAttr} fill="${textColor}" opacity="${textOpacity}">${escapeXml(btn.label)}</text>`
             );
           } else {
             parts.push(
-              `  <text x="${Math.round(btnX + btnW / 2)}" y="${btnY + 22}" font-size="11.5" font-weight="${
-                isActive ? '700' : '600'
-              }" text-anchor="middle" fill="${textColor}" opacity="${textOpacity}">${escapeXml(btn.label)}</text>`
+              `  <text x="${Math.round(btnX + btnW / 2)}" y="${btnY + 22}" font-size="${btnFontSize}" font-weight="${fontWeight}"${fontStyleAttr} text-anchor="middle" fill="${textColor}" opacity="${textOpacity}">${escapeXml(btn.label)}</text>`
             );
           }
 

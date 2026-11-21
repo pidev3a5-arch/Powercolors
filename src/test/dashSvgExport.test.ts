@@ -560,4 +560,45 @@ describe('Dash SVG Canvas Export & Layout Engine', () => {
 
     target.removeEventListener('powerlab:download-dash-svg', listener);
   });
+
+  it('renders primary report navigation buttons with custom font-size, bold and italic styles', () => {
+    const customState: DashCanvasState = {
+      ...DEFAULT_DASH_CANVAS_STATE,
+      navBar: {
+        ...DEFAULT_DASH_CANVAS_STATE.navBar,
+        buttonFontSize: 14,
+        buttonFontBold: false, // Normal weight (400)
+        buttonFontItalic: true, // Italic style
+        buttons: [
+          { id: 'btn-1', label: 'Executive', icon: 'home', isActive: false, section: 'menu' },
+          { id: 'btn-2', label: 'Financials', icon: 'bar-chart', isActive: true, section: 'menu', bold: true }, // Override bold
+        ],
+      },
+    };
+
+    const svg = generateDashSvg(customState);
+    // Button 1: 14px, normal weight 400, italic
+    expect(svg).toContain('font-size="14" font-weight="400" font-style="italic"');
+    expect(svg).toContain('>Executive</text>');
+
+    // Button 2: 14px, overridden bold (700 when active), italic
+    expect(svg).toContain('font-size="14" font-weight="700" font-style="italic"');
+    expect(svg).toContain('>Financials</text>');
+  });
+
+  it('triggers copy via powerlab:copy-dash-svg event only on demand', () => {
+    const target = typeof window !== 'undefined' ? window : new EventTarget();
+    let eventReceived = 0;
+    const listener = () => {
+      eventReceived++;
+    };
+
+    target.addEventListener('powerlab:copy-dash-svg', listener);
+
+    expect(eventReceived).toBe(0);
+    target.dispatchEvent(new CustomEvent('powerlab:copy-dash-svg'));
+    expect(eventReceived).toBe(1);
+
+    target.removeEventListener('powerlab:copy-dash-svg', listener);
+  });
 });

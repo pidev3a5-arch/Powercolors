@@ -17,6 +17,9 @@ export interface NavButtonConfig {
   isActive?: boolean;
   section?: NavButtonSection;
   showIcon?: boolean;
+  fontSize?: number;
+  bold?: boolean;
+  italic?: boolean;
 }
 
 export interface NavBarConfig {
@@ -29,6 +32,9 @@ export interface NavBarConfig {
   reportTitle: string;
   reportTitleSize?: number;
   showButtonIcons?: boolean;
+  buttonFontSize?: number;
+  buttonFontBold?: boolean;
+  buttonFontItalic?: boolean;
   logoUrl: string | null;
   buttons: NavButtonConfig[];
 }
@@ -377,6 +383,9 @@ export const DEFAULT_DASH_CANVAS_STATE: DashCanvasState = {
     reportTitle: 'Executive Sales',
     reportTitleSize: 14,
     showButtonIcons: true,
+    buttonFontSize: 12,
+    buttonFontBold: true,
+    buttonFontItalic: false,
     logoUrl: null,
     buttons: [
       { id: 'btn-1', label: 'Overview', icon: 'home', isActive: true, section: 'menu' },
