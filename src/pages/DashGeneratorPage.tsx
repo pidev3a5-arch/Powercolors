@@ -35,15 +35,11 @@ import { AppPage } from '../core/types';
 
 interface DashGeneratorPageProps {
   onNavigate: (page: AppPage) => void;
-  onRegisterDownloadSvg?: (downloadFn: () => void) => void;
 }
 
 type DashTab = 'canvas' | 'nav' | 'containers';
 
-export const DashGeneratorPage: React.FC<DashGeneratorPageProps> = ({
-  onNavigate,
-  onRegisterDownloadSvg,
-}) => {
+export const DashGeneratorPage: React.FC<DashGeneratorPageProps> = ({ onNavigate }) => {
   const [activeTab, setActiveTab] = useState<DashTab>('canvas');
   const [copied, setCopied] = useState(false);
 
@@ -409,12 +405,7 @@ export const DashGeneratorPage: React.FC<DashGeneratorPageProps> = ({
     downloadDashSvg(dashState);
   }, [dashState]);
 
-  // Expose download trigger to top navigation header
-  useEffect(() => {
-    onRegisterDownloadSvg?.(handleDownloadSvg);
-  }, [handleDownloadSvg, onRegisterDownloadSvg]);
-
-  // Also support custom event from header or shortcuts
+  // Listen for download event triggered by the header button or shortcuts
   useEffect(() => {
     const onEvent = () => handleDownloadSvg();
     window.addEventListener('powerlab:download-dash-svg', onEvent);

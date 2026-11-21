@@ -285,15 +285,10 @@ export default function App() {
     setTimeout(() => setJsonCopied(false), 2000);
   };
 
-  // Dash Canvas registered download handler
-  const [dashDownloadFn, setDashDownloadFn] = useState<(() => void) | null>(null);
+  // Download Dash Canvas SVG from top navigation header
   const handleDownloadDashSvg = useCallback(() => {
-    if (dashDownloadFn) {
-      dashDownloadFn();
-    } else {
-      window.dispatchEvent(new CustomEvent('powerlab:download-dash-svg'));
-    }
-  }, [dashDownloadFn]);
+    window.dispatchEvent(new CustomEvent('powerlab:download-dash-svg'));
+  }, []);
 
   // Load first sample preset on initial mount
   useEffect(() => {
@@ -357,10 +352,7 @@ export default function App() {
       )}
 
       {currentPage === 'dash-generator' && (
-        <DashGeneratorPage
-          onNavigate={handleNavigate}
-          onRegisterDownloadSvg={setDashDownloadFn}
-        />
+        <DashGeneratorPage onNavigate={handleNavigate} />
       )}
 
       {/* Playful Footer */}

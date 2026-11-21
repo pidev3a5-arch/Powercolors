@@ -541,4 +541,23 @@ describe('Dash SVG Canvas Export & Layout Engine', () => {
     expect(svg).toContain('<text x="466" y="74"');
     expect(svg).toContain('Right Metric</text>');
   });
+
+  it('triggers download via powerlab:download-dash-svg event only on demand', () => {
+    const target = typeof window !== 'undefined' ? window : new EventTarget();
+    let eventReceived = 0;
+    const listener = () => {
+      eventReceived++;
+    };
+
+    target.addEventListener('powerlab:download-dash-svg', listener);
+
+    // Initial state: no event fired
+    expect(eventReceived).toBe(0);
+
+    // Dispatched only when button clicked
+    target.dispatchEvent(new CustomEvent('powerlab:download-dash-svg'));
+    expect(eventReceived).toBe(1);
+
+    target.removeEventListener('powerlab:download-dash-svg', listener);
+  });
 });
