@@ -363,6 +363,8 @@ describe('Dash SVG Canvas Export & Layout Engine', () => {
       expect(updated.layoutPreset).toBe(preset.layoutPreset);
       expect(updated.typography.fontFamily).toBe(preset.fontFamily);
       expect(updated.containerStyle.showDropShadow).toBe(false);
+      // Requirement: reportTitle must be "Report Title" for all ready designs
+      expect(updated.navBar.reportTitle).toBe('Report Title');
       if (preset.id === 'blank-page') {
         expect(updated.containers).toEqual([]);
         expect(updated.navBar.show).toBe(false);

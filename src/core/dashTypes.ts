@@ -382,7 +382,7 @@ export const DEFAULT_DASH_CANVAS_STATE: DashCanvasState = {
     backgroundColor: '#0F172A',
     textColor: '#FFFFFF',
     accentColor: '#8B5CF6',
-    reportTitle: 'Executive Sales',
+    reportTitle: 'Report Title',
     reportTitleSize: 14,
     showButtonIcons: true,
     showButtonLabels: true,

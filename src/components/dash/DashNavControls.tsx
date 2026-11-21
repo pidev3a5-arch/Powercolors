@@ -257,7 +257,7 @@ export const DashNavControls: React.FC<DashNavControlsProps> = ({
                   value={navBar.reportTitle}
                   maxLength={40}
                   onChange={(e) => onUpdateNavBar({ reportTitle: e.target.value })}
-                  placeholder="e.g. Executive Sales Performance"
+                  placeholder="e.g. Report Title"
                   className="w-full px-3 py-2 rounded-xl border-2 border-[#1E293B] dark:border-slate-700 bg-[#FFFDF5] dark:bg-slate-950 text-xs sm:text-sm font-bold text-[#1E293B] dark:text-white outline-none focus:border-[#8B5CF6] focus:shadow-[2px_2px_0px_0px_#8B5CF6] transition-all"
                 />
               </div>

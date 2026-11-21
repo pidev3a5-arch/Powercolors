@@ -101,6 +101,7 @@ export const READY_DESIGN_PRESETS: ReadyDesignPreset[] = [
       navBar: {
         ...curr.navBar,
         show: false,
+        reportTitle: 'Report Title',
       },
       pageTitles: [],
       containerStyle: {
@@ -153,7 +154,7 @@ export const READY_DESIGN_PRESETS: ReadyDesignPreset[] = [
         backgroundColor: '#1B2432',
         textColor: '#F8FAFC',
         accentColor: '#2563EB',
-        reportTitle: 'Rach Dash',
+        reportTitle: 'Report Title',
         showButtonIcons: true,
         showButtonLabels: true,
         showReportTitle: true,
@@ -218,6 +219,7 @@ export const READY_DESIGN_PRESETS: ReadyDesignPreset[] = [
         backgroundColor: '#0F172A',
         textColor: '#FFFFFF',
         accentColor: '#0284C7',
+        reportTitle: 'Report Title',
         buttons: sanitizeButtons(curr.navBar.buttons),
       },
       containerStyle: {
@@ -271,6 +273,7 @@ export const READY_DESIGN_PRESETS: ReadyDesignPreset[] = [
         backgroundColor: '#1E293B',
         textColor: '#FFFFFF',
         accentColor: '#FBBF24',
+        reportTitle: 'Report Title',
         buttons: sanitizeButtons(curr.navBar.buttons),
       },
       containerStyle: {
@@ -330,6 +333,7 @@ export const READY_DESIGN_PRESETS: ReadyDesignPreset[] = [
         backgroundColor: '#18181B',
         textColor: '#FAFAFA',
         accentColor: '#F43F5E',
+        reportTitle: 'Report Title',
         buttons: sanitizeButtons(curr.navBar.buttons),
       },
       containerStyle: {
@@ -389,6 +393,7 @@ export const READY_DESIGN_PRESETS: ReadyDesignPreset[] = [
         backgroundColor: '#312E81',
         textColor: '#EEF2FF',
         accentColor: '#6366F1',
+        reportTitle: 'Report Title',
         buttons: sanitizeButtons(curr.navBar.buttons),
       },
       containerStyle: {
@@ -443,7 +448,7 @@ export const READY_DESIGN_PRESETS: ReadyDesignPreset[] = [
         backgroundColor: '#18191B',
         textColor: '#F8FAFC',
         accentColor: '#CCF842',
-        reportTitle: 'Team & Workflows',
+        reportTitle: 'Report Title',
         buttons: sanitizeButtons(curr.navBar.buttons),
       },
       containerStyle: {
@@ -498,7 +503,7 @@ export const READY_DESIGN_PRESETS: ReadyDesignPreset[] = [
         backgroundColor: '#2C2D30',
         textColor: '#F8FAFC',
         accentColor: '#F59E0B',
-        reportTitle: 'Campaign Hub',
+        reportTitle: 'Report Title',
         buttons: sanitizeButtons(curr.navBar.buttons),
       },
       containerStyle: {
@@ -553,6 +558,7 @@ export const READY_DESIGN_PRESETS: ReadyDesignPreset[] = [
         backgroundColor: '#1C2541',
         textColor: '#F0F9FF',
         accentColor: '#38BDF8',
+        reportTitle: 'Report Title',
         buttons: sanitizeButtons(curr.navBar.buttons),
       },
       containerStyle: {
