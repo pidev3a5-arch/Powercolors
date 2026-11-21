@@ -43,8 +43,11 @@ const BG_PRESET_COLORS = [
   { hex: '#F8FAFC', label: 'Slate Soft' },
   { hex: '#FFFDF5', label: 'Warm Cream' },
   { hex: '#FFFFFF', label: 'Pure White' },
+  { hex: '#F1F5F9', label: 'Ice Slate' },
+  { hex: '#FAF8F5', label: 'Porcelain Sand' },
   { hex: '#0F172A', label: 'Midnight' },
   { hex: '#1E293B', label: 'Dark Slate' },
+  { hex: '#0B0F19', label: 'Deep Obsidian' },
 ];
 
 const FONT_FAMILIES = [
@@ -133,6 +136,14 @@ export const DashCanvasControls: React.FC<DashCanvasControlsProps> = ({
                 <span>{preset.navType === 'left' ? `Left ${preset.navSize}px` : `Top ${preset.navSize}px`}</span>
                 {' • '}
                 <span className="text-slate-600 dark:text-slate-300">{preset.fontFamily}</span>
+                {preset.defaultResolution === '1920x1080' && (
+                  <>
+                    {' • '}
+                    <span className="font-mono font-extrabold text-[#2563EB] dark:text-[#38BDF8]">
+                      1080p
+                    </span>
+                  </>
+                )}
               </div>
 
               {/* Color swatch row preview */}
@@ -260,7 +271,7 @@ export const DashCanvasControls: React.FC<DashCanvasControlsProps> = ({
                 />
                 <span
                   className={
-                    bg.hex === '#0F172A' || bg.hex === '#1E293B'
+                    ['#0F172A', '#1E293B', '#0B0F19'].includes(bg.hex)
                       ? 'text-white'
                       : 'text-[#1E293B]'
                   }

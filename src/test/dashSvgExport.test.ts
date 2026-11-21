@@ -337,7 +337,9 @@ describe('Dash SVG Canvas Export & Layout Engine', () => {
     const citronPreset = READY_DESIGN_PRESETS.find((p) => p.id === 'citron-obsidian');
     const pastelPreset = READY_DESIGN_PRESETS.find((p) => p.id === 'pastel-horizon');
     const cobaltPreset = READY_DESIGN_PRESETS.find((p) => p.id === 'cobalt-sapphire');
-    const forgePreset = READY_DESIGN_PRESETS.find((p) => p.id === 'data-forge-performance');
+    const rachPreset = READY_DESIGN_PRESETS.find((p) => p.id === 'rach-dash');
+    const cyberPreset = READY_DESIGN_PRESETS.find((p) => p.id === 'cyber-crimson');
+    const nordicPreset = READY_DESIGN_PRESETS.find((p) => p.id === 'nordic-frost');
 
     expect(citronPreset).toBeDefined();
     expect(citronPreset?.navType).toBe('left');
@@ -345,8 +347,11 @@ describe('Dash SVG Canvas Export & Layout Engine', () => {
     expect(pastelPreset?.navType).toBe('left');
     expect(cobaltPreset).toBeDefined();
     expect(cobaltPreset?.navType).toBe('left');
-    expect(forgePreset).toBeDefined();
-    expect(forgePreset?.navType).toBe('left');
+    expect(rachPreset).toBeDefined();
+    expect(rachPreset?.name).toBe('Rach Dash');
+    expect(rachPreset?.defaultResolution).toBe('1920x1080');
+    expect(cyberPreset?.defaultResolution).toBe('1920x1080');
+    expect(nordicPreset?.defaultResolution).toBe('1920x1080');
     expect(READY_DESIGN_PRESETS.find((p) => p.id === 'modern-midnight')).toBeUndefined();
 
     expect(DEFAULT_DASH_CANVAS_STATE.containerStyle.showDropShadow).toBe(false);
@@ -361,6 +366,25 @@ describe('Dash SVG Canvas Export & Layout Engine', () => {
       if (preset.id === 'blank-page') {
         expect(updated.containers).toEqual([]);
         expect(updated.navBar.show).toBe(false);
+      } else {
+        // Requirement 3: Every ready design must always have a header title at top-left
+        expect(updated.pageTitles.length).toBeGreaterThan(0);
+        expect(updated.pageTitles[0].position).toBe('top-left');
+
+        // Requirement 3: Selection 1 must have settings icon instead of filter
+        const selectionBtn = updated.navBar.buttons.find(
+          (b) => b.label.includes('Selection #1') || b.label.includes('Selection 1')
+        );
+        if (selectionBtn) {
+          expect(selectionBtn.icon).toBe('settings');
+        }
+      }
+
+      if (['rach-dash', 'cyber-crimson', 'nordic-frost'].includes(preset.id)) {
+        // Requirement 2 & 4: 1920x1080 Full HD aspect ratio
+        expect(updated.dimensions.width).toBe(1920);
+        expect(updated.dimensions.height).toBe(1080);
+        expect(updated.dimensions.preset).toBe('1920x1080');
       }
     }
   });

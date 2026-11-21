@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sun, Moon, Download, Copy, Check, Code2, Sparkles, Home, Palette, Layout, Donut, X } from 'lucide-react';
+import { Sun, Moon, Download, Copy, Check, Code2, Sparkles, Home, Palette, Layout, Menu, X } from 'lucide-react';
 import { AppPage } from '../core/types';
 
 interface NavigationHeaderProps {
@@ -103,31 +103,6 @@ export const NavigationHeader: React.FC<NavigationHeaderProps> = ({
           {/* Landing page ONLY: Desktop navigation tabs placed beside the mode button */}
           {currentPage === 'landing' && renderNavTabs('hidden md:flex mr-1 sm:mr-2')}
 
-          {/* Site Dark/Light Switcher */}
-          <button
-            type="button"
-            onClick={onToggleSiteTheme}
-            className="pop-btn p-1.5 sm:p-2 rounded-full bg-white dark:bg-slate-800 text-[#1E293B] dark:text-[#FBBF24] hover:bg-[#FBBF24] hover:text-[#1E293B] transition-all cursor-pointer"
-            title={isDarkSite ? 'Switch to Warm Cream Paper Mode' : 'Switch to Playful Dark Mode'}
-          >
-            {isDarkSite ? <Sun className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2.5]" /> : <Moon className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2.5]" />}
-          </button>
-
-          {/* Mobile Donut Menu Button (Visible on mobile only, beside mode button) */}
-          <button
-            type="button"
-            onClick={() => setIsMobileMenuOpen((prev) => !prev)}
-            className="md:hidden pop-btn p-1.5 rounded-full bg-white dark:bg-slate-800 text-[#1E293B] dark:text-white hover:bg-[#FBBF24] hover:text-[#1E293B] transition-all cursor-pointer border-2 border-[#1E293B] shadow-[1.5px_1.5px_0px_0px_#1E293B]"
-            title="Toggle Menu"
-            aria-label="Navigation Menu"
-          >
-            {isMobileMenuOpen ? (
-              <X className="w-4 h-4 stroke-[2.5]" />
-            ) : (
-              <Donut className="w-4 h-4 stroke-[2.5]" />
-            )}
-          </button>
-
           {/* Theme Studio-specific Actions */}
           {currentPage === 'theme-generator' ? (
             <>
@@ -203,10 +178,35 @@ export const NavigationHeader: React.FC<NavigationHeaderProps> = ({
               )}
             </>
           ) : null}
+
+          {/* Site Dark/Light Switcher */}
+          <button
+            type="button"
+            onClick={onToggleSiteTheme}
+            className="pop-btn p-1.5 sm:p-2 rounded-full bg-white dark:bg-slate-800 text-[#1E293B] dark:text-[#FBBF24] hover:bg-[#FBBF24] hover:text-[#1E293B] transition-all cursor-pointer"
+            title={isDarkSite ? 'Switch to Warm Cream Paper Mode' : 'Switch to Playful Dark Mode'}
+          >
+            {isDarkSite ? <Sun className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2.5]" /> : <Moon className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2.5]" />}
+          </button>
+
+          {/* Mobile Hamburger Menu Button (Always the first button on the right edge on mobile) */}
+          <button
+            type="button"
+            onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+            className="md:hidden pop-btn p-1.5 sm:p-2 rounded-full bg-white dark:bg-slate-800 text-[#1E293B] dark:text-white hover:bg-[#FBBF24] hover:text-[#1E293B] transition-all cursor-pointer border-2 border-[#1E293B] shadow-[1.5px_1.5px_0px_0px_#1E293B]"
+            title="Toggle Menu"
+            aria-label="Navigation Menu"
+          >
+            {isMobileMenuOpen ? (
+              <X className="w-4 h-4 stroke-[2.5]" />
+            ) : (
+              <Menu className="w-4 h-4 stroke-[2.5]" />
+            )}
+          </button>
         </div>
       </div>
 
-      {/* Mobile Dropdown Drawer: Opened via Donut menu button beside mode switch */}
+      {/* Mobile Dropdown Drawer: Opened via Hamburger menu button */}
       {isMobileMenuOpen && (
         <div className="md:hidden border-t-2 border-[#1E293B] dark:border-slate-800 px-4 py-3 bg-[#FFFDF5] dark:bg-[#0F172A] space-y-2 shadow-[0px_4px_0px_0px_#1E293B]">
           <div className="space-y-1.5">

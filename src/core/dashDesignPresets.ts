@@ -1,4 +1,10 @@
-import { DashCanvasState, LayoutPresetType, NavBarOrientation } from './dashTypes';
+import {
+  DashCanvasState,
+  LayoutPresetType,
+  NavBarOrientation,
+  NavButtonConfig,
+  PageTitleItem,
+} from './dashTypes';
 
 export interface ReadyDesignPreset {
   id: string;
@@ -15,8 +21,61 @@ export interface ReadyDesignPreset {
   fontFamily: string;
   navType: NavBarOrientation;
   navSize: number;
+  defaultResolution?: '1280x720' | '1920x1080' | '1024x768' | '1440x900';
   apply: (currentState: DashCanvasState) => DashCanvasState;
 }
+
+/**
+ * Ensures Selection 1 always uses a settings icon across all ready designs
+ */
+const sanitizeButtons = (buttons?: NavButtonConfig[]): NavButtonConfig[] => {
+  if (!buttons) return [];
+  return buttons.map((b) =>
+    b.id === 'btn-gen-1' ||
+    b.label.toLowerCase().includes('selection 1') ||
+    b.label.toLowerCase().includes('selection #1')
+      ? { ...b, icon: 'settings' }
+      : b
+  );
+};
+
+/**
+ * Ensures every ready design has a designated top-left header title & subtitle
+ */
+const ensureTopLeftTitle = (
+  currTitles: PageTitleItem[],
+  defaultTitle: string,
+  defaultSubtitle: string,
+  titleColor: string,
+  subtitleColor: string
+): PageTitleItem[] => {
+  if (!currTitles || currTitles.length === 0) {
+    return [
+      {
+        id: 'title-header',
+        title: defaultTitle,
+        subtitle: defaultSubtitle,
+        position: 'top-left',
+        titleSize: 18,
+        titleColor,
+        subtitleSize: 11.5,
+        subtitleColor,
+      },
+    ];
+  }
+  return currTitles.map((t, index) =>
+    index === 0
+      ? {
+          ...t,
+          position: 'top-left',
+          title: t.title || defaultTitle,
+          subtitle: t.subtitle || defaultSubtitle,
+          titleColor,
+          subtitleColor,
+        }
+      : { ...t, titleColor, subtitleColor }
+  );
+};
 
 export const READY_DESIGN_PRESETS: ReadyDesignPreset[] = [
   {
@@ -62,10 +121,10 @@ export const READY_DESIGN_PRESETS: ReadyDesignPreset[] = [
     }),
   },
   {
-    id: 'data-forge-performance',
-    name: 'Data Forge Performance',
+    id: 'rach-dash',
+    name: 'Rach Dash',
     category: 'light',
-    description: 'Deep slate navy sidebar with crisp metric cards and Pareto customer analysis, inspired by Data Vis Forge',
+    description: 'Executive dark slate navy sidebar with crisp metric cards and Pareto customer analysis in 1920x1080 Full HD',
     accentColor: '#2563EB',
     backgroundColor: '#F1F5F9',
     navColor: '#1B2432',
@@ -76,8 +135,14 @@ export const READY_DESIGN_PRESETS: ReadyDesignPreset[] = [
     fontFamily: 'Segoe UI',
     navType: 'left',
     navSize: 225,
+    defaultResolution: '1920x1080',
     apply: (curr) => ({
       ...curr,
+      dimensions: {
+        width: 1920,
+        height: 1080,
+        preset: '1920x1080',
+      },
       backgroundColor: '#F1F5F9',
       layoutPreset: 'kpi-ribbon-grid',
       navBar: {
@@ -88,7 +153,7 @@ export const READY_DESIGN_PRESETS: ReadyDesignPreset[] = [
         backgroundColor: '#1B2432',
         textColor: '#F8FAFC',
         accentColor: '#2563EB',
-        reportTitle: 'The Data Vis Forge',
+        reportTitle: 'Rach Dash',
         showButtonIcons: true,
         showButtonLabels: true,
         showReportTitle: true,
@@ -97,7 +162,7 @@ export const READY_DESIGN_PRESETS: ReadyDesignPreset[] = [
           { id: 'btn-2', label: 'Section 2nd', icon: 'layers', isActive: false, section: 'menu' },
           { id: 'btn-3', label: 'Section 3rd', icon: 'pie-chart', isActive: false, section: 'menu' },
           { id: 'btn-4', label: 'Section 4th', icon: 'trending-up', isActive: false, section: 'menu' },
-          { id: 'btn-gen-1', label: 'Selection #1', icon: 'filter', isActive: false, section: 'general' },
+          { id: 'btn-gen-1', label: 'Selection #1', icon: 'settings', isActive: false, section: 'general' },
           { id: 'btn-gen-2', label: 'Selection #2', icon: 'check-circle', isActive: false, section: 'general' },
         ],
       },
@@ -117,13 +182,13 @@ export const READY_DESIGN_PRESETS: ReadyDesignPreset[] = [
         titleColor: '#0F172A',
         subtitleColor: '#64748B',
       },
-      pageTitles: curr.pageTitles.map((t) => ({
-        ...t,
-        title: 'Performance Overview By Segment & Customer',
-        subtitle: "kUSD • Oct'24 - Dec'24 • Applied Filters: Business Line",
-        titleColor: '#0F172A',
-        subtitleColor: '#64748B',
-      })),
+      pageTitles: ensureTopLeftTitle(
+        curr.pageTitles,
+        'Performance Overview By Segment & Customer',
+        "kUSD • Oct'24 - Dec'24 • Applied Filters: Business Line",
+        '#0F172A',
+        '#64748B'
+      ),
     }),
   },
   {
@@ -153,6 +218,7 @@ export const READY_DESIGN_PRESETS: ReadyDesignPreset[] = [
         backgroundColor: '#0F172A',
         textColor: '#FFFFFF',
         accentColor: '#0284C7',
+        buttons: sanitizeButtons(curr.navBar.buttons),
       },
       containerStyle: {
         ...curr.containerStyle,
@@ -169,11 +235,13 @@ export const READY_DESIGN_PRESETS: ReadyDesignPreset[] = [
         titleColor: '#0F172A',
         subtitleColor: '#64748B',
       },
-      pageTitles: curr.pageTitles.map((t) => ({
-        ...t,
-        titleColor: '#0F172A',
-        subtitleColor: '#64748B',
-      })),
+      pageTitles: ensureTopLeftTitle(
+        curr.pageTitles,
+        'Corporate Financial Performance',
+        'Executive Summary • Segment & Regional Analysis',
+        '#0F172A',
+        '#64748B'
+      ),
     }),
   },
   {
@@ -203,6 +271,7 @@ export const READY_DESIGN_PRESETS: ReadyDesignPreset[] = [
         backgroundColor: '#1E293B',
         textColor: '#FFFFFF',
         accentColor: '#FBBF24',
+        buttons: sanitizeButtons(curr.navBar.buttons),
       },
       containerStyle: {
         ...curr.containerStyle,
@@ -219,18 +288,20 @@ export const READY_DESIGN_PRESETS: ReadyDesignPreset[] = [
         titleColor: '#1E293B',
         subtitleColor: '#64748B',
       },
-      pageTitles: curr.pageTitles.map((t) => ({
-        ...t,
-        titleColor: '#1E293B',
-        subtitleColor: '#64748B',
-      })),
+      pageTitles: ensureTopLeftTitle(
+        curr.pageTitles,
+        'Operational Excellence & KPI Pulse',
+        'Weekly Performance Telemetry • Target vs Actual',
+        '#1E293B',
+        '#64748B'
+      ),
     }),
   },
   {
     id: 'cyber-crimson',
     name: 'Cyber Crimson',
     category: 'dark',
-    description: 'Sleek neon tech theme with 200px compact sidebar, 6 executive overview slots, and Verdana typography',
+    description: 'Sleek neon tech theme in 1920x1080 Full HD with compact sidebar, 6 executive overview slots, and Verdana typography',
     accentColor: '#F43F5E',
     backgroundColor: '#121316',
     navColor: '#18181B',
@@ -241,8 +312,14 @@ export const READY_DESIGN_PRESETS: ReadyDesignPreset[] = [
     fontFamily: 'Verdana',
     navType: 'left',
     navSize: 200,
+    defaultResolution: '1920x1080',
     apply: (curr) => ({
       ...curr,
+      dimensions: {
+        width: 1920,
+        height: 1080,
+        preset: '1920x1080',
+      },
       backgroundColor: '#121316',
       layoutPreset: 'executive-overview',
       navBar: {
@@ -253,6 +330,7 @@ export const READY_DESIGN_PRESETS: ReadyDesignPreset[] = [
         backgroundColor: '#18181B',
         textColor: '#FAFAFA',
         accentColor: '#F43F5E',
+        buttons: sanitizeButtons(curr.navBar.buttons),
       },
       containerStyle: {
         ...curr.containerStyle,
@@ -269,18 +347,20 @@ export const READY_DESIGN_PRESETS: ReadyDesignPreset[] = [
         titleColor: '#FAFAFA',
         subtitleColor: '#A1A1AA',
       },
-      pageTitles: curr.pageTitles.map((t) => ({
-        ...t,
-        titleColor: '#FAFAFA',
-        subtitleColor: '#A1A1AA',
-      })),
+      pageTitles: ensureTopLeftTitle(
+        curr.pageTitles,
+        'Cybersecurity Threat & Telemetry Ops',
+        'Real-time System Activity • Security Operations Center',
+        '#FAFAFA',
+        '#A1A1AA'
+      ),
     }),
   },
   {
     id: 'nordic-frost',
     name: 'Nordic Frost',
     category: 'minimal',
-    description: 'Minimal arctic aesthetic with 64px compact top header, 7 multi-tier matrix slots, and Aptos typography',
+    description: 'Minimal arctic aesthetic in 1920x1080 Full HD with compact top header, 7 multi-tier matrix slots, and Aptos typography',
     accentColor: '#6366F1',
     backgroundColor: '#F8FAFC',
     navColor: '#312E81',
@@ -291,8 +371,14 @@ export const READY_DESIGN_PRESETS: ReadyDesignPreset[] = [
     fontFamily: 'Aptos',
     navType: 'top',
     navSize: 64,
+    defaultResolution: '1920x1080',
     apply: (curr) => ({
       ...curr,
+      dimensions: {
+        width: 1920,
+        height: 1080,
+        preset: '1920x1080',
+      },
       backgroundColor: '#F8FAFC',
       layoutPreset: 'multi-tier-matrix',
       navBar: {
@@ -303,6 +389,7 @@ export const READY_DESIGN_PRESETS: ReadyDesignPreset[] = [
         backgroundColor: '#312E81',
         textColor: '#EEF2FF',
         accentColor: '#6366F1',
+        buttons: sanitizeButtons(curr.navBar.buttons),
       },
       containerStyle: {
         ...curr.containerStyle,
@@ -319,11 +406,13 @@ export const READY_DESIGN_PRESETS: ReadyDesignPreset[] = [
         titleColor: '#1E1B4B',
         subtitleColor: '#6366F1',
       },
-      pageTitles: curr.pageTitles.map((t) => ({
-        ...t,
-        titleColor: '#1E1B4B',
-        subtitleColor: '#6366F1',
-      })),
+      pageTitles: ensureTopLeftTitle(
+        curr.pageTitles,
+        'Supply Chain & Inventory Flow',
+        'Multi-Tier Logistics Matrix • Demand Forecasting',
+        '#1E1B4B',
+        '#6366F1'
+      ),
     }),
   },
   // Presets Inspired by Reference Images (Requirement)
@@ -355,6 +444,7 @@ export const READY_DESIGN_PRESETS: ReadyDesignPreset[] = [
         textColor: '#F8FAFC',
         accentColor: '#CCF842',
         reportTitle: 'Team & Workflows',
+        buttons: sanitizeButtons(curr.navBar.buttons),
       },
       containerStyle: {
         ...curr.containerStyle,
@@ -372,13 +462,13 @@ export const READY_DESIGN_PRESETS: ReadyDesignPreset[] = [
         titleColor: '#18191B',
         subtitleColor: '#64748B',
       },
-      pageTitles: curr.pageTitles.map((t) => ({
-        ...t,
-        title: 'Managing Your Team and Workflows',
-        subtitle: 'Live Operations • Data Transfer & Automation',
-        titleColor: '#18191B',
-        subtitleColor: '#64748B',
-      })),
+      pageTitles: ensureTopLeftTitle(
+        curr.pageTitles,
+        'Managing Your Team and Workflows',
+        'Live Operations • Data Transfer & Automation',
+        '#18191B',
+        '#64748B'
+      ),
     }),
   },
   {
@@ -409,6 +499,7 @@ export const READY_DESIGN_PRESETS: ReadyDesignPreset[] = [
         textColor: '#F8FAFC',
         accentColor: '#F59E0B',
         reportTitle: 'Campaign Hub',
+        buttons: sanitizeButtons(curr.navBar.buttons),
       },
       containerStyle: {
         ...curr.containerStyle,
@@ -426,13 +517,13 @@ export const READY_DESIGN_PRESETS: ReadyDesignPreset[] = [
         titleColor: '#1E293B',
         subtitleColor: '#64748B',
       },
-      pageTitles: curr.pageTitles.map((t) => ({
-        ...t,
-        title: 'Campaign Performance Overview',
-        subtitle: 'Calls, SMS & Email Responses • Trend Analysis',
-        titleColor: '#1E293B',
-        subtitleColor: '#64748B',
-      })),
+      pageTitles: ensureTopLeftTitle(
+        curr.pageTitles,
+        'Campaign Performance Overview',
+        'Calls, SMS & Email Responses • Trend Analysis',
+        '#1E293B',
+        '#64748B'
+      ),
     }),
   },
   {
@@ -462,6 +553,7 @@ export const READY_DESIGN_PRESETS: ReadyDesignPreset[] = [
         backgroundColor: '#1C2541',
         textColor: '#F0F9FF',
         accentColor: '#38BDF8',
+        buttons: sanitizeButtons(curr.navBar.buttons),
       },
       containerStyle: {
         ...curr.containerStyle,
@@ -478,11 +570,13 @@ export const READY_DESIGN_PRESETS: ReadyDesignPreset[] = [
         titleColor: '#F0F9FF',
         subtitleColor: '#94A3B8',
       },
-      pageTitles: curr.pageTitles.map((t) => ({
-        ...t,
-        titleColor: '#F0F9FF',
-        subtitleColor: '#94A3B8',
-      })),
+      pageTitles: ensureTopLeftTitle(
+        curr.pageTitles,
+        'Enterprise Revenue & Margins',
+        'Global Business Unit Variance • Q4 Review',
+        '#F0F9FF',
+        '#94A3B8'
+      ),
     }),
   },
 ];
