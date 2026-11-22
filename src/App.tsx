@@ -22,7 +22,8 @@ const DEFAULT_PALETTE_HEXES = [
 export default function App() {
   // Helper to parse hash route
   const getPageFromHash = (): AppPage | null => {
-    const hash = window.location.hash.replace(/^#\/?/, '');
+    const rawHash = window.location.hash.replace(/^#\/?/, '');
+    const hash = rawHash.split('?')[0];
     if (
       hash === 'theme-generator' ||
       hash === 'accessibility-checker' ||

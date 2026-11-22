@@ -40,6 +40,7 @@ import {
   snapToGrid,
 } from '../core/layoutTypes';
 import { LayoutPresetDefinition } from '../core/layoutPresets';
+import { adaptLayoutPresetToCanvas } from '../core/adaptLayoutPreset';
 import { DashNavControls } from '../components/dash/DashNavControls';
 import { DashCanvasControls } from '../components/dash/DashCanvasControls';
 import { DashContainerConfig } from '../components/dash/DashContainerConfig';
@@ -56,7 +57,15 @@ interface DashGeneratorPageProps {
 type DashTab = 'canvas' | 'nav' | 'containers' | 'layout';
 
 export const DashGeneratorPage: React.FC<DashGeneratorPageProps> = ({ onNavigate }) => {
-  const [activeTab, setActiveTab] = useState<DashTab>('canvas');
+  const [activeTab, setActiveTab] = useState<DashTab>(() => {
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash;
+      if (hash.includes('tab=layout') || hash.includes('layout')) return 'layout';
+      if (hash.includes('tab=slots') || hash.includes('tab=containers')) return 'containers';
+      if (hash.includes('tab=nav')) return 'nav';
+    }
+    return 'canvas';
+  });
   const [copied, setCopied] = useState(false);
   const [importNotification, setImportNotification] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -119,8 +128,17 @@ export const DashGeneratorPage: React.FC<DashGeneratorPageProps> = ({ onNavigate
     const meta = VISUAL_TYPES_CATALOG.find((m) => m.type === type);
     const newId = `slot-${Date.now().toString(36)}`;
     const count = dashState.containers.length + 1;
+
+    const hasTopTitle =
+      dashState.pageTitles &&
+      dashState.pageTitles.some(
+        (pt) =>
+          (pt.position === 'top-right' || pt.position === 'top-left') &&
+          ((pt.title && pt.title.trim().length > 0) || (pt.subtitle && pt.subtitle.trim().length > 0))
+      );
+    const topOffset = hasTopTitle ? 80 : 0;
     const startX = dashState.navBar.show && dashState.navBar.orientation === 'left' ? dashState.navBar.size + 24 : 24;
-    const startY = dashState.navBar.show && dashState.navBar.orientation === 'top' ? dashState.navBar.size + 24 : 32;
+    const startY = (dashState.navBar.show && dashState.navBar.orientation === 'top' ? dashState.navBar.size + 24 : 24) + topOffset;
     const offsetX = startX + ((dashState.containers.length * 32) % 300);
     const offsetY = startY + ((dashState.containers.length * 32) % 240);
 
@@ -206,35 +224,28 @@ export const DashGeneratorPage: React.FC<DashGeneratorPageProps> = ({ onNavigate
   };
 
   const handleApplyLayoutPreset = (preset: LayoutPresetDefinition) => {
-    const newContainers: VisualContainerConfig[] = preset.visuals.map((v) => ({
-      id: v.id,
-      title: v.name,
-      subtitle: '',
-      showTitle: true,
-      showSubtitle: false,
-      x: v.x,
-      y: v.y,
-      width: v.width,
-      height: v.height,
-      visualType: v.type,
-      zIndex: v.zIndex,
-      color: v.color,
-      showKpiIcon: v.type === 'kpi' || v.type === 'gauge',
-      kpiIconType: v.type === 'kpi' ? 'trending-up' : 'dollar',
-      kpiIconPosition: 'top-right',
-    }));
+    // Seamlessly adapt preset to fit into the usable content area,
+    // respecting the active navigation ribbon (left/top), page header titles, and canvas resolution!
+    const adaptedContainers = adaptLayoutPresetToCanvas(preset, dashState);
+
+    // Only switch dimensions if preset is specifically designed for mobile
+    const isMobilePreset = preset.category === 'mobile' || preset.dimensions.preset === '390x844';
 
     setDashState((prev) => ({
       ...prev,
-      dimensions: {
-        width: preset.dimensions.width,
-        height: preset.dimensions.height,
-        preset: preset.dimensions.preset as any,
-      },
-      containers: newContainers,
+      ...(isMobilePreset
+        ? {
+            dimensions: {
+              width: preset.dimensions.width,
+              height: preset.dimensions.height,
+              preset: preset.dimensions.preset as any,
+            },
+          }
+        : {}),
+      containers: adaptedContainers,
     }));
     setSelectedVisualId(null);
-    setImportNotification(`Applied "${preset.name}" preset directly to Dash Canvas SVG!`);
+    setImportNotification(`Applied "${preset.name}" preset fitted seamlessly around your navigation ribbon and header!`);
   };
 
   // Re-generate containers whenever resolution, nav bar, or page header titles change
@@ -960,6 +971,8 @@ export const DashGeneratorPage: React.FC<DashGeneratorPageProps> = ({ onNavigate
                 selectedId={selectedVisualId}
                 grid={layoutGrid}
                 backgroundColor={dashState.backgroundColor}
+                navBar={dashState.navBar}
+                pageTitles={dashState.pageTitles}
                 onSelectVisual={setSelectedVisualId}
                 onUpdateVisual={handleUpdateLayoutVisual}
                 onDeleteVisual={handleDeleteLayoutVisual}

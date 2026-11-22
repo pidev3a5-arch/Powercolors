@@ -18,6 +18,7 @@ import {
   clampCoordinates,
   VISUAL_TYPES_CATALOG,
 } from '../../core/layoutTypes';
+import { NavBarConfig, PageTitleItem } from '../../core/dashTypes';
 
 interface LayoutCanvasProps {
   dimensions: LayoutDimension;
@@ -25,6 +26,8 @@ interface LayoutCanvasProps {
   selectedId: string | null;
   grid: GridSnapConfig;
   backgroundColor: string;
+  navBar?: NavBarConfig;
+  pageTitles?: PageTitleItem[];
   onSelectVisual: (id: string | null) => void;
   onUpdateVisual: (id: string, updates: Partial<LayoutVisualItem>) => void;
   onDeleteVisual: (id: string) => void;
@@ -40,6 +43,8 @@ export const LayoutCanvas: React.FC<LayoutCanvasProps> = ({
   selectedId,
   grid,
   backgroundColor,
+  navBar,
+  pageTitles,
   onSelectVisual,
   onUpdateVisual,
   onDeleteVisual,
@@ -345,6 +350,94 @@ export const LayoutCanvas: React.FC<LayoutCanvasProps> = ({
               <rect width="100%" height="100%" fill="url(#canvas-grid-pattern)" />
             </svg>
           )}
+
+          {/* Background Nav Ribbon Guide (Non-interactive) */}
+          {navBar && navBar.show && (
+            navBar.orientation === 'left' ? (
+              <div
+                style={{
+                  left: 0,
+                  top: 0,
+                  width: navBar.size,
+                  height: '100%',
+                  backgroundColor: navBar.backgroundColor || '#0F172A',
+                }}
+                className="absolute border-r-2 border-[#1E293B] pointer-events-none select-none p-4 flex flex-col justify-between z-0"
+              >
+                <div className="space-y-3">
+                  <div className="px-2.5 py-1.5 rounded-lg bg-white/10 text-white font-heading font-black text-xs truncate border border-white/20">
+                    {navBar.reportTitle || 'Navigation'}
+                  </div>
+                  <div className="space-y-2 opacity-60">
+                    <div className="h-6 rounded-md bg-white/20 w-3/4" />
+                    <div className="h-6 rounded-md bg-white/10 w-4/5" />
+                    <div className="h-6 rounded-md bg-white/10 w-2/3" />
+                  </div>
+                </div>
+                <div className="text-[10px] font-mono text-white/50 text-center uppercase tracking-wider py-1 rounded bg-black/20">
+                  Nav Ribbon ({navBar.size}px)
+                </div>
+              </div>
+            ) : (
+              <div
+                style={{
+                  left: 0,
+                  top: 0,
+                  width: '100%',
+                  height: navBar.size,
+                  backgroundColor: navBar.backgroundColor || '#0F172A',
+                }}
+                className="absolute border-b-2 border-[#1E293B] pointer-events-none select-none px-4 flex items-center justify-between z-0"
+              >
+                <div className="px-2.5 py-1.5 rounded-lg bg-white/10 text-white font-heading font-black text-xs truncate border border-white/20">
+                  {navBar.reportTitle || 'Navigation'}
+                </div>
+                <div className="text-[10px] font-mono text-white/50 uppercase tracking-wider py-1 px-2 rounded bg-black/20">
+                  Top Ribbon ({navBar.size}px)
+                </div>
+              </div>
+            )
+          )}
+
+          {/* Background Page Header Titles (Non-interactive) */}
+          {pageTitles && pageTitles.length > 0 && pageTitles.map((pt) => {
+            if (!pt.title && !pt.subtitle) return null;
+            const isLeftNav = navBar?.show && navBar.orientation === 'left';
+            const isTopNav = navBar?.show && navBar.orientation === 'top';
+            const titleLeft = isLeftNav ? navBar.size + 24 : 24;
+            const titleTop = isTopNav ? navBar.size + 16 : 16;
+            const isRight = pt.position === 'top-right' || pt.position === 'bottom-right';
+
+            return (
+              <div
+                key={pt.id}
+                style={{
+                  left: isRight ? undefined : titleLeft,
+                  right: isRight ? 24 : undefined,
+                  top: pt.position.startsWith('bottom') ? undefined : titleTop,
+                  bottom: pt.position.startsWith('bottom') ? 16 : undefined,
+                }}
+                className="absolute pointer-events-none select-none z-0 space-y-0.5"
+              >
+                {pt.title && (
+                  <div
+                    style={{ fontSize: pt.titleSize || 22, color: pt.titleColor || '#1E293B' }}
+                    className="font-heading font-black leading-tight tracking-tight drop-shadow-xs"
+                  >
+                    {pt.title}
+                  </div>
+                )}
+                {pt.subtitle && (
+                  <div
+                    style={{ fontSize: pt.subtitleSize || 13, color: pt.subtitleColor || '#64748B' }}
+                    className="font-bold leading-tight"
+                  >
+                    {pt.subtitle}
+                  </div>
+                )}
+              </div>
+            );
+          })}
 
           {/* Placed Visual Items */}
           {visuals.map((vis) => {
