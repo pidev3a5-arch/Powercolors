@@ -1,5 +1,5 @@
 import React from 'react';
-import { Palette, Layout, ArrowRight, CheckCircle2, Sparkles, Grid } from 'lucide-react';
+import { Palette, Layout, ArrowRight, CheckCircle2, Sparkles } from 'lucide-react';
 import { AppPage } from '../core/types';
 
 interface FeatureGridProps {
@@ -9,21 +9,21 @@ interface FeatureGridProps {
 export const FeatureGrid: React.FC<FeatureGridProps> = ({ onNavigate }) => {
   return (
     <div className="w-full space-y-16 py-6">
-      {/* 4 Core Tools Showcase */}
+      {/* 3 Core Tools Showcase */}
       <section className="space-y-6">
         <div className="text-center space-y-2">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#38BDF8]/20 text-[#0284C7] dark:text-[#38BDF8] text-xs font-heading font-black border border-[#38BDF8]/30">
-            <span>FOUR SPECIALIZED WORKSPACES</span>
+            <span>THREE SPECIALIZED WORKSPACES</span>
           </div>
           <h2 className="text-3xl sm:text-4xl font-heading font-black text-[#1E293B] dark:text-white">
             Everything You Need to Style Power BI
           </h2>
-          <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 font-medium max-w-2xl mx-auto">
-            Switch effortlessly between color harmonization, canvas wallpaper building, SVG DAX micro-visuals, and pixel-accurate visual layout planning.
+          <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 font-medium max-w-xl mx-auto">
+            Switch effortlessly between color harmonization, canvas wallpaper building with visual layout planning, and SVG DAX micro-visuals.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 pt-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-4">
           {/* Spotlight 1: Theme Studio */}
           <div className="pop-card bg-white dark:bg-slate-900 p-6 sm:p-7 rounded-3xl border-3 border-[#1E293B] dark:border-slate-700 shadow-[6px_6px_0px_0px_#1E293B] flex flex-col justify-between space-y-5">
             <div className="space-y-4">
@@ -85,10 +85,10 @@ export const FeatureGrid: React.FC<FeatureGridProps> = ({ onNavigate }) => {
 
               <div>
                 <h3 className="text-xl sm:text-2xl font-heading font-black text-[#1E293B] dark:text-white">
-                  Dash Canvas
+                  Dash Canvas & Layout
                 </h3>
                 <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium mt-1.5 leading-relaxed">
-                  Start from an empty canvas and build pixel-perfect Power BI wallpaper backgrounds in SVG format. Configure navigation ribbons, branding logos, and visual shape slots.
+                  Build pixel-perfect Power BI wallpaper backgrounds in SVG format, and plan visual placements with snap-to-grid precision and coordinate exports.
                 </p>
               </div>
 
@@ -103,7 +103,7 @@ export const FeatureGrid: React.FC<FeatureGridProps> = ({ onNavigate }) => {
                 </div>
                 <div className="flex items-start gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
                   <CheckCircle2 className="w-4 h-4 text-[#F472B6] flex-shrink-0 mt-0.5" />
-                  <span>Card and chart container slots with title / subtitle toggles</span>
+                  <span>Layout Planner tab: 8px snap grid & coordinates export</span>
                 </div>
               </div>
             </div>
@@ -161,53 +161,6 @@ export const FeatureGrid: React.FC<FeatureGridProps> = ({ onNavigate }) => {
               className="pop-btn w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full text-xs sm:text-sm font-heading font-black bg-[#38BDF8] hover:bg-[#0EA5E9] text-[#1E293B] shadow-[3px_3px_0px_0px_#1E293B] transition-all cursor-pointer group"
             >
               <span>Launch Visual Maker</span>
-              <ArrowRight className="w-4 h-4 stroke-[2.5] group-hover:translate-x-1 transition-transform" />
-            </button>
-          </div>
-
-          {/* Spotlight 4: Report Layout Planner */}
-          <div className="pop-card bg-white dark:bg-slate-900 p-6 sm:p-7 rounded-3xl border-3 border-[#1E293B] dark:border-slate-700 shadow-[6px_6px_0px_0px_#1E293B] flex flex-col justify-between space-y-5">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="w-12 h-12 rounded-2xl bg-[#8B5CF6] border-2 border-[#1E293B] flex items-center justify-center text-white shadow-[2.5px_2.5px_0px_0px_#1E293B]">
-                  <Grid className="w-6 h-6 stroke-[2.5]" />
-                </div>
-                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-heading font-black bg-[#8B5CF6]/20 text-[#8B5CF6] dark:text-purple-300 border border-[#8B5CF6]/40">
-                  New v4.0
-                </span>
-              </div>
-
-              <div>
-                <h3 className="text-xl sm:text-2xl font-heading font-black text-[#1E293B] dark:text-white">
-                  Layout Planner
-                </h3>
-                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium mt-1.5 leading-relaxed">
-                  Design pixel-accurate visual placements with snap-to-grid alignment. Export exact X, Y, Width, and Height coordinates for Power BI Desktop.
-                </p>
-              </div>
-
-              <div className="space-y-2 pt-1">
-                <div className="flex items-start gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
-                  <CheckCircle2 className="w-4 h-4 text-[#8B5CF6] flex-shrink-0 mt-0.5" />
-                  <span>Interactive canvas with 8px Power BI snap grid</span>
-                </div>
-                <div className="flex items-start gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
-                  <CheckCircle2 className="w-4 h-4 text-[#8B5CF6] flex-shrink-0 mt-0.5" />
-                  <span>1-click export to Markdown table, CSV, and PBIR</span>
-                </div>
-                <div className="flex items-start gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
-                  <CheckCircle2 className="w-4 h-4 text-[#8B5CF6] flex-shrink-0 mt-0.5" />
-                  <span>Curated layouts: Executive, Finance, Mobile</span>
-                </div>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => onNavigate('layout-planner')}
-              className="pop-btn w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full text-xs sm:text-sm font-heading font-black bg-[#8B5CF6] hover:bg-[#7C3AED] text-white shadow-[3px_3px_0px_0px_#1E293B] transition-all cursor-pointer group"
-            >
-              <span>Launch Layout Planner</span>
               <ArrowRight className="w-4 h-4 stroke-[2.5] group-hover:translate-x-1 transition-transform" />
             </button>
           </div>

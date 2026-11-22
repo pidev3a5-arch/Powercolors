@@ -6,6 +6,8 @@ import {
   Unlock,
   Trash2,
   Box,
+  Boxes,
+  Table,
 } from 'lucide-react';
 import {
   LayoutVisualItem,
@@ -32,6 +34,8 @@ interface LayoutSidebarProps {
   onChangeGrid: (updates: Partial<GridSnapConfig>) => void;
   onChangeBackgroundColor: (color: string) => void;
   onApplyPreset: (preset: LayoutPresetDefinition) => void;
+  onSyncFromSlots?: () => void;
+  onOpenExport?: () => void;
 }
 
 const BG_COLORS = [
@@ -56,6 +60,8 @@ export const LayoutSidebar: React.FC<LayoutSidebarProps> = ({
   onChangeGrid,
   onChangeBackgroundColor,
   onApplyPreset,
+  onSyncFromSlots,
+  onOpenExport,
 }) => {
   const [activeTab, setActiveTab] = React.useState<'add' | 'inspect' | 'canvas' | 'presets'>('add');
 
@@ -70,6 +76,33 @@ export const LayoutSidebar: React.FC<LayoutSidebarProps> = ({
 
   return (
     <aside className="w-full space-y-4">
+      {/* Quick Actions Header: Sync from Slots & Export Coordinates */}
+      <div className="flex items-center gap-2">
+        {onSyncFromSlots && (
+          <button
+            type="button"
+            onClick={onSyncFromSlots}
+            className="pop-btn flex-1 inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl border-2 border-[#1E293B] bg-[#FBBF24] hover:bg-[#F59E0B] text-[#1E293B] text-xs font-heading font-black shadow-[2px_2px_0px_0px_#1E293B] cursor-pointer"
+            title="Populate visual rectangles matching wallpaper card slots"
+          >
+            <Boxes className="w-3.5 h-3.5" />
+            <span>Sync Slots</span>
+          </button>
+        )}
+
+        {onOpenExport && (
+          <button
+            type="button"
+            onClick={onOpenExport}
+            className="pop-btn flex-1 inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl border-2 border-[#1E293B] bg-[#8B5CF6] hover:bg-[#7C3AED] text-white text-xs font-heading font-black shadow-[2px_2px_0px_0px_#1E293B] cursor-pointer"
+            title="Export exact coordinates to Markdown, CSV, or PBIR"
+          >
+            <Table className="w-3.5 h-3.5" />
+            <span>Export Coordinates</span>
+          </button>
+        )}
+      </div>
+
       {/* Navigation Tabs */}
       <div className="flex items-center gap-1.5 p-1 rounded-2xl border-2 border-[#1E293B] bg-white dark:bg-slate-900 shadow-[2px_2px_0px_0px_#1E293B]">
         <button

@@ -5,7 +5,6 @@ import { LandingPage } from './pages/LandingPage';
 import { ThemeGeneratorPage } from './pages/ThemeGeneratorPage';
 import { DashGeneratorPage } from './pages/DashGeneratorPage';
 import { SvgVisualMakerPage } from './pages/SvgVisualMakerPage';
-import { ReportLayoutPlannerPage } from './pages/ReportLayoutPlannerPage';
 import { LinkedInIcon, FacebookIcon, YouTubeIcon, GitHubIcon } from './components/SocialIcons';
 import { extractThemeFromImage } from './core/colorEngine';
 import { createColorSwatch, deriveStructuralColors } from './core/colorHarmonics';
@@ -26,7 +25,6 @@ export default function App() {
       hash === 'theme-generator' ||
       hash === 'dash-generator' ||
       hash === 'svg-visual-maker' ||
-      hash === 'layout-planner' ||
       hash === 'landing'
     ) {
       return hash as AppPage;
@@ -34,7 +32,7 @@ export default function App() {
     return null;
   };
 
-  // Navigation Page State ('landing' | 'theme-generator' | 'dash-generator' | 'svg-visual-maker' | 'layout-planner')
+  // Navigation Page State ('landing' | 'theme-generator' | 'dash-generator' | 'svg-visual-maker')
   const [currentPage, setCurrentPage] = useState<AppPage>(() => {
     const fromHash = typeof window !== 'undefined' ? getPageFromHash() : null;
     if (fromHash) return fromHash;
@@ -43,7 +41,6 @@ export default function App() {
       saved === 'theme-generator' ||
       saved === 'dash-generator' ||
       saved === 'svg-visual-maker' ||
-      saved === 'layout-planner' ||
       saved === 'landing'
     ) {
       return saved as AppPage;
@@ -390,10 +387,6 @@ export default function App() {
 
       {currentPage === 'svg-visual-maker' && (
         <SvgVisualMakerPage onNavigate={handleNavigate} />
-      )}
-
-      {currentPage === 'layout-planner' && (
-        <ReportLayoutPlannerPage onNavigate={handleNavigate} />
       )}
 
       {/* Playful Footer */}
