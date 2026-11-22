@@ -1,4 +1,9 @@
-export type AppPage = 'landing' | 'theme-generator' | 'dash-generator' | 'svg-visual-maker';
+export type AppPage =
+  | 'landing'
+  | 'theme-generator'
+  | 'dash-generator'
+  | 'svg-visual-maker'
+  | 'accessibility-checker';
 
 export type RGB = [number, number, number];
 

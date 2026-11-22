@@ -5,6 +5,7 @@ import { LandingPage } from './pages/LandingPage';
 import { ThemeGeneratorPage } from './pages/ThemeGeneratorPage';
 import { DashGeneratorPage } from './pages/DashGeneratorPage';
 import { SvgVisualMakerPage } from './pages/SvgVisualMakerPage';
+import { AccessibilityCheckerPage } from './pages/AccessibilityCheckerPage';
 import { LinkedInIcon, FacebookIcon, YouTubeIcon, GitHubIcon } from './components/SocialIcons';
 import { extractThemeFromImage } from './core/colorEngine';
 import { createColorSwatch, deriveStructuralColors } from './core/colorHarmonics';
@@ -23,6 +24,7 @@ export default function App() {
     const hash = window.location.hash.replace(/^#\/?/, '');
     if (
       hash === 'theme-generator' ||
+      hash === 'accessibility-checker' ||
       hash === 'dash-generator' ||
       hash === 'svg-visual-maker' ||
       hash === 'landing'
@@ -32,13 +34,14 @@ export default function App() {
     return null;
   };
 
-  // Navigation Page State ('landing' | 'theme-generator' | 'dash-generator' | 'svg-visual-maker')
+  // Navigation Page State ('landing' | 'theme-generator' | 'accessibility-checker' | 'dash-generator' | 'svg-visual-maker')
   const [currentPage, setCurrentPage] = useState<AppPage>(() => {
     const fromHash = typeof window !== 'undefined' ? getPageFromHash() : null;
     if (fromHash) return fromHash;
     const saved = localStorage.getItem('powerlab_current_page');
     if (
       saved === 'theme-generator' ||
+      saved === 'accessibility-checker' ||
       saved === 'dash-generator' ||
       saved === 'svg-visual-maker' ||
       saved === 'landing'
@@ -378,6 +381,13 @@ export default function App() {
           isModalOpen={isModalOpen}
           setIsModalOpen={setIsModalOpen}
           currentTheme={currentTheme}
+        />
+      )}
+
+      {currentPage === 'accessibility-checker' && (
+        <AccessibilityCheckerPage
+          onNavigate={handleNavigate}
+          initialPalette={swatches.map((s) => s.hex)}
         />
       )}
 

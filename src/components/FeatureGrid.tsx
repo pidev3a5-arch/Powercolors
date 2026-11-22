@@ -1,5 +1,5 @@
 import React from 'react';
-import { Palette, Layout, ArrowRight, CheckCircle2, Sparkles } from 'lucide-react';
+import { Palette, Layout, ArrowRight, CheckCircle2, Sparkles, ShieldCheck } from 'lucide-react';
 import { AppPage } from '../core/types';
 
 interface FeatureGridProps {
@@ -13,17 +13,17 @@ export const FeatureGrid: React.FC<FeatureGridProps> = ({ onNavigate }) => {
       <section className="space-y-6">
         <div className="text-center space-y-2">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#38BDF8]/20 text-[#0284C7] dark:text-[#38BDF8] text-xs font-heading font-black border border-[#38BDF8]/30">
-            <span>THREE SPECIALIZED WORKSPACES</span>
+            <span>FOUR SPECIALIZED WORKSPACES</span>
           </div>
           <h2 className="text-3xl sm:text-4xl font-heading font-black text-[#1E293B] dark:text-white">
             Everything You Need to Style Power BI
           </h2>
           <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 font-medium max-w-xl mx-auto">
-            Switch effortlessly between color harmonization, canvas wallpaper building with visual layout planning, and SVG DAX micro-visuals.
+            Switch effortlessly between color harmonization, WCAG accessibility auditing, canvas wallpaper building with layout planning, and SVG DAX micro-visuals.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 pt-4">
           {/* Spotlight 1: Theme Studio */}
           <div className="pop-card bg-white dark:bg-slate-900 p-6 sm:p-7 rounded-3xl border-3 border-[#1E293B] dark:border-slate-700 shadow-[6px_6px_0px_0px_#1E293B] flex flex-col justify-between space-y-5">
             <div className="space-y-4">
@@ -71,7 +71,54 @@ export const FeatureGrid: React.FC<FeatureGridProps> = ({ onNavigate }) => {
             </button>
           </div>
 
-          {/* Spotlight 2: Dash Generator */}
+          {/* Spotlight 2: Color Accessibility Checker */}
+          <div className="pop-card bg-white dark:bg-slate-900 p-6 sm:p-7 rounded-3xl border-3 border-[#1E293B] dark:border-slate-700 shadow-[6px_6px_0px_0px_#1E293B] flex flex-col justify-between space-y-5">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="w-12 h-12 rounded-2xl bg-[#34D399] border-2 border-[#1E293B] flex items-center justify-center text-[#064E3B] shadow-[2.5px_2.5px_0px_0px_#1E293B]">
+                  <ShieldCheck className="w-6 h-6 stroke-[2.5]" />
+                </div>
+                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-heading font-black bg-[#34D399]/20 text-[#059669] dark:text-[#34D399] border border-[#34D399]/40">
+                  WCAG 2.1 AA/AAA
+                </span>
+              </div>
+
+              <div>
+                <h3 className="text-xl sm:text-2xl font-heading font-black text-[#1E293B] dark:text-white">
+                  Accessibility
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium mt-1.5 leading-relaxed">
+                  Verify WCAG compliance for text (4.5:1) and non-text visual objects (3.0:1). Simulate Deuteranopia, Protanopia, and Tritanopia with 1-click auto-fixes.
+                </p>
+              </div>
+
+              <div className="space-y-2 pt-1">
+                <div className="flex items-start gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
+                  <CheckCircle2 className="w-4 h-4 text-[#34D399] flex-shrink-0 mt-0.5" />
+                  <span>Full contrast matrix across canvas & card backgrounds</span>
+                </div>
+                <div className="flex items-start gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
+                  <CheckCircle2 className="w-4 h-4 text-[#34D399] flex-shrink-0 mt-0.5" />
+                  <span>Colorblind CVD simulation & confusion alerts</span>
+                </div>
+                <div className="flex items-start gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
+                  <CheckCircle2 className="w-4 h-4 text-[#34D399] flex-shrink-0 mt-0.5" />
+                  <span>Export audit report card & accessible theme JSON</span>
+                </div>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => onNavigate('accessibility-checker')}
+              className="pop-btn w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full text-xs sm:text-sm font-heading font-black bg-[#34D399] hover:bg-[#10B981] text-[#064E3B] shadow-[3px_3px_0px_0px_#1E293B] transition-all cursor-pointer group"
+            >
+              <span>Check Accessibility</span>
+              <ArrowRight className="w-4 h-4 stroke-[2.5] group-hover:translate-x-1 transition-transform" />
+            </button>
+          </div>
+
+          {/* Spotlight 3: Dash Generator */}
           <div className="pop-card bg-white dark:bg-slate-900 p-6 sm:p-7 rounded-3xl border-3 border-[#1E293B] dark:border-slate-700 shadow-[6px_6px_0px_0px_#1E293B] flex flex-col justify-between space-y-5">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
