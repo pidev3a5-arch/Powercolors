@@ -373,6 +373,8 @@ export default function App() {
           isLoading={isLoading}
           handleToggleCanvasMode={handleToggleCanvasMode}
           handleDownloadJson={handleDownloadJson}
+          handleCopyJson={handleCopyJson}
+          jsonCopied={jsonCopied}
           isModalOpen={isModalOpen}
           setIsModalOpen={setIsModalOpen}
           currentTheme={currentTheme}

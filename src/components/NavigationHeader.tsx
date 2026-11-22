@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sun, Moon, Download, Copy, Check, Code2, Sparkles, Home, Palette, Layout, Menu, X } from 'lucide-react';
+import { Sun, Moon, Sparkles, Home, Palette, Layout, Menu, X } from 'lucide-react';
 import { AppPage } from '../core/types';
 
 interface NavigationHeaderProps {
@@ -7,12 +7,11 @@ interface NavigationHeaderProps {
   onNavigate: (page: AppPage) => void;
   isDarkSite: boolean;
   onToggleSiteTheme: () => void;
-  // Theme studio action handlers (active when on theme-generator)
+  // Optional action handlers retained for backward-compatibility
   onOpenModal?: () => void;
   onCopyJson?: () => void;
   jsonCopied?: boolean;
   onDownloadJson?: () => void;
-  // Dash canvas action handlers (active when on dash-generator)
   onCopySvg?: () => void;
   svgCopied?: boolean;
   onDownloadSvg?: () => void;
@@ -23,13 +22,6 @@ export const NavigationHeader: React.FC<NavigationHeaderProps> = ({
   onNavigate,
   isDarkSite,
   onToggleSiteTheme,
-  onOpenModal,
-  onCopyJson,
-  jsonCopied,
-  onDownloadJson,
-  onCopySvg,
-  svgCopied,
-  onDownloadSvg,
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -96,89 +88,9 @@ export const NavigationHeader: React.FC<NavigationHeaderProps> = ({
           </span>
         </div>
 
-        {/* Center: Desktop Navigation Tabs (Hidden on landing page, moved beside mode button) */}
-        {currentPage !== 'landing' && renderNavTabs('hidden md:flex')}
-
-        {/* Right: Actions Toolbar */}
+        {/* Right: Desktop Navigation Tabs placed beside the mode button across all pages */}
         <div className="flex items-center space-x-1 sm:space-x-2 flex-shrink-0">
-          {/* Landing page ONLY: Desktop navigation tabs placed beside the mode button */}
-          {currentPage === 'landing' && renderNavTabs('hidden md:flex mr-1 sm:mr-2')}
-
-          {/* Theme Studio-specific Actions */}
-          {currentPage === 'theme-generator' ? (
-            <>
-              {onOpenModal && (
-                <button
-                  type="button"
-                  onClick={onOpenModal}
-                  className="pop-btn inline-flex items-center gap-1.5 p-1.5 sm:px-3 sm:py-1.5 rounded-full text-xs font-heading font-extrabold bg-white dark:bg-slate-800 text-[#1E293B] dark:text-white hover:bg-[#F472B6] hover:text-white transition-all cursor-pointer"
-                  title="Inspect Theme JSON with Schema Verification"
-                >
-                  <Code2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2.5]" />
-                  <span className="hidden sm:inline">Inspect JSON</span>
-                </button>
-              )}
-
-              {onCopyJson && (
-                <button
-                  type="button"
-                  onClick={onCopyJson}
-                  className="pop-btn inline-flex items-center gap-1.5 p-1.5 sm:px-3 sm:py-1.5 rounded-full text-xs font-heading font-extrabold bg-white dark:bg-slate-800 text-[#1E293B] dark:text-white hover:bg-[#34D399] hover:text-[#1E293B] transition-all cursor-pointer"
-                  title="Copy theme JSON to clipboard"
-                >
-                  {jsonCopied ? <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600 stroke-[3]" /> : <Copy className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2.5]" />}
-                  <span className="hidden sm:inline">{jsonCopied ? 'Copied!' : 'Copy'}</span>
-                </button>
-              )}
-
-              {onDownloadJson && (
-                <button
-                  type="button"
-                  onClick={onDownloadJson}
-                  className="pop-btn inline-flex items-center gap-1.5 px-2.5 sm:px-4 py-1.5 rounded-full text-xs sm:text-xs font-heading font-black bg-[#8B5CF6] hover:bg-[#7C3AED] text-white transition-all cursor-pointer shadow-[2.5px_2.5px_0px_0px_#1E293B]"
-                  title="Download theme JSON file for Power BI Desktop"
-                >
-                  <Download className="w-3.5 h-3.5 stroke-[2.5]" />
-                  <span className="hidden sm:inline">Download Theme</span>
-                  <span className="sm:hidden font-extrabold">Theme</span>
-                </button>
-              )}
-            </>
-          ) : null}
-
-          {/* Dash Canvas-specific Actions */}
-          {currentPage === 'dash-generator' ? (
-            <>
-              {onCopySvg && (
-                <button
-                  type="button"
-                  onClick={onCopySvg}
-                  className="pop-btn inline-flex items-center gap-1.5 p-1.5 sm:px-3 sm:py-1.5 rounded-full text-xs font-heading font-extrabold bg-white dark:bg-slate-800 text-[#1E293B] dark:text-white hover:bg-[#34D399] hover:text-[#1E293B] transition-all cursor-pointer"
-                  title="Copy canvas wallpaper SVG to clipboard"
-                >
-                  {svgCopied ? (
-                    <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600 stroke-[3]" />
-                  ) : (
-                    <Copy className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2.5]" />
-                  )}
-                  <span className="hidden sm:inline">{svgCopied ? 'Copied SVG!' : 'Copy SVG'}</span>
-                </button>
-              )}
-
-              {onDownloadSvg && (
-                <button
-                  type="button"
-                  onClick={onDownloadSvg}
-                  className="pop-btn inline-flex items-center gap-1.5 px-2.5 sm:px-4 py-1.5 rounded-full text-xs sm:text-xs font-heading font-black bg-[#8B5CF6] hover:bg-[#7C3AED] text-white transition-all cursor-pointer shadow-[2.5px_2.5px_0px_0px_#1E293B]"
-                  title="Download Power BI Canvas wallpaper SVG"
-                >
-                  <Download className="w-3.5 h-3.5 stroke-[2.5]" />
-                  <span className="hidden sm:inline">Download SVG</span>
-                  <span className="sm:hidden font-extrabold">SVG</span>
-                </button>
-              )}
-            </>
-          ) : null}
+          {renderNavTabs('hidden md:flex mr-1 sm:mr-2')}
 
           {/* Site Dark/Light Switcher */}
           <button

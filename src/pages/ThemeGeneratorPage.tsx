@@ -1,6 +1,7 @@
-import React from 'react';
-import { Sparkles, Download } from 'lucide-react';
+import React, { useState } from 'react';
+import { Sparkles, Download, Code2, Copy, Check } from 'lucide-react';
 import { ColorSwatch, StructuralColors, PowerBITheme, ThemeCustomizationOptions, AppPage } from '../core/types';
+import { serializePowerBITheme } from '../core/powerBiTheme';
 import { ImageUploader } from '../components/ImageUploader';
 import { PaletteStrip } from '../components/PaletteStrip';
 import { ThemeControls } from '../components/ThemeControls';
@@ -32,6 +33,8 @@ interface ThemeGeneratorPageProps {
   isLoading: boolean;
   handleToggleCanvasMode: () => void;
   handleDownloadJson: () => void;
+  handleCopyJson?: () => void;
+  jsonCopied?: boolean;
   isModalOpen: boolean;
   setIsModalOpen: (open: boolean) => void;
   currentTheme: PowerBITheme;
@@ -62,29 +65,73 @@ export const ThemeGeneratorPage: React.FC<ThemeGeneratorPageProps> = ({
   isLoading,
   handleToggleCanvasMode,
   handleDownloadJson,
+  handleCopyJson,
+  jsonCopied,
   isModalOpen,
   setIsModalOpen,
   currentTheme,
 }) => {
+  const [localCopied, setLocalCopied] = useState(false);
+  const isCopied = jsonCopied !== undefined ? jsonCopied : localCopied;
+
+  const onCopy = () => {
+    if (handleCopyJson) {
+      handleCopyJson();
+    } else {
+      const jsonString = serializePowerBITheme(currentTheme);
+      navigator.clipboard.writeText(jsonString);
+      setLocalCopied(true);
+      setTimeout(() => setLocalCopied(false), 2000);
+    }
+  };
   return (
     <main className="flex-1 max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 w-full space-y-10 sm:space-y-14">
-      {/* Playful Geometric Hero Section */}
-      <div className="relative space-y-3">
+      {/* Playful Geometric Hero Section with Action Buttons (matches Dash Canvas layout) */}
+      <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b-2 border-slate-200 dark:border-slate-800">
         {/* Decorative Background Shapes */}
         <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full bg-[#FBBF24]/20 -z-10 blur-xl pointer-events-none" />
         <div className="absolute top-12 -left-8 w-20 h-20 rounded-full bg-[#F472B6]/20 -z-10 blur-xl pointer-events-none" />
 
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FBBF24] text-[#1E293B] text-xs font-heading font-black border-2 border-[#1E293B] shadow-[2px_2px_0px_0px_#1E293B]">
-          <span className="w-2 h-2 rounded-full bg-[#1E293B] animate-pulse" />
-          <span>Stable Grid, Wild Decoration</span>
+        <div className="space-y-2 max-w-2xl">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FBBF24] text-[#1E293B] text-xs font-heading font-black border-2 border-[#1E293B] shadow-[2px_2px_0px_0px_#1E293B]">
+            <span className="w-2 h-2 rounded-full bg-[#1E293B] animate-pulse" />
+            <span>Stable Grid, Wild Decoration</span>
+          </div>
+
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-heading font-black tracking-tight text-[#1E293B] dark:text-white leading-[1.1]">
+            Playful Geometric <span className="text-[#8B5CF6]">Theme Studio</span>
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-medium">
+            A friendly, tactile, and energetic palette generator for Microsoft Power BI. Drop a brand logo or paste a screenshot (<kbd className="px-1.5 py-0.5 text-xs font-mono font-bold bg-[#FBBF24] text-[#1E293B] border border-[#1E293B] rounded shadow-[1px_1px_0px_0px_#1E293B]">Ctrl+V</kbd>) to quantize 10 vivid data colors with official schema compliance.
+          </p>
         </div>
 
-        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-heading font-black tracking-tight text-[#1E293B] dark:text-white leading-[1.1]">
-          Playful Geometric <span className="text-[#8B5CF6]">Theme Studio</span>
-        </h1>
-        <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 max-w-2xl font-medium">
-          A friendly, tactile, and energetic palette generator for Microsoft Power BI. Drop a brand logo or paste a screenshot (<kbd className="px-1.5 py-0.5 text-xs font-mono font-bold bg-[#FBBF24] text-[#1E293B] border border-[#1E293B] rounded shadow-[1px_1px_0px_0px_#1E293B]">Ctrl+V</kbd>) to quantize 10 vivid data colors with official schema compliance.
-        </p>
+        {/* Global Action Buttons */}
+        <div className="flex items-center gap-2.5 flex-wrap flex-shrink-0 self-start md:self-center">
+          <button
+            type="button"
+            onClick={onCopy}
+            className="pop-btn inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs sm:text-sm font-heading font-black bg-white dark:bg-slate-800 text-[#1E293B] dark:text-white border-2 border-[#1E293B] shadow-[2.5px_2.5px_0px_0px_#1E293B] hover:bg-slate-50 transition-all cursor-pointer"
+            title="Copy theme JSON to clipboard"
+          >
+            {isCopied ? (
+              <Check className="w-4 h-4 text-emerald-600 stroke-[3]" />
+            ) : (
+              <Copy className="w-4 h-4 text-slate-500 stroke-[2.5]" />
+            )}
+            <span>{isCopied ? 'Copied JSON!' : 'Copy'}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleDownloadJson}
+            className="pop-btn inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs sm:text-sm font-heading font-black bg-[#F472B6] hover:bg-[#EC4899] text-white border-2 border-[#1E293B] shadow-[3px_3px_0px_0px_#1E293B] transition-all cursor-pointer"
+            title="Download theme JSON file for Power BI Desktop"
+          >
+            <Download className="w-4 h-4 stroke-[2.5]" />
+            <span>Download Theme</span>
+          </button>
+        </div>
       </div>
 
       {/* Section 1: Ingestion Zone */}
@@ -154,15 +201,44 @@ export const ThemeGeneratorPage: React.FC<ThemeGeneratorPageProps> = ({
             </p>
           </div>
 
-          <button
-            type="button"
-            onClick={handleDownloadJson}
-            className="pop-btn w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-full text-sm sm:text-base font-heading font-black bg-[#F472B6] hover:bg-[#EC4899] text-white shadow-[4px_4px_0px_0px_#1E293B] transition-all cursor-pointer flex-shrink-0"
-            title="Download theme JSON file for Power BI Desktop"
-          >
-            <Download className="w-5 h-5 stroke-[3]" />
-            <span>Download Theme</span>
-          </button>
+          <div className="flex flex-wrap items-center justify-center sm:justify-end gap-3 w-full sm:w-auto flex-shrink-0">
+            {/* Inspect JSON Button */}
+            <button
+              type="button"
+              onClick={() => setIsModalOpen(true)}
+              className="pop-btn w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full text-xs sm:text-sm font-heading font-black bg-white dark:bg-slate-800 text-[#1E293B] dark:text-white hover:bg-[#FBBF24] hover:text-[#1E293B] border-2 border-[#1E293B] dark:border-slate-700 shadow-[3px_3px_0px_0px_#1E293B] transition-all cursor-pointer"
+              title="Inspect raw JSON theme schema with verification"
+            >
+              <Code2 className="w-4 h-4 stroke-[2.5]" />
+              <span>Inspect JSON</span>
+            </button>
+
+            {/* Copy Button */}
+            <button
+              type="button"
+              onClick={onCopy}
+              className="pop-btn w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full text-xs sm:text-sm font-heading font-black bg-white dark:bg-slate-800 text-[#1E293B] dark:text-white hover:bg-[#34D399] hover:text-[#1E293B] border-2 border-[#1E293B] dark:border-slate-700 shadow-[3px_3px_0px_0px_#1E293B] transition-all cursor-pointer"
+              title="Copy theme JSON to clipboard"
+            >
+              {isCopied ? (
+                <Check className="w-4 h-4 text-emerald-600 stroke-[3]" />
+              ) : (
+                <Copy className="w-4 h-4 stroke-[2.5]" />
+              )}
+              <span>{isCopied ? 'Copied JSON!' : 'Copy'}</span>
+            </button>
+
+            {/* Download Theme Button */}
+            <button
+              type="button"
+              onClick={handleDownloadJson}
+              className="pop-btn w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 sm:px-7 py-3 rounded-full text-xs sm:text-sm font-heading font-black bg-[#F472B6] hover:bg-[#EC4899] text-white border-2 border-[#1E293B] shadow-[4px_4px_0px_0px_#1E293B] transition-all cursor-pointer flex-shrink-0"
+              title="Download theme JSON file for Power BI Desktop"
+            >
+              <Download className="w-4 h-4 stroke-[3]" />
+              <span>Download Theme</span>
+            </button>
+          </div>
         </div>
       </section>
 
