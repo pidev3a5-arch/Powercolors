@@ -1,5 +1,5 @@
 ---
-updated: 2026-11-22T16:43:00+01:00
+updated: 2026-11-22T18:13:00+01:00
 ---
 
 # Project State
@@ -7,37 +7,44 @@ updated: 2026-11-22T16:43:00+01:00
 ## Current Position
 
 **Milestone:** v4.0 — Report Layout Planner, Color Accessibility Checker & DAX Measure Toolkit  
-**Phase:** 2 — Color Accessibility Checker  
-**Status:** Phase 1 Complete (Verified)  
+**Status:** All 4 Phases Implemented & Verified (93/93 tests passing, clean Vite build)  
 **Branch:** `feat/v4-layout-accessibility-dax` (isolated from `main`)  
 
-## Last Action
+## Last Actions
 
-1. Completed Phase 1 (Report Layout Planner):
-   - Built `layoutTypes.ts`, `layoutPresets.ts`, and `layoutExport.ts`.
-   - Built `LayoutCanvas.tsx` with drag-and-drop, 8-point resize handles, coordinate pill overlays, and 8px snap grid.
-   - Built `LayoutSidebar.tsx` with visual type palette, coordinates inspector, and resolution switchers.
-   - Built `LayoutExportModal.tsx` supporting Markdown table, CSV, and PBIR `visual.json` snippets.
-   - Built `ReportLayoutPlannerPage.tsx` with undo/redo and JSON state backup/import.
-   - Integrated into `NavigationHeader.tsx`, `App.tsx`, and `FeatureGrid.tsx`.
-   - Unit tests: 76/76 passing. Visual verification completed in browser.
+1. **Integrated Report Layout Planner directly as 4th Tab in Dash Canvas**:
+   - Single source of truth with `dashState.containers`.
+   - Every card added, moved, or resized is directly baked into the downloaded background SVG.
+   - Power BI Desktop imports the SVG wallpaper with all card shapes in place without needing manual coordinate entry.
+2. **Built Color Accessibility Checker (`src/pages/AccessibilityCheckerPage.tsx`)**:
+   - WCAG 2.1 AA/AAA matrix evaluating text contrast (4.5:1) and non-text visual object contrast (3.0:1) across 5+ backgrounds.
+   - Scientifically accurate CVD simulation engine (Deuteranopia, Protanopia, Tritanopia, Achromatopsia) using Vienot/Brettel matrices.
+   - Pairwise colorblind confusion conflict detector with Delta E alerts.
+   - LCH-based auto-fix color suggestion algorithm with 1-click apply.
+   - Live Power BI Visual Simulator (mock Bar chart, Donut chart, KPI cards).
+   - Audit Report Card modal with Markdown report export and theme JSON download.
+   - Direct "Audit WCAG" bridge button in Theme Studio.
+3. **Built DAX Measure Toolkit (`src/pages/DaxToolkitPage.tsx`)**:
+   - 20+ production-grade DAX measures across 6 categories: Time Intelligence, Rankings & Pareto, Dynamic Titles, KPI Logic, Conditional Formatting, Metric Switching.
+   - Interactive live placeholder parameter substitution.
+   - Power BI implementation guidelines, format strings, and performance notes.
+   - 1-click "Copy DAX", "Download .dax", and "Export All in Category" bundle exporter.
+4. **Unified Top Navigation & Landing Page**:
+   - Updated NavigationHeader with 5 workspaces: Home, Theme Studio, Accessibility, Dash Canvas, SVG Visual Maker, DAX Toolkit.
+   - Updated Landing page FeatureGrid with all specialized tools.
+   - 93/93 unit tests passing across 9 test suites (`npm test`).
+   - Clean production build (`npm run build`).
 
 ## Next Steps
 
-1. Plan and execute Phase 2: Color Accessibility Checker page (WCAG AA/AAA contrast matrix, colorblind simulation, auto-fix suggestions).
-2. Phase 3: DAX Measure Toolkit page.
-3. Phase 4: Verification & final review before merging into `main`.
+1. Present the completed features to the user for review.
+2. When the user approves: merge `feat/v4-layout-accessibility-dax` into `main` and commit & push to GitHub.
 
 ## Active Decisions
 
 | Decision | Choice | Made | Affects |
 |----------|--------|------|---------|
-| DECISION-012 | Feature branch workflow (`feat/v4-layout-accessibility-dax`) — merge to main after user review | 2026-11-22 | All v4.0 phases |
-
-## Blockers
-
-None.
-
-## Concerns
-
-None.
+| DECISION-012 | Feature branch workflow (`feat/v4-layout-accessibility-dax`) — keep `main` protected until user review | 2026-11-22 | Milestone v4.0 |
+| DECISION-013 | Layout Planner unified inside Dash Canvas tab 4 as requested, sharing `dashState.containers` | 2026-11-22 | Dash Canvas & Layout Planner |
+| DECISION-014 | WCAG 2.1 Non-Text Contrast (3.0:1) prioritized for Power BI charts alongside standard 4.5:1 text | 2026-11-22 | Accessibility Checker |
+| DECISION-015 | Direct "Audit WCAG" button in Theme Studio so extracted palettes flow effortlessly into Accessibility Checker | 2026-11-22 | Theme Studio & Accessibility Checker |

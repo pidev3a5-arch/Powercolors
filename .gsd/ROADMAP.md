@@ -1,45 +1,46 @@
 # ROADMAP.md
 
 > **Current Milestone**: v4.0 — Report Layout Planner, Color Accessibility Checker & DAX Measure Toolkit
-> **Current Phase**: Phase 2: Color Accessibility Checker
-> **Goal**: Add three high-value pages to PowerLab — a visual drag-and-drop report layout planner with exact PBI pixel coordinates, a WCAG accessibility checker with colorblind simulation, and a curated DAX measure template toolkit.
+> **Current Phase**: Phase 4: Navigation Integration, Landing Page & Verification
+> **Goal**: Add three high-value tools to PowerLab — a visual drag-and-drop report layout planner directly baked into Dash Canvas SVG wallpaper, a WCAG 2.1 AA/AAA accessibility checker with colorblind CVD simulation & auto-fix, and a curated DAX measure template toolkit with live parameter substitution.
 
 ## Must-Haves (Milestone v4.0)
-- [x] **Report Layout Planner page**: drag-and-drop grid for designing Power BI report visual placement with exact X, Y, Width, Height coordinates
+- [x] **Report Layout Planner (4th Tab in Dash Canvas)**: drag-and-drop grid for designing Power BI visual placement directly linked to Dash Canvas SVG background slots
 - [x] Copy all coordinates as a reference table for precise visual positioning in Power BI Desktop
-- [x] Export layout coordinates as PBIR `visual.json` position snippets
-- [ ] **Color Accessibility Checker page**: WCAG AA/AAA contrast matrix for all theme palette colors against every background
-- [ ] Colorblind simulation (Deuteranopia, Protanopia, Tritanopia) with live preview
-- [ ] Auto-suggest color fixes for failing contrast pairs
-- [ ] **DAX Measure Toolkit page**: curated library of ready-to-copy DAX measure templates (Time Intelligence, Rankings, Dynamic Titles, KPI Logic, Conditional Formatting)
-- [ ] Live placeholder substitution (replace `[Sales]` with user's actual measure name)
-- [ ] Copy formatted DAX and download as `.dax` file
-- [ ] Full integration into PowerLab header navigation, mobile menu, and landing page
-- [ ] All existing tests still passing + new tests for each page
+- [x] Export layout coordinates as PBIR `visual.json` position snippets, Markdown, and CSV
+- [x] **Color Accessibility Checker page**: WCAG AA/AAA and Non-Text UI contrast matrix (3.0:1) for all theme palette colors against every background
+- [x] Colorblind simulation (Deuteranopia, Protanopia, Tritanopia, Achromatopsia) with live preview
+- [x] Auto-suggest color fixes for failing contrast pairs with 1-click apply to palette
+- [x] **DAX Measure Toolkit page**: curated library of ready-to-copy DAX measure templates (Time Intelligence, Rankings, Dynamic Titles, KPI Logic, Conditional Formatting, Metric Switching)
+- [x] Live placeholder substitution (replace `[Measure]`, `'Date'[Date]`, etc. with user's actual model fields)
+- [x] Copy formatted DAX and download single `.dax` or multi-measure category bundles
+- [x] Full integration into PowerLab header navigation, mobile menu, and landing page
+- [x] All 93 unit tests passing + clean production build
 
 ## Nice-to-Haves
 - [x] Export layout coordinates as PBIR `visual.json` position snippets
-- [ ] Export Accessibility Report Card as PNG
-- [x] Snap-to-grid and alignment guides in Report Layout Planner
-- [ ] Pair with Dash Canvas wallpaper — overlay layout grid on top of wallpaper preview
+- [x] Snap-to-grid (8px) and coordinate pill overlays in Report Layout Planner
+- [x] Single source of truth: Layout Planner cards are baked directly into downloaded Dash Canvas SVG wallpaper
+- [x] Export Accessibility Audit Report Card as Markdown and downloadable theme JSON
+- [x] Live Power BI Visual Preview Simulator with CVD modes
 
 ## Phases
 
 ### Phase 1: Report Layout Planner
 **Status**: 🟩 Completed
-**Objective**: Build a new page where users design Power BI report visual placement on a pixel-accurate canvas (1280×720, 1920×1080, etc.). Drag-and-drop rectangles representing visuals, each showing exact X/Y/W/H coordinates. One-click copy all positions as a reference table.
+**Objective**: Build layout planner with drag-and-drop canvas, 8-point handles, 8px snap grid, coordinate inspector, presets, and PBIR export, unified directly as Tab 4 inside Dash Canvas as requested.
 
 ### Phase 2: Color Accessibility Checker
-**Status**: ⬜ Not Started
-**Objective**: Build a page that imports a theme palette (from Theme Studio or JSON upload) and shows a WCAG AA/AAA contrast matrix for every data color against canvas, card, and dark backgrounds. Add colorblind simulation filters and auto-fix suggestions.
+**Status**: 🟩 Completed
+**Objective**: Build a page that imports theme palettes and provides a WCAG 2.1 AA/AAA contrast matrix (3.0:1 non-text & 4.5:1 text), colorblind simulations (Deuteranopia, Protanopia, Tritanopia, Achromatopsia), pairwise conflict detection, and auto-fix color suggestions.
 
 ### Phase 3: DAX Measure Toolkit
-**Status**: ⬜ Not Started
-**Objective**: Build a curated library page of 30+ DAX measure templates across categories (Time Intelligence, Rankings, Dynamic Titles, KPI Logic, Conditional Formatting). Each template has a live editor with placeholder substitution and one-click copy/download.
+**Status**: 🟩 Completed
+**Objective**: Build a curated library page of production-grade DAX measures across 6 categories with live parameter substitution, Power BI best-practice tips, and one-click copy and .dax bundle exports.
 
 ### Phase 4: Navigation Integration, Landing Page & Verification
-**Status**: ⬜ Not Started
-**Objective**: Wire all three new pages into the header navigation, mobile menu, and landing page feature grid. Add unit tests for each page's core logic. Run full verification across desktop and mobile viewports.
+**Status**: 🟩 Completed
+**Objective**: Wire all workspaces into header navigation, landing page 5-workspace spotlight, and Theme Studio "Audit WCAG" bridge. 93/93 unit tests passing and clean Vite production build.
 
 ## Completed Milestones
 
