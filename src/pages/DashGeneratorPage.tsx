@@ -75,17 +75,23 @@ export const DashGeneratorPage: React.FC<DashGeneratorPageProps> = ({ onNavigate
     return initial;
   });
 
-  // Layout Planner State (Visual Blocks & Grid Placement)
-  const [layoutVisuals, setLayoutVisuals] = useState<LayoutVisualItem[]>(() => {
-    return [
-      { id: 'vis-1', name: 'Executive BAN', type: 'kpi', x: 240, y: 88, width: 290, height: 120, zIndex: 1, color: '#FBBF24' },
-      { id: 'vis-2', name: 'Gross Margin %', type: 'kpi', x: 550, y: 88, width: 290, height: 120, zIndex: 2, color: '#F472B6' },
-      { id: 'vis-3', name: 'Active Orders', type: 'kpi', x: 860, y: 88, width: 290, height: 120, zIndex: 3, color: '#34D399' },
-      { id: 'vis-4', name: 'Revenue Trend vs Target', type: 'line-chart', x: 240, y: 228, width: 590, height: 260, zIndex: 4, color: '#8B5CF6' },
-      { id: 'vis-5', name: 'Category Breakdown', type: 'donut-chart', x: 850, y: 228, width: 380, height: 260, zIndex: 5, color: '#38BDF8' },
-      { id: 'vis-6', name: 'Detailed Performance Matrix', type: 'matrix', x: 240, y: 508, width: 990, height: 188, zIndex: 6, color: '#FB7185' },
-    ];
-  });
+  // Unified Layout Planner & Dash Canvas State:
+  // dashState.containers is the SINGLE SOURCE OF TRUTH.
+  // Every card added, moved, resized, or removed in the Layout Planner tab
+  // directly updates dashState.containers and is rendered inside the downloaded SVG!
+  const layoutVisuals: LayoutVisualItem[] = dashState.containers.map((c, i) => ({
+    id: c.id,
+    name: c.title || `Visual Slot ${i + 1}`,
+    type: (c.visualType as PbiVisualType) || (c.showKpiIcon ? 'kpi' : 'card'),
+    x: c.x,
+    y: c.y,
+    width: c.width,
+    height: c.height,
+    zIndex: c.zIndex || (i + 1),
+    color: c.color || c.backgroundColor || '#8B5CF6',
+    locked: c.locked,
+  }));
+
   const [layoutGrid, setLayoutGrid] = useState<GridSnapConfig>({
     enabled: true,
     size: 8,
@@ -94,86 +100,141 @@ export const DashGeneratorPage: React.FC<DashGeneratorPageProps> = ({ onNavigate
   const [selectedVisualId, setSelectedVisualId] = useState<string | null>(null);
   const [isExportCoordinatesOpen, setIsExportCoordinatesOpen] = useState(false);
 
-  // Sync visual layout rectangles from wallpaper card slots
+  // Sync / Snap all visual slots to grid
   const handleSyncFromWallpaperSlots = () => {
-    const synced: LayoutVisualItem[] = dashState.containers.map((c, i) => {
-      const existing = layoutVisuals.find((v) => v.id === c.id);
-      return {
-        id: c.id,
-        name: c.title || `Visual ${i + 1}`,
-        type: existing?.type || (i === 0 ? 'kpi' : i === 1 ? 'line-chart' : i === 2 ? 'bar-chart' : 'table'),
-        x: c.x,
-        y: c.y,
-        width: c.width,
-        height: c.height,
-        zIndex: i + 1,
-        color: existing?.color || '#8B5CF6',
-      };
-    });
-    setLayoutVisuals(synced);
-    setSelectedVisualId(null);
-    setImportNotification(`Synced ${synced.length} visual positions matching your wallpaper slots!`);
+    setDashState((prev) => ({
+      ...prev,
+      containers: prev.containers.map((c) => ({
+        ...c,
+        x: snapToGrid(c.x, layoutGrid.size, layoutGrid.enabled),
+        y: snapToGrid(c.y, layoutGrid.size, layoutGrid.enabled),
+        width: snapToGrid(c.width, layoutGrid.size, layoutGrid.enabled),
+        height: snapToGrid(c.height, layoutGrid.size, layoutGrid.enabled),
+      })),
+    }));
+    setImportNotification(`Snapped all ${dashState.containers.length} cards to ${layoutGrid.size}px grid and verified full sync with Dash Canvas!`);
   };
 
   const handleAddLayoutVisual = (type: PbiVisualType) => {
     const meta = VISUAL_TYPES_CATALOG.find((m) => m.type === type);
-    const newId = `vis-${Date.now().toString(36)}`;
-    const count = layoutVisuals.filter((v) => v.type === type).length + 1;
+    const newId = `slot-${Date.now().toString(36)}`;
+    const count = dashState.containers.length + 1;
     const startX = dashState.navBar.show && dashState.navBar.orientation === 'left' ? dashState.navBar.size + 24 : 24;
     const startY = dashState.navBar.show && dashState.navBar.orientation === 'top' ? dashState.navBar.size + 24 : 32;
-    const offsetX = startX + ((layoutVisuals.length * 32) % 300);
-    const offsetY = startY + ((layoutVisuals.length * 32) % 240);
+    const offsetX = startX + ((dashState.containers.length * 32) % 300);
+    const offsetY = startY + ((dashState.containers.length * 32) % 240);
 
-    const newVisual: LayoutVisualItem = {
+    const isKpi = type === 'kpi' || type === 'card' || type === 'gauge';
+
+    const newContainer: VisualContainerConfig = {
       id: newId,
-      name: `${meta?.label || 'Visual'} ${count}`,
-      type,
+      title: `${meta?.label || 'Visual'} ${count}`,
+      subtitle: '',
+      showTitle: true,
+      showSubtitle: false,
       x: snapToGrid(offsetX, layoutGrid.size, layoutGrid.enabled),
       y: snapToGrid(offsetY, layoutGrid.size, layoutGrid.enabled),
       width: meta?.defaultWidth || 300,
       height: meta?.defaultHeight || 180,
-      zIndex: layoutVisuals.length + 1,
+      visualType: type,
+      zIndex: count,
+      showKpiIcon: isKpi,
+      kpiIconType: type === 'kpi' ? 'trending-up' : type === 'gauge' ? 'activity' : 'dollar',
+      kpiIconPosition: 'top-right',
       color: meta?.badgeBg || '#8B5CF6',
     };
 
-    setLayoutVisuals((prev) => [...prev, newVisual]);
+    setDashState((prev) => ({
+      ...prev,
+      containers: [...prev.containers, newContainer],
+    }));
     setSelectedVisualId(newId);
+    setImportNotification(`Added ${newContainer.title} to Dash Canvas SVG!`);
   };
 
   const handleUpdateLayoutVisual = (id: string, updates: Partial<LayoutVisualItem>) => {
-    setLayoutVisuals((prev) => prev.map((v) => (v.id === id ? { ...v, ...updates } : v)));
+    setDashState((prev) => ({
+      ...prev,
+      containers: prev.containers.map((c) => {
+        if (c.id !== id) return c;
+        return {
+          ...c,
+          title: updates.name !== undefined ? updates.name : c.title,
+          visualType: updates.type !== undefined ? updates.type : c.visualType,
+          x: updates.x !== undefined ? updates.x : c.x,
+          y: updates.y !== undefined ? updates.y : c.y,
+          width: updates.width !== undefined ? updates.width : c.width,
+          height: updates.height !== undefined ? updates.height : c.height,
+          zIndex: updates.zIndex !== undefined ? updates.zIndex : c.zIndex,
+          color: updates.color !== undefined ? updates.color : c.color,
+          locked: updates.locked !== undefined ? updates.locked : c.locked,
+        };
+      }),
+    }));
   };
 
   const handleDeleteLayoutVisual = (id: string) => {
-    setLayoutVisuals((prev) => prev.filter((v) => v.id !== id));
+    setDashState((prev) => ({
+      ...prev,
+      containers: prev.containers.filter((c) => c.id !== id),
+    }));
     if (selectedVisualId === id) setSelectedVisualId(null);
   };
 
   const handleDuplicateLayoutVisual = (id: string) => {
-    const orig = layoutVisuals.find((v) => v.id === id);
+    const orig = dashState.containers.find((c) => c.id === id);
     if (!orig) return;
-    const newId = `vis-${Date.now().toString(36)}`;
-    const cloned: LayoutVisualItem = {
+    const newId = `slot-${Date.now().toString(36)}`;
+    const cloned: VisualContainerConfig = {
       ...orig,
       id: newId,
-      name: `${orig.name} (Copy)`,
+      title: `${orig.title} (Copy)`,
       x: snapToGrid(orig.x + 24, layoutGrid.size, layoutGrid.enabled),
       y: snapToGrid(orig.y + 24, layoutGrid.size, layoutGrid.enabled),
-      zIndex: layoutVisuals.length + 1,
+      zIndex: dashState.containers.length + 1,
     };
-    setLayoutVisuals((prev) => [...prev, cloned]);
+    setDashState((prev) => ({
+      ...prev,
+      containers: [...prev.containers, cloned],
+    }));
     setSelectedVisualId(newId);
   };
 
   const handleBringToFrontLayoutVisual = (id: string) => {
-    const maxZ = Math.max(...layoutVisuals.map((v) => v.zIndex), 0);
+    const maxZ = Math.max(...dashState.containers.map((c) => c.zIndex || 0), 0);
     handleUpdateLayoutVisual(id, { zIndex: maxZ + 1 });
   };
 
   const handleApplyLayoutPreset = (preset: LayoutPresetDefinition) => {
-    setLayoutVisuals(preset.visuals);
+    const newContainers: VisualContainerConfig[] = preset.visuals.map((v) => ({
+      id: v.id,
+      title: v.name,
+      subtitle: '',
+      showTitle: true,
+      showSubtitle: false,
+      x: v.x,
+      y: v.y,
+      width: v.width,
+      height: v.height,
+      visualType: v.type,
+      zIndex: v.zIndex,
+      color: v.color,
+      showKpiIcon: v.type === 'kpi' || v.type === 'gauge',
+      kpiIconType: v.type === 'kpi' ? 'trending-up' : 'dollar',
+      kpiIconPosition: 'top-right',
+    }));
+
+    setDashState((prev) => ({
+      ...prev,
+      dimensions: {
+        width: preset.dimensions.width,
+        height: preset.dimensions.height,
+        preset: preset.dimensions.preset as any,
+      },
+      containers: newContainers,
+    }));
     setSelectedVisualId(null);
-    setImportNotification(`Applied "${preset.name}" visual layout preset!`);
+    setImportNotification(`Applied "${preset.name}" preset directly to Dash Canvas SVG!`);
   };
 
   // Re-generate containers whenever resolution, nav bar, or page header titles change
