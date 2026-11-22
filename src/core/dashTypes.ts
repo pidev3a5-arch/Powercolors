@@ -69,6 +69,11 @@ export interface VisualContainerConfig {
   kpiIconPosition?: 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';
   kpiIconColor?: string;
   kpiIconBgColor?: string;
+  // Visual Layout Planner Integration
+  visualType?: string;
+  zIndex?: number;
+  locked?: boolean;
+  color?: string;
 }
 
 export interface DashCanvasContainerStyle {

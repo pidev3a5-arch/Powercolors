@@ -36,49 +36,59 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onNavigate }) => {
         {/* Eyebrow Pill */}
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FBBF24] text-[#1E293B] text-xs sm:text-sm font-heading font-black border-2 border-[#1E293B] shadow-[3px_3px_0px_0px_#1E293B]">
           <Sparkles className="w-4 h-4 stroke-[2.5]" />
-          <span>The Playful Power BI Design Studio</span>
+          <span>The End-to-End Power BI Developer Journey</span>
         </div>
 
         {/* Main Headline */}
         <h1 className="text-4xl sm:text-6xl md:text-7xl font-heading font-black tracking-tight text-[#1E293B] dark:text-white leading-[1.08] max-w-4xl mx-auto">
-          Design Gorgeous <span className="text-[#8B5CF6] underline decoration-wavy decoration-[#FBBF24] decoration-2">Power BI Reports</span> in Seconds
+          From Project Kickoff to <span className="text-[#8B5CF6] underline decoration-wavy decoration-[#FBBF24] decoration-2">Executive Delivery</span>
         </h1>
 
         {/* Subtitle */}
         <p className="text-base sm:text-xl text-slate-600 dark:text-slate-300 font-medium max-w-2xl mx-auto leading-relaxed">
-          Generate official 10-color themes with verified schema compliance, or craft pixel-perfect SVG canvas layouts with navigation ribbons and card containers.
+          The ultimate playbook for BI developers: extract official themes & color harmonies, design pixel-accurate SVG canvas wallpapers with snap layouts, inject vector icons, and deploy 56 battle-tested DAX calculation patterns.
         </p>
 
-        {/* Tactile Triple CTAs */}
-        <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
+        {/* Tactile Quad CTAs */}
+        <div className="pt-2 flex flex-wrap items-center justify-center gap-2.5 sm:gap-3">
           <button
             type="button"
             onClick={() => onNavigate('theme-generator')}
-            className="pop-btn w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full text-sm font-heading font-black bg-[#8B5CF6] hover:bg-[#7C3AED] text-white shadow-[3.5px_3.5px_0px_0px_#1E293B] transition-all cursor-pointer group"
+            className="pop-btn inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full text-xs sm:text-sm font-heading font-black bg-[#8B5CF6] hover:bg-[#7C3AED] text-white shadow-[3px_3px_0px_0px_#1E293B] transition-all cursor-pointer group"
           >
             <Palette className="w-4 h-4 stroke-[2.5]" />
-            <span>Theme Studio</span>
+            <span>1. Theme & Harmony</span>
             <ArrowRight className="w-4 h-4 stroke-[2.5] group-hover:translate-x-1 transition-transform" />
           </button>
 
           <button
             type="button"
             onClick={() => onNavigate('dash-generator')}
-            className="pop-btn w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full text-sm font-heading font-black bg-[#F472B6] hover:bg-[#EC4899] text-white shadow-[3.5px_3.5px_0px_0px_#1E293B] transition-all cursor-pointer group"
+            className="pop-btn inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full text-xs sm:text-sm font-heading font-black bg-[#F472B6] hover:bg-[#EC4899] text-white shadow-[3px_3px_0px_0px_#1E293B] transition-all cursor-pointer group"
           >
             <Layout className="w-4 h-4 stroke-[2.5]" />
-            <span>Dash Canvas</span>
+            <span>2. Dash Canvas & Layout</span>
             <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-white/25 border border-white/40">SVG</span>
           </button>
 
           <button
             type="button"
-            onClick={() => onNavigate('svg-visual-maker')}
-            className="pop-btn w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full text-sm font-heading font-black bg-[#38BDF8] hover:bg-[#0EA5E9] text-[#1E293B] shadow-[3.5px_3.5px_0px_0px_#1E293B] transition-all cursor-pointer group"
+            onClick={() => onNavigate('icon-library')}
+            className="pop-btn inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full text-xs sm:text-sm font-heading font-black bg-[#10B981] hover:bg-[#059669] text-white shadow-[3px_3px_0px_0px_#1E293B] transition-all cursor-pointer group"
           >
             <Sparkles className="w-4 h-4 stroke-[2.5]" />
-            <span>SVG Visual Maker</span>
-            <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-white/50 border border-[#1E293B]">New</span>
+            <span>3. Icon Library & SVGs</span>
+            <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-white/25 border border-white/40">120+</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => onNavigate('dax-toolkit')}
+            className="pop-btn inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full text-xs sm:text-sm font-heading font-black bg-[#FBBF24] hover:bg-[#F59E0B] text-[#1E293B] shadow-[3px_3px_0px_0px_#1E293B] transition-all cursor-pointer group"
+          >
+            <Zap className="w-4 h-4 stroke-[2.5]" />
+            <span>4. DAX Toolkit</span>
+            <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-white/60 border border-[#1E293B]">56</span>
           </button>
         </div>
 

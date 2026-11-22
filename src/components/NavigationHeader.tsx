@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sun, Moon, Sparkles, Home, Palette, Layout, Menu, X } from 'lucide-react';
+import { Sun, Moon, Sparkles, Home, Palette, Layout, Wand2, Image, Terminal, Menu, X } from 'lucide-react';
 import { AppPage } from '../core/types';
 
 interface NavigationHeaderProps {
@@ -28,8 +28,11 @@ export const NavigationHeader: React.FC<NavigationHeaderProps> = ({
   const navItems: Array<{ id: AppPage; label: string; icon: React.ComponentType<{ className?: string }> }> = [
     { id: 'landing', label: 'Home', icon: Home },
     { id: 'theme-generator', label: 'Theme Studio', icon: Palette },
+    { id: 'palette-harmony', label: 'Palette Harmony', icon: Wand2 },
     { id: 'dash-generator', label: 'Dash Canvas', icon: Layout },
-    { id: 'svg-visual-maker', label: 'SVG Visual Maker', icon: Sparkles },
+    { id: 'svg-visual-maker', label: 'SVG Visuals', icon: Sparkles },
+    { id: 'icon-library', label: 'Icon Library', icon: Image },
+    { id: 'dax-toolkit', label: 'DAX Toolkit', icon: Terminal },
   ];
 
   const renderNavTabs = (className?: string) => (

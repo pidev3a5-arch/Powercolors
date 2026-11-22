@@ -835,5 +835,80 @@ describe('Dash SVG Canvas Export & Layout Engine', () => {
       expect(parsed.containers[1].width).toBe(480);
       expect(parsed.containerStyle.cornerRadius).toBe(14);
     });
+
+    it('ensures Layout Planner tweaks (adding, repositioning, resizing) are directly baked into the downloadable SVG', () => {
+      // Simulate user workflow: user starts with 2 slots, then tweaks them and adds a 3rd slot in Layout Planner
+      const stateWithTweakedLayout: DashCanvasState = {
+        ...DEFAULT_DASH_CANVAS_STATE,
+        containers: [
+          {
+            id: 'slot-tweaked-kpi',
+            title: 'Custom Revenue KPI',
+            subtitle: 'Real-time',
+            showTitle: true,
+            showSubtitle: true,
+            x: 260,
+            y: 90,
+            width: 320,
+            height: 140,
+            visualType: 'kpi',
+            zIndex: 1,
+            color: '#FBBF24',
+          },
+          {
+            id: 'slot-tweaked-chart',
+            title: 'Sales Trend Line Chart',
+            subtitle: '',
+            showTitle: true,
+            showSubtitle: false,
+            x: 600,
+            y: 90,
+            width: 640,
+            height: 380,
+            visualType: 'line-chart',
+            zIndex: 2,
+            color: '#8B5CF6',
+          },
+          {
+            id: 'slot-tweaked-matrix',
+            title: 'Product Breakdown Matrix',
+            subtitle: '',
+            showTitle: true,
+            showSubtitle: false,
+            x: 260,
+            y: 500,
+            width: 980,
+            height: 190,
+            visualType: 'matrix',
+            zIndex: 3,
+            color: '#FB7185',
+          },
+        ],
+      };
+
+      const svgOutput = generateDashSvg(stateWithTweakedLayout);
+
+      // Verify each visual card's coordinates and title are baked directly into the SVG
+      expect(svgOutput).toContain('data-slot-id="slot-tweaked-kpi"');
+      expect(svgOutput).toContain('x="260" y="90" width="320" height="140"');
+      expect(svgOutput).toContain('Custom Revenue KPI');
+
+      expect(svgOutput).toContain('data-slot-id="slot-tweaked-chart"');
+      expect(svgOutput).toContain('x="600" y="90" width="640" height="380"');
+      expect(svgOutput).toContain('Sales Trend Line Chart');
+
+      expect(svgOutput).toContain('data-slot-id="slot-tweaked-matrix"');
+      expect(svgOutput).toContain('x="260" y="500" width="980" height="190"');
+      expect(svgOutput).toContain('Product Breakdown Matrix');
+
+      // Verify that re-import preserves all 3 tweaked containers
+      const reImported = parseDashSvg(svgOutput);
+      expect(reImported.containers.length).toBe(3);
+      expect(reImported.containers[0].x).toBe(260);
+      expect(reImported.containers[0].y).toBe(90);
+      expect(reImported.containers[0].width).toBe(320);
+      expect(reImported.containers[0].height).toBe(140);
+      expect(reImported.containers[0].title).toBe('Custom Revenue KPI');
+    });
   });
 });

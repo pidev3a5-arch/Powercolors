@@ -1,4 +1,11 @@
-export type AppPage = 'landing' | 'theme-generator' | 'dash-generator' | 'svg-visual-maker';
+export type AppPage =
+  | 'landing'
+  | 'theme-generator'
+  | 'palette-harmony'
+  | 'dash-generator'
+  | 'svg-visual-maker'
+  | 'icon-library'
+  | 'dax-toolkit';
 
 export type RGB = [number, number, number];
 

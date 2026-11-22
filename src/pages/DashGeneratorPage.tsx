@@ -11,6 +11,8 @@ import {
   Sparkles,
   Upload,
   FileUp,
+  Grid,
+  Table,
 } from 'lucide-react';
 import {
   DashCanvasState,
@@ -30,20 +32,40 @@ import { generateLayoutContainers, autoArrangeContainers } from '../core/dashLay
 import { READY_DESIGN_PRESETS } from '../core/dashDesignPresets';
 import { generateDashSvg, downloadDashSvg } from '../core/dashSvgExport';
 import { parseDashSvg } from '../core/dashSvgImport';
+import {
+  LayoutVisualItem,
+  GridSnapConfig,
+  PbiVisualType,
+  VISUAL_TYPES_CATALOG,
+  snapToGrid,
+} from '../core/layoutTypes';
+import { LayoutPresetDefinition } from '../core/layoutPresets';
+import { adaptLayoutPresetToCanvas } from '../core/adaptLayoutPreset';
 import { DashNavControls } from '../components/dash/DashNavControls';
 import { DashCanvasControls } from '../components/dash/DashCanvasControls';
 import { DashContainerConfig } from '../components/dash/DashContainerConfig';
 import { DashSvgCanvas } from '../components/dash/DashSvgCanvas';
+import { LayoutCanvas } from '../components/layout/LayoutCanvas';
+import { LayoutSidebar } from '../components/layout/LayoutSidebar';
+import { LayoutExportModal } from '../components/layout/LayoutExportModal';
 import { AppPage } from '../core/types';
 
 interface DashGeneratorPageProps {
   onNavigate: (page: AppPage) => void;
 }
 
-type DashTab = 'canvas' | 'nav' | 'containers';
+type DashTab = 'canvas' | 'nav' | 'containers' | 'layout';
 
 export const DashGeneratorPage: React.FC<DashGeneratorPageProps> = ({ onNavigate }) => {
-  const [activeTab, setActiveTab] = useState<DashTab>('canvas');
+  const [activeTab, setActiveTab] = useState<DashTab>(() => {
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash;
+      if (hash.includes('tab=layout') || hash.includes('layout')) return 'layout';
+      if (hash.includes('tab=slots') || hash.includes('tab=containers')) return 'containers';
+      if (hash.includes('tab=nav')) return 'nav';
+    }
+    return 'canvas';
+  });
   const [copied, setCopied] = useState(false);
   const [importNotification, setImportNotification] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -61,6 +83,170 @@ export const DashGeneratorPage: React.FC<DashGeneratorPageProps> = ({ onNavigate
     );
     return initial;
   });
+
+  // Unified Layout Planner & Dash Canvas State:
+  // dashState.containers is the SINGLE SOURCE OF TRUTH.
+  // Every card added, moved, resized, or removed in the Layout Planner tab
+  // directly updates dashState.containers and is rendered inside the downloaded SVG!
+  const layoutVisuals: LayoutVisualItem[] = dashState.containers.map((c, i) => ({
+    id: c.id,
+    name: c.title || `Visual Slot ${i + 1}`,
+    type: (c.visualType as PbiVisualType) || (c.showKpiIcon ? 'kpi' : 'card'),
+    x: c.x,
+    y: c.y,
+    width: c.width,
+    height: c.height,
+    zIndex: c.zIndex || (i + 1),
+    color: c.color || c.backgroundColor || '#8B5CF6',
+    locked: c.locked,
+  }));
+
+  const [layoutGrid, setLayoutGrid] = useState<GridSnapConfig>({
+    enabled: true,
+    size: 8,
+    showGrid: true,
+  });
+  const [selectedVisualId, setSelectedVisualId] = useState<string | null>(null);
+  const [isExportCoordinatesOpen, setIsExportCoordinatesOpen] = useState(false);
+
+  // Sync / Snap all visual slots to grid
+  const handleSyncFromWallpaperSlots = () => {
+    setDashState((prev) => ({
+      ...prev,
+      containers: prev.containers.map((c) => ({
+        ...c,
+        x: snapToGrid(c.x, layoutGrid.size, layoutGrid.enabled),
+        y: snapToGrid(c.y, layoutGrid.size, layoutGrid.enabled),
+        width: snapToGrid(c.width, layoutGrid.size, layoutGrid.enabled),
+        height: snapToGrid(c.height, layoutGrid.size, layoutGrid.enabled),
+      })),
+    }));
+    setImportNotification(`Snapped all ${dashState.containers.length} cards to ${layoutGrid.size}px grid and verified full sync with Dash Canvas!`);
+  };
+
+  const handleAddLayoutVisual = (type: PbiVisualType) => {
+    const meta = VISUAL_TYPES_CATALOG.find((m) => m.type === type);
+    const newId = `slot-${Date.now().toString(36)}`;
+    const count = dashState.containers.length + 1;
+
+    const hasTopTitle =
+      dashState.pageTitles &&
+      dashState.pageTitles.some(
+        (pt) =>
+          (pt.position === 'top-right' || pt.position === 'top-left') &&
+          ((pt.title && pt.title.trim().length > 0) || (pt.subtitle && pt.subtitle.trim().length > 0))
+      );
+    const topOffset = hasTopTitle ? 80 : 0;
+    const startX = dashState.navBar.show && dashState.navBar.orientation === 'left' ? dashState.navBar.size + 24 : 24;
+    const startY = (dashState.navBar.show && dashState.navBar.orientation === 'top' ? dashState.navBar.size + 24 : 24) + topOffset;
+    const offsetX = startX + ((dashState.containers.length * 32) % 300);
+    const offsetY = startY + ((dashState.containers.length * 32) % 240);
+
+    const isKpi = type === 'kpi' || type === 'card' || type === 'gauge';
+
+    const newContainer: VisualContainerConfig = {
+      id: newId,
+      title: `${meta?.label || 'Visual'} ${count}`,
+      subtitle: '',
+      showTitle: true,
+      showSubtitle: false,
+      x: snapToGrid(offsetX, layoutGrid.size, layoutGrid.enabled),
+      y: snapToGrid(offsetY, layoutGrid.size, layoutGrid.enabled),
+      width: meta?.defaultWidth || 300,
+      height: meta?.defaultHeight || 180,
+      visualType: type,
+      zIndex: count,
+      showKpiIcon: isKpi,
+      kpiIconType: type === 'kpi' ? 'trending-up' : type === 'gauge' ? 'activity' : 'dollar',
+      kpiIconPosition: 'top-right',
+      color: meta?.badgeBg || '#8B5CF6',
+    };
+
+    setDashState((prev) => ({
+      ...prev,
+      containers: [...prev.containers, newContainer],
+    }));
+    setSelectedVisualId(newId);
+    setImportNotification(`Added ${newContainer.title} to Dash Canvas SVG!`);
+  };
+
+  const handleUpdateLayoutVisual = (id: string, updates: Partial<LayoutVisualItem>) => {
+    setDashState((prev) => ({
+      ...prev,
+      containers: prev.containers.map((c) => {
+        if (c.id !== id) return c;
+        return {
+          ...c,
+          title: updates.name !== undefined ? updates.name : c.title,
+          visualType: updates.type !== undefined ? updates.type : c.visualType,
+          x: updates.x !== undefined ? updates.x : c.x,
+          y: updates.y !== undefined ? updates.y : c.y,
+          width: updates.width !== undefined ? updates.width : c.width,
+          height: updates.height !== undefined ? updates.height : c.height,
+          zIndex: updates.zIndex !== undefined ? updates.zIndex : c.zIndex,
+          color: updates.color !== undefined ? updates.color : c.color,
+          locked: updates.locked !== undefined ? updates.locked : c.locked,
+        };
+      }),
+    }));
+  };
+
+  const handleDeleteLayoutVisual = (id: string) => {
+    setDashState((prev) => ({
+      ...prev,
+      containers: prev.containers.filter((c) => c.id !== id),
+    }));
+    if (selectedVisualId === id) setSelectedVisualId(null);
+  };
+
+  const handleDuplicateLayoutVisual = (id: string) => {
+    const orig = dashState.containers.find((c) => c.id === id);
+    if (!orig) return;
+    const newId = `slot-${Date.now().toString(36)}`;
+    const cloned: VisualContainerConfig = {
+      ...orig,
+      id: newId,
+      title: `${orig.title} (Copy)`,
+      x: snapToGrid(orig.x + 24, layoutGrid.size, layoutGrid.enabled),
+      y: snapToGrid(orig.y + 24, layoutGrid.size, layoutGrid.enabled),
+      zIndex: dashState.containers.length + 1,
+    };
+    setDashState((prev) => ({
+      ...prev,
+      containers: [...prev.containers, cloned],
+    }));
+    setSelectedVisualId(newId);
+  };
+
+  const handleBringToFrontLayoutVisual = (id: string) => {
+    const maxZ = Math.max(...dashState.containers.map((c) => c.zIndex || 0), 0);
+    handleUpdateLayoutVisual(id, { zIndex: maxZ + 1 });
+  };
+
+  const handleApplyLayoutPreset = (preset: LayoutPresetDefinition) => {
+    // Seamlessly adapt preset to fit into the usable content area,
+    // respecting the active navigation ribbon (left/top), page header titles, and canvas resolution!
+    const adaptedContainers = adaptLayoutPresetToCanvas(preset, dashState);
+
+    // Only switch dimensions if preset is specifically designed for mobile
+    const isMobilePreset = preset.category === 'mobile' || preset.dimensions.preset === '390x844';
+
+    setDashState((prev) => ({
+      ...prev,
+      ...(isMobilePreset
+        ? {
+            dimensions: {
+              width: preset.dimensions.width,
+              height: preset.dimensions.height,
+              preset: preset.dimensions.preset as any,
+            },
+          }
+        : {}),
+      containers: adaptedContainers,
+    }));
+    setSelectedVisualId(null);
+    setImportNotification(`Applied "${preset.name}" preset fitted seamlessly around your navigation ribbon and header!`);
+  };
 
   // Re-generate containers whenever resolution, nav bar, or page header titles change
   const syncContainersWithLayout = useCallback(
@@ -644,6 +830,19 @@ export const DashGeneratorPage: React.FC<DashGeneratorPageProps> = ({ onNavigate
               <Boxes className="w-3.5 h-3.5" />
               <span>Slots ({dashState.containers.length})</span>
             </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab('layout')}
+              className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl text-xs font-heading font-black transition-all cursor-pointer ${
+                activeTab === 'layout'
+                  ? 'bg-[#8B5CF6] text-white shadow-[2px_2px_0px_0px_#1E293B]'
+                  : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100'
+              }`}
+            >
+              <Grid className="w-3.5 h-3.5" />
+              <span>Layout Planner ({layoutVisuals.length})</span>
+            </button>
           </div>
 
           {/* Tab Content Panels */}
@@ -689,58 +888,173 @@ export const DashGeneratorPage: React.FC<DashGeneratorPageProps> = ({ onNavigate
               onAutoArrange={handleAutoArrangeContainers}
             />
           )}
+
+          {activeTab === 'layout' && (
+            <LayoutSidebar
+              dimensions={{
+                width: dashState.dimensions.width,
+                height: dashState.dimensions.height,
+                preset: dashState.dimensions.preset as any,
+              }}
+              grid={layoutGrid}
+              backgroundColor={dashState.backgroundColor}
+              visuals={layoutVisuals}
+              selectedId={selectedVisualId}
+              onAddVisual={handleAddLayoutVisual}
+              onSelectVisual={setSelectedVisualId}
+              onUpdateVisual={handleUpdateLayoutVisual}
+              onDeleteVisual={handleDeleteLayoutVisual}
+              onChangeDimensions={(dim) => {
+                handleUpdateDimensions({
+                  width: dim.width,
+                  height: dim.height,
+                  preset: (dim.preset === '390x844' ? 'custom' : dim.preset) as any,
+                });
+              }}
+              onChangeGrid={(updates) => setLayoutGrid((g) => ({ ...g, ...updates }))}
+              onChangeBackgroundColor={handleUpdateBackgroundColor}
+              onApplyPreset={handleApplyLayoutPreset}
+              onSyncFromSlots={handleSyncFromWallpaperSlots}
+              onOpenExport={() => setIsExportCoordinatesOpen(true)}
+            />
+          )}
         </div>
 
         {/* Right Canvas Preview & Import Instructions (7 cols on lg) */}
         <div className="lg:col-span-7 space-y-6">
-          {/* Live Vector Canvas Viewport */}
-          <DashSvgCanvas state={dashState} />
+          {activeTab === 'layout' ? (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between gap-3 p-3 rounded-2xl border-2 border-[#1E293B] bg-white dark:bg-slate-900 shadow-[3px_3px_0px_0px_#1E293B] flex-wrap">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg bg-[#8B5CF6] text-white flex items-center justify-center border border-[#1E293B] shadow-[1px_1px_0px_0px_#1E293B]">
+                    <Grid className="w-3.5 h-3.5" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-heading font-black text-[#1E293B] dark:text-white">
+                      Visual Placement Canvas
+                    </h4>
+                    <p className="text-[10px] text-slate-500 font-bold">
+                      Snap-to-Grid (8px) • Power BI Pixel Coordinates
+                    </p>
+                  </div>
+                </div>
 
-          {/* Power BI Desktop Import Guide */}
-          <div className="pop-card bg-white dark:bg-slate-900 p-6 rounded-3xl border-3 border-[#1E293B] dark:border-slate-700 shadow-[4px_4px_0px_0px_#1E293B] space-y-3">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-xl bg-[#FBBF24] border-2 border-[#1E293B] flex items-center justify-center text-[#1E293B] shadow-[2px_2px_0px_0px_#1E293B]">
-                <HelpCircle className="w-4 h-4 stroke-[2.5]" />
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleSyncFromWallpaperSlots}
+                    className="pop-btn inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-heading font-black bg-[#FBBF24] hover:bg-[#F59E0B] text-[#1E293B] border-2 border-[#1E293B] shadow-[1.5px_1.5px_0px_0px_#1E293B] cursor-pointer"
+                    title="Populate visual cards directly matching wallpaper slots"
+                  >
+                    <Boxes className="w-3.5 h-3.5" />
+                    <span>Sync Slots</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setIsExportCoordinatesOpen(true)}
+                    className="pop-btn inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-heading font-black bg-[#8B5CF6] hover:bg-[#7C3AED] text-white border-2 border-[#1E293B] shadow-[2px_2px_0px_0px_#1E293B] cursor-pointer"
+                  >
+                    <Table className="w-3.5 h-3.5" />
+                    <span>Export Coordinates</span>
+                  </button>
+                </div>
               </div>
-              <h3 className="text-base font-heading font-black text-[#1E293B] dark:text-white">
-                How to Import in Power BI Desktop
-              </h3>
-            </div>
 
-            <ol className="text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-300 space-y-2 list-decimal list-inside pl-1">
-              <li>
-                Download the <span className="font-bold text-[#F472B6]">.svg</span> background using the button above.
-              </li>
-              <li>
-                Open your report in <span className="font-bold text-[#1E293B] dark:text-white">Power BI Desktop</span> and click on the blank canvas area.
-              </li>
-              <li>
-                In the right panel, go to <span className="font-bold text-[#8B5CF6]">Format Page &gt; Canvas background</span>.
-              </li>
-              <li>
-                Click <span className="font-bold">Browse / Add file</span> and select the downloaded SVG file.
-              </li>
-              <li>
-                Set <span className="font-bold text-emerald-600">Image fit = Normal</span> (or <span className="font-bold text-emerald-600">Fit</span>) and change <span className="font-bold text-emerald-600">Transparency = 0%</span>.
-              </li>
-            </ol>
-
-            <div className="pt-2 flex items-center justify-between border-t border-slate-100 dark:border-slate-800 text-xs">
-              <span className="text-slate-500 font-bold">
-                Need matching visual colors?
-              </span>
-              <button
-                type="button"
-                onClick={() => onNavigate('theme-generator')}
-                className="inline-flex items-center gap-1 font-heading font-black text-[#8B5CF6] hover:underline cursor-pointer"
-              >
-                <Palette className="w-3.5 h-3.5" />
-                <span>Open Theme Studio &rarr;</span>
-              </button>
+              <LayoutCanvas
+                dimensions={{
+                  width: dashState.dimensions.width,
+                  height: dashState.dimensions.height,
+                  preset: dashState.dimensions.preset as any,
+                }}
+                visuals={layoutVisuals}
+                selectedId={selectedVisualId}
+                grid={layoutGrid}
+                backgroundColor={dashState.backgroundColor}
+                navBar={dashState.navBar}
+                pageTitles={dashState.pageTitles}
+                onSelectVisual={setSelectedVisualId}
+                onUpdateVisual={handleUpdateLayoutVisual}
+                onDeleteVisual={handleDeleteLayoutVisual}
+                onDuplicateVisual={handleDuplicateLayoutVisual}
+                onBringToFront={handleBringToFrontLayoutVisual}
+              />
             </div>
-          </div>
+          ) : (
+            <>
+              {/* Live Vector Canvas Viewport */}
+              <DashSvgCanvas state={dashState} />
+
+              {/* Power BI Desktop Import Guide */}
+              <div className="pop-card bg-white dark:bg-slate-900 p-6 rounded-3xl border-3 border-[#1E293B] dark:border-slate-700 shadow-[4px_4px_0px_0px_#1E293B] space-y-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-xl bg-[#FBBF24] border-2 border-[#1E293B] flex items-center justify-center text-[#1E293B] shadow-[2px_2px_0px_0px_#1E293B]">
+                    <HelpCircle className="w-4 h-4 stroke-[2.5]" />
+                  </div>
+                  <h3 className="text-base font-heading font-black text-[#1E293B] dark:text-white">
+                    How to Import in Power BI Desktop
+                  </h3>
+                </div>
+
+                <ol className="text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-300 space-y-2 list-decimal list-inside pl-1">
+                  <li>
+                    Download the <span className="font-bold text-[#F472B6]">.svg</span> background using the button above.
+                  </li>
+                  <li>
+                    Open your report in <span className="font-bold text-[#1E293B] dark:text-white">Power BI Desktop</span> and click on the blank canvas area.
+                  </li>
+                  <li>
+                    In the right panel, go to <span className="font-bold text-[#8B5CF6]">Format Page &gt; Canvas background</span>.
+                  </li>
+                  <li>
+                    Click <span className="font-bold">Browse / Add file</span> and select the downloaded SVG file.
+                  </li>
+                  <li>
+                    Set <span className="font-bold text-emerald-600">Image fit = Normal</span> (or <span className="font-bold text-emerald-600">Fit</span>) and change <span className="font-bold text-emerald-600">Transparency = 0%</span>.
+                  </li>
+                </ol>
+
+                <div className="pt-2 flex items-center justify-between border-t border-slate-100 dark:border-slate-800 text-xs">
+                  <span className="text-slate-500 font-bold">
+                    Need matching visual colors?
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => onNavigate('theme-generator')}
+                    className="inline-flex items-center gap-1 font-heading font-black text-[#8B5CF6] hover:underline cursor-pointer"
+                  >
+                    <Palette className="w-3.5 h-3.5" />
+                    <span>Open Theme Studio &rarr;</span>
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
+
+      {/* Export Coordinates Modal */}
+      <LayoutExportModal
+        isOpen={isExportCoordinatesOpen}
+        onClose={() => setIsExportCoordinatesOpen(false)}
+        visuals={layoutVisuals}
+        dimensions={{
+          width: dashState.dimensions.width,
+          height: dashState.dimensions.height,
+          preset: dashState.dimensions.preset as any,
+        }}
+        state={{
+          name: 'PowerLab Report Layout',
+          dimensions: {
+            width: dashState.dimensions.width,
+            height: dashState.dimensions.height,
+            preset: dashState.dimensions.preset as any,
+          },
+          grid: layoutGrid,
+          backgroundColor: dashState.backgroundColor,
+          visuals: layoutVisuals,
+        }}
+      />
     </main>
   );
 };
