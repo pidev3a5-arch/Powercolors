@@ -1,53 +1,47 @@
 # ROADMAP.md
 
-> **Current Milestone**: v3.0 - SVG Visual Maker & Power BI DAX Studio
-> **Current Phase**: Phase 8: Core SVG Visual Library & DAX Generation Engine
-> **Goal**: Empower Power BI developers to generate dozens of SVG micro-visuals as error-free DAX measures with Image URL category, plus convert imported SVGs into DAX.
+> **Current Milestone**: v4.0 — Report Layout Planner, Color Accessibility Checker & DAX Measure Toolkit
+> **Current Phase**: Phase 1: Report Layout Planner
+> **Goal**: Add three high-value pages to PowerLab — a visual drag-and-drop report layout planner with exact PBI pixel coordinates, a WCAG accessibility checker with colorblind simulation, and a curated DAX measure template toolkit.
 
-## Must-Haves (Milestone v3.0)
-- [x] Curated library of dozens of Power BI SVG visuals across categories: KPI, Gauge, Line, Bar, Donut, Waffle/Rating
-- [x] Gauge with track and Gauge with outline & needle (40%, 55%, 80%) inspired by references
-- [x] Circular ring progress with % and checkmarks inspired by references
-- [x] Real-time parameter customizer (value, target, min/max, colors, dimensions)
-- [x] 1-click Power BI DAX Measure Generator (`VAR _Actual = ...`, properly escaped quotes and `%23` encoding)
-- [x] 1-click Copy DAX Measure, Copy Raw SVG, and Download SVG
-- [x] SVG to DAX Converter tab: import/paste custom SVG and generate copyable DAX measure
-- [x] Search box & category chips filter
-- [x] Full integration into PowerLab header navigation, mobile menu, and landing page
+## Must-Haves (Milestone v4.0)
+- [ ] **Report Layout Planner page**: drag-and-drop grid for designing Power BI report visual placement with exact X, Y, Width, Height coordinates
+- [ ] Copy all coordinates as a reference table for precise visual positioning in Power BI Desktop
+- [ ] **Color Accessibility Checker page**: WCAG AA/AAA contrast matrix for all theme palette colors against every background
+- [ ] Colorblind simulation (Deuteranopia, Protanopia, Tritanopia) with live preview
+- [ ] Auto-suggest color fixes for failing contrast pairs
+- [ ] **DAX Measure Toolkit page**: curated library of ready-to-copy DAX measure templates (Time Intelligence, Rankings, Dynamic Titles, KPI Logic, Conditional Formatting)
+- [ ] Live placeholder substitution (replace `[Sales]` with user's actual measure name)
+- [ ] Copy formatted DAX and download as `.dax` file
+- [ ] Full integration into PowerLab header navigation, mobile menu, and landing page
+- [ ] All existing tests still passing + new tests for each page
+
+## Nice-to-Haves
+- [ ] Export layout coordinates as PBIR `visual.json` position snippets
+- [ ] Export Accessibility Report Card as PNG
+- [ ] Snap-to-grid and alignment guides in Report Layout Planner
+- [ ] Pair with Dash Canvas wallpaper — overlay layout grid on top of wallpaper preview
 
 ## Phases
 
-### Phase 1: Project Scaffolding & Core Color Engine
-**Status**: 🟩 Completed
+### Phase 1: Report Layout Planner
+**Status**: ⬜ Not Started
+**Objective**: Build a new page where users design Power BI report visual placement on a pixel-accurate canvas (1280×720, 1920×1080, etc.). Drag-and-drop rectangles representing visuals, each showing exact X/Y/W/H coordinates. One-click copy all positions as a reference table.
 
-### Phase 2: Palette Management & Customization UI
-**Status**: 🟩 Completed
+### Phase 2: Color Accessibility Checker
+**Status**: ⬜ Not Started
+**Objective**: Build a page that imports a theme palette (from Theme Studio or JSON upload) and shows a WCAG AA/AAA contrast matrix for every data color against canvas, card, and dark backgrounds. Add colorblind simulation filters and auto-fix suggestions.
 
-### Phase 3: Live Power BI Visuals Mock Canvas
-**Status**: 🟩 Completed
+### Phase 3: DAX Measure Toolkit
+**Status**: ⬜ Not Started
+**Objective**: Build a curated library page of 30+ DAX measure templates across categories (Time Intelligence, Rankings, Dynamic Titles, KPI Logic, Conditional Formatting). Each template has a live editor with placeholder substitution and one-click copy/download.
 
-### Phase 4: Theme JSON Generator & Export
-**Status**: 🟩 Completed
+### Phase 4: Navigation Integration, Landing Page & Verification
+**Status**: ⬜ Not Started
+**Objective**: Wire all three new pages into the header navigation, mobile menu, and landing page feature grid. Add unit tests for each page's core logic. Run full verification across desktop and mobile viewports.
 
-### Phase 5: Polish, Verification & Production Readiness
-**Status**: 🟩 Completed
+## Completed Milestones
 
-### Phase 6: Multi-Page Navigation & Landing Page
-**Status**: 🟩 Completed
-
-### Phase 7: Dashboard SVG Canvas Builder (Dash Generator)
-**Status**: 🟩 Completed
-
----
-
-### Phase 8: Core SVG Visual Library & DAX Generation Engine
-**Status**: 🟩 Completed
-**Objective**: Build the library of SVG visual templates (gauges, KPI rings, sparklines, bullet bars, waffles), the DAX code serializer with clean VAR substitutions and quote escaping, and the custom SVG-to-DAX parser.
-
-### Phase 9: SVG Visual Maker UI, Gallery & Customizer
-**Status**: 🟩 Completed
-**Objective**: Build `SvgVisualMakerPage.tsx` with Visual Gallery, category filters, search box, live preview parameter sliders, DAX code display, and the Import/Convert SVG tab.
-
-### Phase 10: Routing Integration, Landing Showcase & Verification
-**Status**: 🟩 Completed
-**Objective**: Connect navigation header, mobile menu, and landing page showcases to SVG Visual Maker, and verify across desktop/mobile viewports with automated unit tests.  
+### v3.0 — SVG Visual Maker & Power BI DAX Studio ✅
+### v2.0 — Multi-Page & Dashboard SVG Generator ✅
+### v1.0 — Theme Studio & Color Engine ✅
