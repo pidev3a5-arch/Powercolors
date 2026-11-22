@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sun, Moon, Sparkles, Home, Palette, Layout, ShieldCheck, Menu, X } from 'lucide-react';
+import { Sun, Moon, Sparkles, Home, Palette, Layout, ShieldCheck, Terminal, Menu, X } from 'lucide-react';
 import { AppPage } from '../core/types';
 
 interface NavigationHeaderProps {
@@ -31,6 +31,7 @@ export const NavigationHeader: React.FC<NavigationHeaderProps> = ({
     { id: 'accessibility-checker', label: 'Accessibility', icon: ShieldCheck },
     { id: 'dash-generator', label: 'Dash Canvas', icon: Layout },
     { id: 'svg-visual-maker', label: 'SVG Visual Maker', icon: Sparkles },
+    { id: 'dax-toolkit', label: 'DAX Toolkit', icon: Terminal },
   ];
 
   const renderNavTabs = (className?: string) => (

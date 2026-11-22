@@ -1,9 +1,10 @@
 export type AppPage =
   | 'landing'
   | 'theme-generator'
+  | 'accessibility-checker'
   | 'dash-generator'
   | 'svg-visual-maker'
-  | 'accessibility-checker';
+  | 'dax-toolkit';
 
 export type RGB = [number, number, number];
 
