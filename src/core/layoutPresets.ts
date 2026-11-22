@@ -1,4 +1,4 @@
-import { LayoutVisualItem, LayoutDimension, ReportLayoutState } from './layoutTypes';
+import { LayoutVisualItem, LayoutDimension } from './layoutTypes';
 
 export interface LayoutPresetDefinition {
   id: string;

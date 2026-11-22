@@ -11,6 +11,7 @@ import {
   BarChart2,
   TrendingUp,
   Filter,
+  Grid,
 } from 'lucide-react';
 import { AppPage } from '../core/types';
 
@@ -79,6 +80,16 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onNavigate }) => {
             <Sparkles className="w-4 h-4 stroke-[2.5]" />
             <span>SVG Visual Maker</span>
             <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-white/50 border border-[#1E293B]">New</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => onNavigate('layout-planner')}
+            className="pop-btn w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full text-sm font-heading font-black bg-[#FBBF24] hover:bg-[#F59E0B] text-[#1E293B] shadow-[3.5px_3.5px_0px_0px_#1E293B] transition-all cursor-pointer group"
+          >
+            <Grid className="w-4 h-4 stroke-[2.5]" />
+            <span>Layout Planner</span>
+            <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-white/50 border border-[#1E293B]">v4.0</span>
           </button>
         </div>
 

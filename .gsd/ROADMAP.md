@@ -1,12 +1,13 @@
 # ROADMAP.md
 
 > **Current Milestone**: v4.0 — Report Layout Planner, Color Accessibility Checker & DAX Measure Toolkit
-> **Current Phase**: Phase 1: Report Layout Planner
+> **Current Phase**: Phase 2: Color Accessibility Checker
 > **Goal**: Add three high-value pages to PowerLab — a visual drag-and-drop report layout planner with exact PBI pixel coordinates, a WCAG accessibility checker with colorblind simulation, and a curated DAX measure template toolkit.
 
 ## Must-Haves (Milestone v4.0)
-- [ ] **Report Layout Planner page**: drag-and-drop grid for designing Power BI report visual placement with exact X, Y, Width, Height coordinates
-- [ ] Copy all coordinates as a reference table for precise visual positioning in Power BI Desktop
+- [x] **Report Layout Planner page**: drag-and-drop grid for designing Power BI report visual placement with exact X, Y, Width, Height coordinates
+- [x] Copy all coordinates as a reference table for precise visual positioning in Power BI Desktop
+- [x] Export layout coordinates as PBIR `visual.json` position snippets
 - [ ] **Color Accessibility Checker page**: WCAG AA/AAA contrast matrix for all theme palette colors against every background
 - [ ] Colorblind simulation (Deuteranopia, Protanopia, Tritanopia) with live preview
 - [ ] Auto-suggest color fixes for failing contrast pairs
@@ -17,15 +18,15 @@
 - [ ] All existing tests still passing + new tests for each page
 
 ## Nice-to-Haves
-- [ ] Export layout coordinates as PBIR `visual.json` position snippets
+- [x] Export layout coordinates as PBIR `visual.json` position snippets
 - [ ] Export Accessibility Report Card as PNG
-- [ ] Snap-to-grid and alignment guides in Report Layout Planner
+- [x] Snap-to-grid and alignment guides in Report Layout Planner
 - [ ] Pair with Dash Canvas wallpaper — overlay layout grid on top of wallpaper preview
 
 ## Phases
 
 ### Phase 1: Report Layout Planner
-**Status**: ⬜ Not Started
+**Status**: 🟩 Completed
 **Objective**: Build a new page where users design Power BI report visual placement on a pixel-accurate canvas (1280×720, 1920×1080, etc.). Drag-and-drop rectangles representing visuals, each showing exact X/Y/W/H coordinates. One-click copy all positions as a reference table.
 
 ### Phase 2: Color Accessibility Checker

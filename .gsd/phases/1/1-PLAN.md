@@ -4,45 +4,45 @@ plan: 1
 wave: 1
 ---
 
-# Plan 1.1: Project Scaffolding & Setup
+# Plan 1.1: Core Layout Planner Types, Presets & Coordinate Export Engine
 
-## Objective
-Set up the React 19 + TypeScript + Vite workspace with Tailwind CSS, Chroma.js, Lucide React, and Vitest, establishing the development and testing baseline for the PowerColors web application.
+<objective>
+Build the core data structures, resolution configurations, grid alignment utilities, layout presets, and coordinate export engines (Markdown table, CSV, JSON, and PBIR coordinates) for the Power BI Report Layout Planner.
+</objective>
 
-## Context
-- .gsd/SPEC.md
-- .gsd/RESEARCH.md
-- .gsd/REQUIREMENTS.md
-
-## Tasks
-
-<task type="auto">
-  <name>Scaffold Vite React TypeScript App</name>
-  <files>package.json, vite.config.ts, tsconfig.json, index.html, src/main.tsx, src/App.tsx</files>
-  <action>
-    - Initialize Vite React TypeScript project at the project root.
-    - Install dependencies: `chroma-js`, `lucide-react`.
-    - Install devDependencies: `@types/chroma-js`, `tailwindcss`, `@tailwindcss/vite` (or Tailwind v4/v3), `vitest`, `@testing-library/react`.
-    - Set up base CSS with Tailwind styling and modern font smoothing.
-    - Avoid heavy backend libraries; keep client-side pure.
-  </action>
-  <verify>npm run build</verify>
-  <done>Production build completes cleanly without TypeScript errors.</done>
+<tasks>
+<task id="1.1.1">
+Create `src/core/layoutTypes.ts` defining:
+- Supported Power BI visual types: `card`, `bar-chart`, `column-chart`, `line-chart`, `area-chart`, `donut-chart`, `table`, `matrix`, `slicer`, `kpi`, `gauge`, `decomposition-tree`, `custom`
+- Visual layout item interface: `LayoutVisualItem` (id, name, type, x, y, width, height, zIndex, color, locked, notes)
+- Canvas resolution configs: `LayoutResolutionPreset` (1280x720, 1920x1080, 1440x900, 1024x768, 390x844 mobile)
+- Grid configuration: snap-to-grid intervals (4px, 8px, 10px, 16px), guide lines, padding/margin
+- State interface: `ReportLayoutState` with default starting configuration
 </task>
 
-<task type="auto">
-  <name>Configure Vitest Test Harness</name>
-  <files>vitest.config.ts, src/test/setup.ts</files>
-  <action>
-    - Configure Vitest for fast, headless unit testing of the color engine.
-    - Add mock canvas/ImageData support if needed for Node-based test runs.
-    - Add test script to package.json (`npm test`).
-  </action>
-  <verify>npm test</verify>
-  <done>Vitest runs and passes with sample assertion.</done>
+<task id="1.1.2">
+Create `src/core/layoutPresets.ts` with curated Power BI layout architectures:
+- Executive Scorecard (Top KPI cards + 2 main chart slots + summary table)
+- Analytics Split (Left slicer ribbon + 2x2 analytic matrix)
+- Storyline Flow (Hero visual on top + 3-column breakdown)
+- Financial Matrix & BANs (High-density matrix with variance cards)
+- Mobile Portrait Layout (Optimized for Power BI Mobile view 390x844)
 </task>
 
-## Success Criteria
-- [ ] Vite dev server and build run with zero errors.
-- [ ] Tailwind CSS utility classes are functional.
-- [ ] Vitest test runner is configured and operational.
+<task id="1.1.3">
+Create `src/core/layoutExport.ts` implementing:
+- `generateCoordinatesMarkdownTable(visuals)`: Markdown table with exact X, Y, Width, Height, Type
+- `generateCoordinatesCsv(visuals)`: CSV formatted string for Excel/Sheets
+- `generatePbirPositionSnippet(visual)`: Standard PBIR `visual.json` position snippet
+- `copyCoordinatesToClipboard(...)` helper
+- State export to JSON and import from JSON
+</task>
+
+<task id="1.1.4">
+Write unit tests in `src/test/layoutPlanner.test.ts` testing coordinate calculations, grid snapping, preset generation, and export formats. Verify `npm test` passes.
+</task>
+</tasks>
+
+<verify>
+Run `npm test` to verify all layout planner unit tests pass with 0 errors.
+</verify>

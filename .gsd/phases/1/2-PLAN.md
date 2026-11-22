@@ -2,74 +2,48 @@
 phase: 1
 plan: 2
 wave: 2
-depends_on: [1]
 ---
 
-# Plan 1.2: Core Color Extraction Engine & Unit Tests
+# Plan 1.2: Interactive Layout Canvas UI, Visual Blocks & Page Integration
 
-## Objective
-Implement client-side Canvas pixel downsampling, K-Means clustering, Chroma.js deduplication, 10-color harmonic completion, and structural color derivation, verified with automated unit tests.
+<objective>
+Build the interactive visual layout canvas with drag/drop, resize handles, visual type badges, coordinate inspector panel, quick-add visual palette, layout preset picker, and the main `ReportLayoutPlannerPage.tsx`.
+</objective>
 
-## Context
-- .gsd/SPEC.md
-- .gsd/RESEARCH.md
-- .gsd/REQUIREMENTS.md
-- .gsd/phases/1/1-PLAN.md
-
-## Tasks
-
-<task type="auto">
-  <name>Implement Canvas Downsampling & Pixel Extractor</name>
-  <files>src/core/types.ts, src/core/canvasExtractor.ts</files>
-  <action>
-    - Define domain types in `types.ts` (`RGB`, `HEX`, `ColorSwatch`, `StructuralColors`, `PowerBITheme`, `ExtractionOptions`).
-    - Implement `loadImage(source: File | Blob | string): Promise<HTMLImageElement>`.
-    - Implement `extractPixels(img: HTMLImageElement, maxSize?: number): RGB[]`:
-      - Scale image down to max dimension (e.g. 150px) maintaining aspect ratio.
-      - Render onto an offscreen canvas and fetch RGBA pixel data via `getImageData`.
-      - Filter out transparent/semi-transparent pixels (`alpha < 128`).
-      - Return sanitized array of `RGB` tuples.
-  </action>
-  <verify>npm run build</verify>
-  <done>Pixel extraction accurately scales images and removes transparent pixels.</done>
+<tasks>
+<task id="1.2.1">
+Create `src/components/layout/LayoutCanvas.tsx`:
+- Render interactive canvas with zoom controls (fit, zoom slider, reset) and background grid pattern
+- Render visual rectangles with Neo-brutalist styling, type icons, titles, and live coordinate badges (X, Y, W, H)
+- Drag-and-drop movement with optional grid-snapping (8px default)
+- 8-point resize handles (corners and edges) with minimum width/height constraints
+- Selection state, multi-select / active visual highlight
 </task>
 
-<task type="auto">
-  <name>Implement K-Means Clustering & Harmonic Padding Engine</name>
-  <files>src/core/kmeans.ts, src/core/colorHarmonics.ts, src/core/colorEngine.ts</files>
-  <action>
-    - Implement K-Means clustering in `kmeans.ts` with convergence tolerance or max iterations (20).
-    - Implement `colorHarmonics.ts`:
-      - Deduplication: filter out colors closer than threshold Delta E.
-      - Palette padding: if cluster count < 10, use Chroma.js to generate harmonious tints, shades, and analogous variants until exactly 10 distinct data colors are produced.
-      - Sort colors by perceptual lightness or visual prominence.
-    - Implement structural color derivation in `colorEngine.ts`:
-      - `background`: `#FFFFFF` (light mode default) or `#1E293B` (dark mode).
-      - `foreground`: Contrast-tested text color (WCAG AA).
-      - `tableAccent`: Dominant primary brand color.
-      - KPI status colors: `good` (#16A34A), `bad` (#DC2626), `neutral` (#EAB308).
-  </action>
-  <verify>npm run build</verify>
-  <done>Engine always returns exactly 10 distinct dataColors and valid structural colors.</done>
+<task id="1.2.2">
+Create `src/components/layout/LayoutSidebar.tsx`:
+- Visual Type Palette: 1-click add card, bar chart, line chart, table, slicer, etc.
+- Selected Visual Inspector: Fine-tune X, Y, Width, Height with numeric inputs, rename, change visual type, delete, lock/unlock
+- Canvas Settings: Resolution picker (1280x720, 1920x1080), grid snap toggle & grid size (8px, 16px), background color
+- Curated Layout Presets: 1-click apply pre-built layouts
 </task>
 
-<task type="auto">
-  <name>Write Comprehensive Unit Tests for Color Engine</name>
-  <files>src/test/colorEngine.test.ts</files>
-  <action>
-    - Write unit tests for:
-      1. K-Means clustering on known synthetic pixel distributions.
-      2. Deduplication of near-identical hex colors.
-      3. Palette padding ensuring exactly 10 distinct colors when input has only 1, 2, or 3 colors.
-      4. Structural color contrast validation (WCAG AA minimum 4.5:1 ratio for text against background).
-      5. Full color extraction pipeline end-to-end.
-  </action>
-  <verify>npm test</verify>
-  <done>All unit tests pass with 100% pass rate.</done>
+<task id="1.2.3">
+Create `src/components/layout/LayoutExportModal.tsx`:
+- View and copy coordinates table (Markdown, CSV, JSON, PBIR)
+- Copy all coordinates button with toast notification
+- Step-by-step instructions on applying exact coordinates in Power BI Desktop (*Format Visual → Properties → Position: Horizontal, Vertical, Width, Height*)
 </task>
 
-## Success Criteria
-- [ ] Color engine guarantees an array of exactly 10 dataColors for any image input.
-- [ ] Low-color images (e.g. 2-color logos) generate pleasing, harmonic palettes.
-- [ ] Structural colors are generated with verified contrast against canvas background.
-- [ ] All unit tests pass cleanly.
+<task id="1.2.4">
+Create `src/pages/ReportLayoutPlannerPage.tsx`:
+- Top page header with actions: Add Visual, Presets, Clear, Export Coordinates, Reset
+- Wire up state management (visuals array, selectedId, history undo/redo)
+- Connect to `App.tsx` routing as `'layout-planner'`
+- Update `App.tsx` and types to support the new page
+</task>
+</tasks>
+
+<verify>
+Run `npm run build` and `npm test` to ensure clean TypeScript compilation and 100% test passing.
+</verify>
