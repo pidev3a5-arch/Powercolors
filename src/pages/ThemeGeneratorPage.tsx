@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sparkles, Download, Code2, Copy, Check, ShieldCheck } from 'lucide-react';
+import { Sparkles, Download, Code2, Copy, Check, Wand2 } from 'lucide-react';
 import { ColorSwatch, StructuralColors, PowerBITheme, ThemeCustomizationOptions, AppPage } from '../core/types';
 import { serializePowerBITheme } from '../core/powerBiTheme';
 import { ImageUploader } from '../components/ImageUploader';
@@ -111,12 +111,12 @@ export const ThemeGeneratorPage: React.FC<ThemeGeneratorPageProps> = ({
           {onNavigate && (
             <button
               type="button"
-              onClick={() => onNavigate('accessibility-checker')}
-              className="pop-btn inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs sm:text-sm font-heading font-black bg-[#34D399] hover:bg-[#10B981] text-[#064E3B] border-2 border-[#1E293B] shadow-[2.5px_2.5px_0px_0px_#1E293B] transition-all cursor-pointer"
-              title="Audit this palette for WCAG AA/AAA compliance and colorblind safety"
+              onClick={() => onNavigate('palette-harmony')}
+              className="pop-btn inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs sm:text-sm font-heading font-black bg-[#8B5CF6] hover:bg-[#7C3AED] text-white border-2 border-[#1E293B] shadow-[2.5px_2.5px_0px_0px_#1E293B] transition-all cursor-pointer"
+              title="Explore color wheel harmonies and 9-step shade scales"
             >
-              <ShieldCheck className="w-4 h-4 stroke-[2.5]" />
-              <span>Audit WCAG</span>
+              <Wand2 className="w-4 h-4 stroke-[2.5]" />
+              <span>Palette Harmony</span>
             </button>
           )}
 

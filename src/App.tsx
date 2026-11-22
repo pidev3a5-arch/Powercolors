@@ -5,7 +5,8 @@ import { LandingPage } from './pages/LandingPage';
 import { ThemeGeneratorPage } from './pages/ThemeGeneratorPage';
 import { DashGeneratorPage } from './pages/DashGeneratorPage';
 import { SvgVisualMakerPage } from './pages/SvgVisualMakerPage';
-import { AccessibilityCheckerPage } from './pages/AccessibilityCheckerPage';
+import { PaletteHarmonyPage } from './pages/PaletteHarmonyPage';
+import { IconLibraryPage } from './pages/IconLibraryPage';
 import { DaxToolkitPage } from './pages/DaxToolkitPage';
 import { LinkedInIcon, FacebookIcon, YouTubeIcon, GitHubIcon } from './components/SocialIcons';
 import { extractThemeFromImage } from './core/colorEngine';
@@ -26,9 +27,10 @@ export default function App() {
     const hash = rawHash.split('?')[0];
     if (
       hash === 'theme-generator' ||
-      hash === 'accessibility-checker' ||
+      hash === 'palette-harmony' ||
       hash === 'dash-generator' ||
       hash === 'svg-visual-maker' ||
+      hash === 'icon-library' ||
       hash === 'dax-toolkit' ||
       hash === 'landing'
     ) {
@@ -37,16 +39,17 @@ export default function App() {
     return null;
   };
 
-  // Navigation Page State ('landing' | 'theme-generator' | 'accessibility-checker' | 'dash-generator' | 'svg-visual-maker' | 'dax-toolkit')
+  // Navigation Page State ('landing' | 'theme-generator' | 'palette-harmony' | 'dash-generator' | 'svg-visual-maker' | 'icon-library' | 'dax-toolkit')
   const [currentPage, setCurrentPage] = useState<AppPage>(() => {
     const fromHash = typeof window !== 'undefined' ? getPageFromHash() : null;
     if (fromHash) return fromHash;
     const saved = localStorage.getItem('powerlab_current_page');
     if (
       saved === 'theme-generator' ||
-      saved === 'accessibility-checker' ||
+      saved === 'palette-harmony' ||
       saved === 'dash-generator' ||
       saved === 'svg-visual-maker' ||
+      saved === 'icon-library' ||
       saved === 'dax-toolkit' ||
       saved === 'landing'
     ) {
@@ -274,6 +277,19 @@ export default function App() {
     setCurrentImageName(null);
   }, []);
 
+  const handleApplyHarmonyToThemeStudio = useCallback((harmonyHexes: string[]) => {
+    setSwatches((prev) => {
+      const next = [...prev];
+      harmonyHexes.slice(0, 10).forEach((hex, idx) => {
+        next[idx] = createColorSwatch(hex, `swatch-${idx + 1}`);
+      });
+      return next;
+    });
+    if (harmonyHexes[0]) {
+      setStructural(deriveStructuralColors(harmonyHexes[0], isDarkCanvas));
+    }
+  }, [isDarkCanvas]);
+
   // Current compiled theme JSON
   const currentTheme: PowerBITheme = buildPowerBITheme(
     themeName,
@@ -388,10 +404,10 @@ export default function App() {
         />
       )}
 
-      {currentPage === 'accessibility-checker' && (
-        <AccessibilityCheckerPage
+      {currentPage === 'palette-harmony' && (
+        <PaletteHarmonyPage
           onNavigate={handleNavigate}
-          initialPalette={swatches.map((s) => s.hex)}
+          onApplyToThemeStudio={handleApplyHarmonyToThemeStudio}
         />
       )}
 
@@ -401,6 +417,10 @@ export default function App() {
 
       {currentPage === 'svg-visual-maker' && (
         <SvgVisualMakerPage onNavigate={handleNavigate} />
+      )}
+
+      {currentPage === 'icon-library' && (
+        <IconLibraryPage onNavigate={handleNavigate} />
       )}
 
       {currentPage === 'dax-toolkit' && (
