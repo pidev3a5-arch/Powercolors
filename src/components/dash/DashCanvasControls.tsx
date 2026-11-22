@@ -8,6 +8,7 @@ import {
   Heading,
   Plus,
   Trash2,
+  Upload,
 } from 'lucide-react';
 import {
   CanvasDimension,
@@ -37,6 +38,7 @@ interface DashCanvasControlsProps {
   onRemovePageTitle: (id: string) => void;
   onSelectLayoutPreset: (preset: LayoutPresetType) => void;
   onApplyReadyDesign: (presetId: string) => void;
+  onImportSvg?: () => void;
 }
 
 const BG_PRESET_COLORS = [
@@ -77,6 +79,7 @@ export const DashCanvasControls: React.FC<DashCanvasControlsProps> = ({
   onRemovePageTitle,
   onSelectLayoutPreset,
   onApplyReadyDesign,
+  onImportSvg,
 }) => {
   const handleResolutionPresetChange = (preset: CanvasResolutionPreset) => {
     if (preset === '1280x720') {
@@ -94,6 +97,28 @@ export const DashCanvasControls: React.FC<DashCanvasControlsProps> = ({
 
   return (
     <div className="space-y-6">
+      {/* Modify Downloaded SVG Quick Action */}
+      {onImportSvg && (
+        <div className="p-3.5 rounded-2xl border-2 border-dashed border-[#1E293B] dark:border-slate-700 bg-[#FFFDF5] dark:bg-slate-900 shadow-[2px_2px_0px_0px_#1E293B] flex items-center justify-between gap-3">
+          <div className="space-y-0.5 min-w-0">
+            <span className="text-xs font-heading font-black text-[#1E293B] dark:text-white flex items-center gap-1.5 truncate">
+              <Upload className="w-3.5 h-3.5 text-[#F59E0B]" />
+              <span>Modify Downloaded SVG</span>
+            </span>
+            <span className="text-[11px] text-slate-500 font-medium block truncate">
+              Load an existing canvas SVG to change slots or styling
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={onImportSvg}
+            className="pop-btn px-3 py-1.5 rounded-full text-xs font-heading font-black bg-[#FBBF24] hover:bg-[#F59E0B] text-[#1E293B] border border-[#1E293B] shadow-[1.5px_1.5px_0px_0px_#1E293B] transition-all cursor-pointer flex-shrink-0"
+          >
+            Import SVG
+          </button>
+        </div>
+      )}
+
       {/* 1. Ready-Made Design Themes (Requirement 1: 6 Unique Presets) */}
       <div className="pop-card bg-white dark:bg-slate-900 p-5 rounded-2xl border-2 border-[#1E293B] dark:border-slate-700 shadow-[3px_3px_0px_0px_#1E293B] space-y-4">
         <div className="flex items-center justify-between">

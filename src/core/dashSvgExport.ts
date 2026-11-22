@@ -14,6 +14,36 @@ export function escapeXml(str: string): string {
 }
 
 /**
+ * UTF-8 safe Base64 encoder for browser and node
+ */
+export function encodeBase64Utf8(str: string): string {
+  if (typeof Buffer !== 'undefined') {
+    return Buffer.from(str, 'utf8').toString('base64');
+  }
+  const bytes = new TextEncoder().encode(str);
+  let binary = '';
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}
+
+/**
+ * UTF-8 safe Base64 decoder for browser and node
+ */
+export function decodeBase64Utf8(b64: string): string {
+  if (typeof Buffer !== 'undefined') {
+    return Buffer.from(b64, 'base64').toString('utf8');
+  }
+  const binary = atob(b64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return new TextDecoder().decode(bytes);
+}
+
+/**
  * Generates standalone, valid XML SVG markup for Power BI canvas wallpaper background.
  */
 export function generateDashSvg(state: DashCanvasState, forPreview = false): string {
@@ -33,6 +63,16 @@ export function generateDashSvg(state: DashCanvasState, forPreview = false): str
   const preserveAttr = forPreview ? ` preserveAspectRatio="none"` : '';
   parts.push(
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}"${preserveAttr}${styleAttr}>`
+  );
+
+  // PowerLab Dash Canvas Embedded State (Lossless Re-Import Metadata)
+  const stateJson = JSON.stringify(state);
+  const stateBase64 = encodeBase64Utf8(stateJson);
+  parts.push(
+    `  <metadata id="powerlab-dash-state" data-version="1" data-state="${stateBase64}">`,
+    `    <!-- PowerLab Dash Canvas State -->`,
+    `    <![CDATA[${stateJson}]]>`,
+    `  </metadata>`
   );
 
   // Embedded Typography and CSS Styles
@@ -73,7 +113,7 @@ export function generateDashSvg(state: DashCanvasState, forPreview = false): str
 
     // Main Card Shape
     parts.push(
-      `  <rect x="${Math.round(c.x)}" y="${Math.round(c.y)}" width="${Math.round(
+      `  <rect class="dash-visual-slot" data-slot-id="${c.id}" x="${Math.round(c.x)}" y="${Math.round(c.y)}" width="${Math.round(
         c.width
       )}" height="${Math.round(c.height)}" rx="${rx}" fill="${fill}" stroke="${strokeColor}" stroke-width="${strokeW}" />`
     );

@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { generateDashSvg, escapeXml, getDefaultSvgFilename } from '../core/dashSvgExport';
+import { parseDashSvg } from '../core/dashSvgImport';
 import { DashCanvasState, DEFAULT_DASH_CANVAS_STATE } from '../core/dashTypes';
 import { generateLayoutContainers, autoArrangeContainers } from '../core/dashLayoutPresets';
 import { READY_DESIGN_PRESETS } from '../core/dashDesignPresets';
@@ -710,5 +711,129 @@ describe('Dash SVG Canvas Export & Layout Engine', () => {
     expect(svg).toContain('Visible Report Title</text>');
     // Button label should NOT be rendered
     expect(svg).not.toContain('>Overview</text>');
+  });
+
+  describe('Dash SVG Import & Round-Trip Capabilities', () => {
+    it('losslessly re-imports an exported Dash Canvas SVG with exact slots and settings', () => {
+      const stateWith2Slots: DashCanvasState = {
+        ...DEFAULT_DASH_CANVAS_STATE,
+        dimensions: { width: 1440, height: 900, preset: '1440x900' },
+        backgroundColor: '#0F172A',
+        navBar: {
+          ...DEFAULT_DASH_CANVAS_STATE.navBar,
+          orientation: 'left',
+          size: 240,
+          reportTitle: 'Financial Dashboard',
+        },
+        containers: [
+          {
+            id: 'slot-rev',
+            title: 'Revenue Trends',
+            subtitle: 'Actual vs Target',
+            showTitle: true,
+            showSubtitle: true,
+            x: 260,
+            y: 80,
+            width: 560,
+            height: 380,
+          },
+          {
+            id: 'slot-costs',
+            title: 'Cost Breakdown',
+            subtitle: 'Operating Expenditures',
+            showTitle: true,
+            showSubtitle: true,
+            x: 840,
+            y: 80,
+            width: 560,
+            height: 380,
+          },
+        ],
+      };
+
+      // 1. Export to SVG
+      const exportedSvg = generateDashSvg(stateWith2Slots);
+      expect(exportedSvg).toContain('id="powerlab-dash-state"');
+      expect(exportedSvg).toContain('Financial Dashboard');
+      expect(exportedSvg).toContain('Revenue Trends');
+
+      // 2. Import back
+      const importedState = parseDashSvg(exportedSvg);
+
+      expect(importedState.dimensions.width).toBe(1440);
+      expect(importedState.dimensions.height).toBe(900);
+      expect(importedState.backgroundColor).toBe('#0F172A');
+      expect(importedState.navBar.orientation).toBe('left');
+      expect(importedState.navBar.size).toBe(240);
+      expect(importedState.navBar.reportTitle).toBe('Financial Dashboard');
+
+      // 3. User modifies from 2 slots to 4 slots (User's specific requirement)
+      expect(importedState.containers.length).toBe(2);
+      expect(importedState.containers[0].title).toBe('Revenue Trends');
+      expect(importedState.containers[1].title).toBe('Cost Breakdown');
+
+      const modifiedTo4Slots: DashCanvasState = {
+        ...importedState,
+        containers: [
+          ...importedState.containers,
+          {
+            id: 'slot-margins',
+            title: 'Gross Margins',
+            subtitle: '',
+            showTitle: true,
+            showSubtitle: false,
+            x: 260,
+            y: 480,
+            width: 560,
+            height: 380,
+          },
+          {
+            id: 'slot-ebitda',
+            title: 'EBITDA Summary',
+            subtitle: '',
+            showTitle: true,
+            showSubtitle: false,
+            x: 840,
+            y: 480,
+            width: 560,
+            height: 380,
+          },
+        ],
+      };
+
+      expect(modifiedTo4Slots.containers.length).toBe(4);
+      const reExportedSvg = generateDashSvg(modifiedTo4Slots);
+      expect(reExportedSvg).toContain('Gross Margins');
+      expect(reExportedSvg).toContain('EBITDA Summary');
+
+      // Re-import the 4-slot SVG
+      const reImported4Slots = parseDashSvg(reExportedSvg);
+      expect(reImported4Slots.containers.length).toBe(4);
+      expect(reImported4Slots.containers[2].title).toBe('Gross Margins');
+      expect(reImported4Slots.containers[3].title).toBe('EBITDA Summary');
+    });
+
+    it('heuristically reconstructs canvas state from standard SVG markup without metadata', () => {
+      const bareSvg = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720">
+          <rect width="1280" height="720" fill="#111827" />
+          <rect x="0" y="0" width="210" height="720" fill="#1F2937" />
+          <rect class="dash-visual-slot" data-slot-id="slot-1" x="234" y="84" width="480" height="280" rx="14" fill="#FFFFFF" stroke="#374151" stroke-width="2" />
+          <rect class="dash-visual-slot" data-slot-id="slot-2" x="734" y="84" width="480" height="280" rx="14" fill="#FFFFFF" stroke="#374151" stroke-width="2" />
+        </svg>
+      `;
+
+      const parsed = parseDashSvg(bareSvg);
+      expect(parsed.dimensions.width).toBe(1280);
+      expect(parsed.dimensions.height).toBe(720);
+      expect(parsed.backgroundColor).toBe('#111827');
+      expect(parsed.navBar.orientation).toBe('left');
+      expect(parsed.navBar.size).toBe(210);
+      expect(parsed.navBar.backgroundColor).toBe('#1F2937');
+      expect(parsed.containers.length).toBe(2);
+      expect(parsed.containers[0].width).toBe(480);
+      expect(parsed.containers[1].width).toBe(480);
+      expect(parsed.containerStyle.cornerRadius).toBe(14);
+    });
   });
 });

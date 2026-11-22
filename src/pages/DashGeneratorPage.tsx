@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import {
   Download,
   Copy,
@@ -9,6 +9,8 @@ import {
   HelpCircle,
   Palette,
   Sparkles,
+  Upload,
+  FileUp,
 } from 'lucide-react';
 import {
   DashCanvasState,
@@ -27,6 +29,7 @@ import {
 import { generateLayoutContainers, autoArrangeContainers } from '../core/dashLayoutPresets';
 import { READY_DESIGN_PRESETS } from '../core/dashDesignPresets';
 import { generateDashSvg, downloadDashSvg } from '../core/dashSvgExport';
+import { parseDashSvg } from '../core/dashSvgImport';
 import { DashNavControls } from '../components/dash/DashNavControls';
 import { DashCanvasControls } from '../components/dash/DashCanvasControls';
 import { DashContainerConfig } from '../components/dash/DashContainerConfig';
@@ -42,6 +45,9 @@ type DashTab = 'canvas' | 'nav' | 'containers';
 export const DashGeneratorPage: React.FC<DashGeneratorPageProps> = ({ onNavigate }) => {
   const [activeTab, setActiveTab] = useState<DashTab>('canvas');
   const [copied, setCopied] = useState(false);
+  const [importNotification, setImportNotification] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Dash Canvas Core State
   const [dashState, setDashState] = useState<DashCanvasState>(() => {
@@ -424,8 +430,83 @@ export const DashGeneratorPage: React.FC<DashGeneratorPageProps> = ({ onNavigate
     return () => window.removeEventListener('powerlab:download-dash-svg', onEvent);
   }, [handleDownloadSvg]);
 
+  // Import SVG Handler: lossless state metadata extraction + heuristic fallback
+  const handleImportSvgContent = useCallback((svgText: string, fileName?: string) => {
+    try {
+      const parsed = parseDashSvg(svgText);
+      setDashState(parsed);
+      const nameStr = fileName ? ` from "${fileName}"` : '';
+      setImportNotification(
+        `Imported Canvas SVG${nameStr}! (${parsed.containers.length} slots, ${parsed.dimensions.width}×${parsed.dimensions.height}, ${parsed.navBar.orientation} nav restored) — you can now add or edit slots, adjust layout, or customize styles.`
+      );
+      setTimeout(() => setImportNotification(null), 7000);
+    } catch (err) {
+      console.error('Failed to import SVG:', err);
+      alert(err instanceof Error ? err.message : 'Failed to import SVG. Please check the file format.');
+    }
+  }, []);
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const content = event.target?.result as string;
+      if (content) {
+        handleImportSvgContent(content, file.name);
+      }
+    };
+    reader.readAsText(file);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file && (file.name.toLowerCase().endsWith('.svg') || file.type.includes('svg'))) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const content = event.target?.result as string;
+        if (content) {
+          handleImportSvgContent(content, file.name);
+        }
+      };
+      reader.readAsText(file);
+    }
+  };
+
+  // Support pasting SVG markup with Ctrl+V
+  useEffect(() => {
+    const handlePaste = (e: ClipboardEvent) => {
+      const text = e.clipboardData?.getData('text');
+      if (text && text.trim().startsWith('<svg') && text.includes('</svg>')) {
+        handleImportSvgContent(text, 'Clipboard Paste');
+      }
+    };
+    window.addEventListener('paste', handlePaste);
+    return () => window.removeEventListener('paste', handlePaste);
+  }, [handleImportSvgContent]);
+
   return (
-    <main className="flex-1 max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 w-full space-y-8">
+    <main
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+      className="flex-1 max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 w-full space-y-8"
+    >
       {/* Page Header Ribbon */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b-2 border-slate-200 dark:border-slate-800">
         <div className="space-y-1">
@@ -443,6 +524,26 @@ export const DashGeneratorPage: React.FC<DashGeneratorPageProps> = ({ onNavigate
 
         {/* Global Action Buttons */}
         <div className="flex items-center gap-2.5 flex-wrap">
+          {/* Hidden SVG File Input */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".svg,image/svg+xml"
+            onChange={handleFileUpload}
+            className="hidden"
+          />
+
+          {/* Import SVG Button */}
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="pop-btn inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs sm:text-sm font-heading font-black bg-[#FBBF24] hover:bg-[#F59E0B] text-[#1E293B] border-2 border-[#1E293B] shadow-[2.5px_2.5px_0px_0px_#1E293B] transition-all cursor-pointer"
+            title="Import an existing Dash Canvas SVG to modify slots, navigation, or styles"
+          >
+            <Upload className="w-4 h-4 stroke-[2.5]" />
+            <span>Import SVG</span>
+          </button>
+
           <button
             type="button"
             onClick={handleCopySvg}
@@ -466,6 +567,38 @@ export const DashGeneratorPage: React.FC<DashGeneratorPageProps> = ({ onNavigate
           </button>
         </div>
       </div>
+
+      {/* Import Notification Banner */}
+      {importNotification && (
+        <div className="p-3.5 px-5 rounded-2xl border-2 border-[#1E293B] bg-[#34D399] text-[#1E293B] font-heading font-black text-xs sm:text-sm shadow-[3px_3px_0px_0px_#1E293B] flex items-center justify-between gap-3 animate-fade-in">
+          <div className="flex items-center gap-2 min-w-0">
+            <Check className="w-4 h-4 stroke-[3] flex-shrink-0" />
+            <span className="truncate">{importNotification}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setImportNotification(null)}
+            className="text-xs font-black underline hover:opacity-80 cursor-pointer flex-shrink-0"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
+      {/* Drag & Drop Visual Overlay */}
+      {isDragging && (
+        <div className="fixed inset-0 z-50 bg-[#8B5CF6]/30 backdrop-blur-xs flex items-center justify-center p-6 pointer-events-none">
+          <div className="p-8 rounded-3xl border-4 border-dashed border-[#1E293B] bg-[#FFFDF5] dark:bg-slate-900 shadow-[8px_8px_0px_0px_#1E293B] text-center space-y-3">
+            <FileUp className="w-12 h-12 text-[#8B5CF6] mx-auto animate-bounce" />
+            <h3 className="text-xl font-heading font-black text-[#1E293B] dark:text-white">
+              Drop your Dash Canvas SVG here
+            </h3>
+            <p className="text-sm text-slate-600 dark:text-slate-300 font-medium">
+              We&rsquo;ll load your slots, layout, and styling so you can modify and re-export.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Main Studio Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -531,6 +664,7 @@ export const DashGeneratorPage: React.FC<DashGeneratorPageProps> = ({ onNavigate
               onRemovePageTitle={handleRemovePageTitle}
               onSelectLayoutPreset={handleSelectLayoutPreset}
               onApplyReadyDesign={handleApplyReadyDesign}
+              onImportSvg={() => fileInputRef.current?.click()}
             />
           )}
 
