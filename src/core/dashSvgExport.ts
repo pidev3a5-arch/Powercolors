@@ -153,6 +153,7 @@ export function generateDashSvg(state: DashCanvasState, forPreview = false): str
       const showButtonLabels = navBar.showButtonLabels !== false;
       const isCompactRail = navBar.size <= 80 || !showButtonLabels;
 
+      const canFitText = navBar.size > 80;
       if (navBar.logoUrl) {
         const logoX = isCompactRail ? Math.round((navBar.size - 32) / 2) : 18;
         parts.push(
@@ -161,9 +162,9 @@ export function generateDashSvg(state: DashCanvasState, forPreview = false): str
           )}" preserveAspectRatio="xMidYMid meet" />`
         );
         titleX = 58;
-      } else if (isCompactRail && !showReportTitle) {
-        // Render a clean brandmark icon when title is hidden in compact rail
-        const iconBoxX = Math.round((navBar.size - 32) / 2);
+      } else if (isCompactRail || !showReportTitle) {
+        // Render a clean brandmark icon when title is hidden or in compact rail
+        const iconBoxX = isCompactRail ? Math.round((navBar.size - 32) / 2) : 18;
         parts.push(
           `  <rect x="${iconBoxX}" y="20" width="32" height="32" rx="8" fill="${navBar.accentColor}" opacity="0.9" />`,
           `  <path d="M ${iconBoxX + 9} 36 L ${iconBoxX + 16} 27 L ${iconBoxX + 23} 36 Z" fill="#FFFFFF" />`
@@ -172,7 +173,7 @@ export function generateDashSvg(state: DashCanvasState, forPreview = false): str
 
       const reportTitleSizeLeft = navBar.reportTitleSize || 14;
 
-      if (showReportTitle && navBar.reportTitle) {
+      if (showReportTitle && navBar.reportTitle && canFitText) {
         parts.push(
           `  <text x="${titleX}" y="${titleY}" font-size="${reportTitleSizeLeft}" font-weight="800" fill="${
             navBar.textColor

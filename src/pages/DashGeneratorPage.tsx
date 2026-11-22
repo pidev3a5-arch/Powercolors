@@ -140,8 +140,12 @@ export const DashGeneratorPage: React.FC<DashGeneratorPageProps> = ({ onNavigate
     setDashState((prev) => {
       const newId = `title-${Date.now()}`;
       const usedPositions = prev.pageTitles.map((t) => t.position);
-      const allPositions: PageTitlePosition[] = ['top-right', 'top-left', 'bottom-right', 'bottom-left'];
-      const nextPos = allPositions.find((p) => !usedPositions.includes(p)) || 'bottom-left';
+      const allPositions: PageTitlePosition[] = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
+      // Requirement 1: Always place in top-left as default whenever user adds the first Page Header Title
+      const nextPos: PageTitlePosition =
+        prev.pageTitles.length === 0
+          ? 'top-left'
+          : allPositions.find((p) => !usedPositions.includes(p)) || 'top-left';
       const newTitle: PageTitleItem = {
         id: newId,
         title: 'New Page Stamp',

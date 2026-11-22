@@ -393,7 +393,7 @@ export const DashCanvasControls: React.FC<DashCanvasControlsProps> = ({
               <span>Page Header Titles ({pageTitles.length})</span>
             </h4>
             <p className="text-[11px] text-slate-500 font-medium">
-              Place title & subtitle in corners (Top-Right default)
+              Place title & subtitle in corners (Top-Left default)
             </p>
           </div>
 
@@ -412,35 +412,39 @@ export const DashCanvasControls: React.FC<DashCanvasControlsProps> = ({
           </button>
         </div>
 
-        <div className="space-y-3">
-          {pageTitles.map((pt, idx) => (
-            <div
-              key={pt.id}
-              className="p-3 rounded-xl border-2 border-[#1E293B] dark:border-slate-700 bg-slate-50 dark:bg-slate-800 space-y-2.5"
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-heading font-black text-[#1E293B] dark:text-white">
-                  Title #{idx + 1}
-                </span>
+        {pageTitles.length === 0 ? (
+          <div className="p-4 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-700 text-center text-xs text-slate-500 font-medium">
+            No header titles. Click &ldquo;+ Add Title&rdquo; to place a title in the Top-Left.
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {pageTitles.map((pt, idx) => (
+              <div
+                key={pt.id}
+                className="p-3 rounded-xl border-2 border-[#1E293B] dark:border-slate-700 bg-slate-50 dark:bg-slate-800 space-y-2.5"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-heading font-black text-[#1E293B] dark:text-white">
+                    Title #{idx + 1}
+                  </span>
 
-                <div className="flex items-center gap-2">
-                  {/* Position Dropdown */}
-                  <select
-                    value={pt.position}
-                    onChange={(e) =>
-                      onUpdatePageTitle(pt.id, {
-                        position: e.target.value as PageTitlePosition,
-                      })
-                    }
-                    className="px-2 py-0.5 rounded-lg border border-[#1E293B] text-[11px] font-bold bg-white dark:bg-slate-900 text-[#1E293B] dark:text-white cursor-pointer"
-                  >
-                    <option value="top-right">Top-Right (Default)</option>
-                    <option value="top-left">Top-Left</option>
-                    <option value="bottom-right">Bottom-Right</option>
-                    <option value="bottom-left">Bottom-Left</option>
-                  </select>
+                  <div className="flex items-center gap-2">
+                    {/* Position Dropdown */}
+                    <select
+                      value={pt.position}
+                      onChange={(e) =>
+                        onUpdatePageTitle(pt.id, {
+                          position: e.target.value as PageTitlePosition,
+                        })
+                      }
+                      className="px-2 py-0.5 rounded-lg border border-[#1E293B] text-[11px] font-bold bg-white dark:bg-slate-900 text-[#1E293B] dark:text-white cursor-pointer"
+                    >
+                      <option value="top-left">Top-Left (Default)</option>
+                      <option value="top-right">Top-Right</option>
+                      <option value="bottom-left">Bottom-Left</option>
+                      <option value="bottom-right">Bottom-Right</option>
+                    </select>
 
-                  {idx > 0 && (
                     <button
                       type="button"
                       onClick={() => onRemovePageTitle(pt.id)}
@@ -449,9 +453,8 @@ export const DashCanvasControls: React.FC<DashCanvasControlsProps> = ({
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
-                  )}
+                  </div>
                 </div>
-              </div>
 
               <input
                 type="text"
@@ -521,6 +524,7 @@ export const DashCanvasControls: React.FC<DashCanvasControlsProps> = ({
             </div>
           ))}
         </div>
+        )}
       </div>
 
       {/* 5. Visual Shapes Layout Presets (9 Presets - Requirement 8) */}

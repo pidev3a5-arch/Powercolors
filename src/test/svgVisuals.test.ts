@@ -16,8 +16,49 @@ describe('SVG Visuals Catalog & DAX Generator (Phase 8)', () => {
     expect(catIds).toContain('waffle');
   });
 
-  it('should contain at least 40 rich micro-visuals in the catalog', () => {
-    expect(SVG_VISUALS_CATALOG.length).toBeGreaterThanOrEqual(40);
+  it('should contain at least 50 rich micro-visuals in the catalog', () => {
+    expect(SVG_VISUALS_CATALOG.length).toBeGreaterThanOrEqual(50);
+  });
+
+  it('should contain at least 16 KPI and executive card visuals inspired by Sebastine Amede collection', () => {
+    const kpiVisuals = SVG_VISUALS_CATALOG.filter((v) => v.category === 'kpi');
+    expect(kpiVisuals.length).toBeGreaterThanOrEqual(16);
+
+    const expectedExecutiveCardIds = [
+      'kpi-card-columns-minmax',
+      'kpi-card-area-sparkline',
+      'kpi-card-dual-trendline',
+      'kpi-card-variance-columns',
+      'kpi-card-combo-line-variance',
+      'kpi-card-lollipop-variance',
+      'kpi-card-stepped-area',
+      'kpi-card-benchmark-horizon',
+    ];
+
+    for (const cardId of expectedExecutiveCardIds) {
+      const card = kpiVisuals.find((v) => v.id === cardId);
+      expect(card).toBeDefined();
+      expect(card?.viewBox).toBe('0 0 170 120');
+      expect(card?.recommendedDimensions).toEqual({ width: 170, height: 120 });
+
+      // Verify SVG rendering
+      const defaultParams: Record<string, unknown> = {};
+      card?.params.forEach((p) => {
+        defaultParams[p.id] = p.defaultValue;
+      });
+      const svg = card?.renderSvg(defaultParams);
+      expect(svg).toContain("viewBox='0 0 170 120'");
+      expect(svg).toContain('$95,926');
+      expect(svg).toContain('Profit as at 30/12/2024');
+
+      // Verify DAX generation
+      const dax = card?.generateDax(defaultParams, `[${card.name}]`);
+      expect(dax).toContain(`[${card?.name}] = `);
+      expect(dax).toContain('Image URL');
+      expect(dax).toContain('VAR _Title = "Profit as at 30/12/2024"');
+      expect(dax).toContain('VAR _MetricValue = "$95,926"');
+      expect(dax).toContain('RETURN');
+    }
   });
 
   it('every visual should render valid SVG XML with default parameters', () => {

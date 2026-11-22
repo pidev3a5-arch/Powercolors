@@ -665,4 +665,50 @@ describe('Dash SVG Canvas Export & Layout Engine', () => {
     // But SVG vector paths for icons ARE rendered
     expect(svg).toContain('<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z');
   });
+
+  it('renders independently when showReportTitle is false and showButtonLabels is true', () => {
+    const state: DashCanvasState = {
+      ...DEFAULT_DASH_CANVAS_STATE,
+      navBar: {
+        ...DEFAULT_DASH_CANVAS_STATE.navBar,
+        orientation: 'left',
+        size: 210,
+        showReportTitle: false,
+        showButtonLabels: true,
+        reportTitle: 'Hidden Report Title',
+        buttons: [
+          { id: 'btn-1', label: 'Overview', icon: 'home', isActive: true, section: 'menu' },
+        ],
+      },
+    };
+
+    const svg = generateDashSvg(state);
+    // Report title text should NOT be rendered
+    expect(svg).not.toContain('Hidden Report Title</text>');
+    // Button label SHOULD be rendered
+    expect(svg).toContain('>Overview</text>');
+  });
+
+  it('renders independently when showReportTitle is true and showButtonLabels is false', () => {
+    const state: DashCanvasState = {
+      ...DEFAULT_DASH_CANVAS_STATE,
+      navBar: {
+        ...DEFAULT_DASH_CANVAS_STATE.navBar,
+        orientation: 'left',
+        size: 210,
+        showReportTitle: true,
+        showButtonLabels: false,
+        reportTitle: 'Visible Report Title',
+        buttons: [
+          { id: 'btn-1', label: 'Overview', icon: 'home', isActive: true, section: 'menu' },
+        ],
+      },
+    };
+
+    const svg = generateDashSvg(state);
+    // Report title text SHOULD be rendered
+    expect(svg).toContain('Visible Report Title</text>');
+    // Button label should NOT be rendered
+    expect(svg).not.toContain('>Overview</text>');
+  });
 });

@@ -10,8 +10,8 @@ export const SVG_CATEGORIES: SvgCategoryInfo[] = [
   },
   {
     id: 'kpi',
-    label: 'KPI & Badges',
-    description: 'Progress rings, checkpoint completion badges, and metric cards',
+    label: 'KPI & Executive Cards',
+    description: 'Executive KPI cards, monthly trend BANs, progress rings, and checkpoint badges',
     iconName: 'Sparkles',
   },
   {
@@ -50,7 +50,7 @@ const clamp = (val: number, min: number, max: number) => Math.min(Math.max(val, 
 
 export const SVG_VISUALS_CATALOG: SvgVisualDefinition[] = [
   // =========================================================================
-  // 1. KPI & BADGES (8 visuals)
+  // 1. KPI & EXECUTIVE CARDS (16 visuals)
   // =========================================================================
   {
     id: 'kpi-ring-progress',
@@ -512,6 +512,1080 @@ export const SVG_VISUALS_CATALOG: SvgVisualDefinition[] = [
           },
         ],
         viewBox: '0 0 60 40',
+      });
+    },
+  },
+
+  // -------------------------------------------------------------------------
+  // Executive KPI Cards (inspired by Sebastine Amede 20 KPI Cards collection)
+  // -------------------------------------------------------------------------
+  {
+    id: 'kpi-card-columns-minmax',
+    name: 'KPI Card: Columns with Min/Max Highlights',
+    category: 'kpi',
+    description: 'Executive KPI card with 12 monthly columns, automatically highlighting the lowest month in coral and highest month in primary blue.',
+    tags: ['kpi', 'card', 'columns', 'minmax', 'monthly', 'executive', 'ban'],
+    viewBox: '0 0 170 120',
+    recommendedDimensions: { width: 170, height: 120 },
+    pbiTips: {
+      visualType: 'Card (new) / Table / Matrix / Image',
+      recommendedWidth: 170,
+      recommendedHeight: 120,
+      notes: 'Compact executive card. Displays BAN, delta %, and 12 monthly bars with min/max highlighted.',
+    },
+    params: [
+      { id: 'title', label: 'Metric Title', type: 'text', defaultValue: 'Profit as at 30/12/2024', daxVarName: '_Title' },
+      { id: 'value', label: 'Callout Value', type: 'text', defaultValue: '$95,926', daxVarName: '_MetricValue' },
+      { id: 'delta', label: 'Delta (%)', type: 'number', defaultValue: 16.0, step: 0.1, daxVarName: '_DeltaPct' },
+      { id: 'subtext', label: 'Secondary Context', type: 'text', defaultValue: 'Last Year : $82,665 (+13.2k)', daxVarName: '_Subtext' },
+      { id: 'barColor', label: 'Default Bar Color', type: 'color', defaultValue: '#CBD5E1', daxVarName: '_BarColor' },
+      { id: 'maxColor', label: 'Highest Month Color', type: 'color', defaultValue: '#2563EB', daxVarName: '_MaxColor' },
+      { id: 'minColor', label: 'Lowest Month Color', type: 'color', defaultValue: '#EF4444', daxVarName: '_MinColor' },
+    ],
+    renderSvg: (params) => {
+      const title = String(params.title ?? 'Profit as at 30/12/2024');
+      const value = String(params.value ?? '$95,926');
+      const delta = Number(params.delta ?? 16.0);
+      const subtext = String(params.subtext ?? 'Last Year : $82,665 (+13.2k)');
+      const barColor = params.barColor || '#CBD5E1';
+      const maxColor = params.maxColor || '#2563EB';
+      const minColor = params.minColor || '#EF4444';
+      const isPos = delta >= 0;
+      const deltaColor = isPos ? '#10B981' : '#EF4444';
+      const arrow = isPos ? '▲' : '▼';
+      const heights = [18, 14, 28, 8, 38, 22, 26, 30, 24, 32, 20, 36];
+      const months = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
+
+      const barsSvg = heights
+        .map((h, i) => {
+          const x = 12 + i * 11.5;
+          const y = 98 - h;
+          const fill = i === 4 ? maxColor : i === 3 ? minColor : barColor;
+          return `<rect x='${x.toFixed(1)}' y='${y}' width='7.5' height='${h}' rx='1.5' fill='${fill}' />`;
+        })
+        .join('\n  ');
+
+      const labelsSvg = months
+        .map((m, i) => {
+          const x = 15.75 + i * 11.5;
+          return `<text x='${x.toFixed(1)}' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>${m}</text>`;
+        })
+        .join('\n  ');
+
+      return `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 170 120' width='100%' height='100%'>
+  <rect x='1' y='1' width='168' height='118' rx='8' fill='#FFFFFF' stroke='#E2E8F0' stroke-width='1.5' />
+  <text x='12' y='18' font-family='Segoe UI, sans-serif' font-size='8' font-weight='500' fill='#64748B'>${title}</text>
+  <circle cx='118' cy='15' r='2' fill='${minColor}' />
+  <text x='123' y='17.5' font-family='Segoe UI, sans-serif' font-size='6' fill='#64748B'>Min</text>
+  <circle cx='140' cy='15' r='2' fill='${maxColor}' />
+  <text x='145' y='17.5' font-family='Segoe UI, sans-serif' font-size='6' fill='#64748B'>Max</text>
+  <text x='12' y='36' font-family='Segoe UI, sans-serif' font-size='17' font-weight='900' fill='#0F172A'>${value}</text>
+  <text x='100' y='35' font-family='Segoe UI, sans-serif' font-size='9.5' font-weight='700' fill='${deltaColor}'>${arrow} ${Math.abs(delta).toFixed(1)}%</text>
+  <text x='12' y='47' font-family='Segoe UI, sans-serif' font-size='7' font-weight='500' fill='#94A3B8'>${subtext}</text>
+  <line x1='12' y1='98' x2='158' y2='98' stroke='#F1F5F9' stroke-width='1' />
+  ${barsSvg}
+  ${labelsSvg}
+</svg>`;
+    },
+    generateDax: (params, measureName = 'SVG_KPI_Card_Columns_MinMax') => {
+      return buildDaxMeasure({
+        measureName,
+        description: 'Executive KPI card with 12 monthly columns and automatic Min/Max highlights.',
+        configVars: [
+          { name: '_Title', value: params.title ?? 'Profit as at 30/12/2024', type: 'text' },
+          { name: '_MetricValue', value: params.value ?? '$95,926', type: 'text' },
+          { name: '_DeltaPct', value: params.delta ?? 16.0, type: 'number' },
+          { name: '_Subtext', value: params.subtext ?? 'Last Year : $82,665 (+13.2k)', type: 'text' },
+          { name: '_BarColor', value: params.barColor || '#CBD5E1', type: 'color' },
+          { name: '_MaxColor', value: params.maxColor || '#2563EB', type: 'color' },
+          { name: '_MinColor', value: params.minColor || '#EF4444', type: 'color' },
+        ],
+        calcVars: [
+          { name: '_IsPos', expression: '_DeltaPct >= 0' },
+          { name: '_DeltaColor', expression: 'IF( _IsPos, "#10B981", "#EF4444" )' },
+          { name: '_DeltaArrow', expression: 'IF( _IsPos, "▲ ", "▼ " )' },
+          { name: '_DeltaFormatted', expression: '_DeltaArrow & FORMAT( ABS( _DeltaPct ), "0.0" ) & "%"' },
+        ],
+        svgElements: [
+          {
+            name: '_CardFrame',
+            expression: `"<rect x='1' y='1' width='168' height='118' rx='8' fill='#FFFFFF' stroke='#E2E8F0' stroke-width='1.5'/>"`,
+          },
+          {
+            name: '_Header',
+            expression: `"<text x='12' y='18' font-family='Segoe UI, sans-serif' font-size='8' font-weight='500' fill='#64748B'>" & _Title & "</text>" &
+    "<circle cx='118' cy='15' r='2' fill='" & _MinColor & "'/>" &
+    "<text x='123' y='17.5' font-family='Segoe UI, sans-serif' font-size='6' fill='#64748B'>Min</text>" &
+    "<circle cx='140' cy='15' r='2' fill='" & _MaxColor & "'/>" &
+    "<text x='145' y='17.5' font-family='Segoe UI, sans-serif' font-size='6' fill='#64748B'>Max</text>" &
+    "<text x='12' y='36' font-family='Segoe UI, sans-serif' font-size='17' font-weight='900' fill='#0F172A'>" & _MetricValue & "</text>" &
+    "<text x='100' y='35' font-family='Segoe UI, sans-serif' font-size='9.5' font-weight='700' fill='" & _DeltaColor & "'>" & _DeltaFormatted & "</text>" &
+    "<text x='12' y='47' font-family='Segoe UI, sans-serif' font-size='7' font-weight='500' fill='#94A3B8'>" & _Subtext & "</text>"`,
+          },
+          {
+            name: '_BarsMarkup',
+            expression: `"<line x1='12' y1='98' x2='158' y2='98' stroke='#F1F5F9' stroke-width='1'/>" &
+    "<rect x='12.0' y='80' width='7.5' height='18' rx='1.5' fill='" & _BarColor & "'/>" &
+    "<rect x='23.5' y='84' width='7.5' height='14' rx='1.5' fill='" & _BarColor & "'/>" &
+    "<rect x='35.0' y='70' width='7.5' height='28' rx='1.5' fill='" & _BarColor & "'/>" &
+    "<rect x='46.5' y='90' width='7.5' height='8' rx='1.5' fill='" & _MinColor & "'/>" &
+    "<rect x='58.0' y='60' width='7.5' height='38' rx='1.5' fill='" & _MaxColor & "'/>" &
+    "<rect x='69.5' y='76' width='7.5' height='22' rx='1.5' fill='" & _BarColor & "'/>" &
+    "<rect x='81.0' y='72' width='7.5' height='26' rx='1.5' fill='" & _BarColor & "'/>" &
+    "<rect x='92.5' y='68' width='7.5' height='30' rx='1.5' fill='" & _BarColor & "'/>" &
+    "<rect x='104.0' y='74' width='7.5' height='24' rx='1.5' fill='" & _BarColor & "'/>" &
+    "<rect x='115.5' y='66' width='7.5' height='32' rx='1.5' fill='" & _BarColor & "'/>" &
+    "<rect x='127.0' y='78' width='7.5' height='20' rx='1.5' fill='" & _BarColor & "'/>" &
+    "<rect x='138.5' y='62' width='7.5' height='36' rx='1.5' fill='" & _BarColor & "'/>"`,
+          },
+          {
+            name: '_LabelsMarkup',
+            expression: `"<text x='15.8' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>J</text>" &
+    "<text x='27.3' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>F</text>" &
+    "<text x='38.8' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>M</text>" &
+    "<text x='50.3' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>A</text>" &
+    "<text x='61.8' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>M</text>" &
+    "<text x='73.3' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>J</text>" &
+    "<text x='84.8' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>J</text>" &
+    "<text x='96.3' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>A</text>" &
+    "<text x='107.8' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>S</text>" &
+    "<text x='119.3' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>O</text>" &
+    "<text x='130.8' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>N</text>" &
+    "<text x='142.3' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>D</text>"`,
+          },
+        ],
+        viewBox: '0 0 170 120',
+      });
+    },
+  },
+
+  {
+    id: 'kpi-card-area-sparkline',
+    name: 'KPI Card: Area Sparkline with Peak Dot',
+    category: 'kpi',
+    description: 'Executive KPI card featuring a soft gradient area trendline with peak dot marker and quarterly timeline ticks.',
+    tags: ['kpi', 'card', 'area', 'sparkline', 'gradient', 'peak', 'executive'],
+    viewBox: '0 0 170 120',
+    recommendedDimensions: { width: 170, height: 120 },
+    pbiTips: {
+      visualType: 'Card (new) / Table / Matrix / Image',
+      recommendedWidth: 170,
+      recommendedHeight: 120,
+      notes: 'Clean area sparkline card. Highlights all-time peak with pulsing target dot.',
+    },
+    params: [
+      { id: 'title', label: 'Metric Title', type: 'text', defaultValue: 'Profit as at 30/12/2024', daxVarName: '_Title' },
+      { id: 'value', label: 'Callout Value', type: 'text', defaultValue: '$95,926', daxVarName: '_MetricValue' },
+      { id: 'delta', label: 'Delta (%)', type: 'number', defaultValue: 16.0, step: 0.1, daxVarName: '_DeltaPct' },
+      { id: 'subtext', label: 'Secondary Context', type: 'text', defaultValue: 'Last Year : $82,665 (+13.2k)', daxVarName: '_Subtext' },
+      { id: 'lineColor', label: 'Sparkline Color', type: 'color', defaultValue: '#3B82F6', daxVarName: '_LineColor' },
+      { id: 'areaColor', label: 'Area Fill Color', type: 'color', defaultValue: '#93C5FD', daxVarName: '_AreaColor' },
+      { id: 'peakColor', label: 'Peak Marker Color', type: 'color', defaultValue: '#1D4ED8', daxVarName: '_PeakColor' },
+    ],
+    renderSvg: (params) => {
+      const title = String(params.title ?? 'Profit as at 30/12/2024');
+      const value = String(params.value ?? '$95,926');
+      const delta = Number(params.delta ?? 16.0);
+      const subtext = String(params.subtext ?? 'Last Year : $82,665 (+13.2k)');
+      const lineColor = params.lineColor || '#3B82F6';
+      const areaColor = params.areaColor || '#93C5FD';
+      const peakColor = params.peakColor || '#1D4ED8';
+      const isPos = delta >= 0;
+      const deltaColor = isPos ? '#10B981' : '#EF4444';
+      const arrow = isPos ? '▲' : '▼';
+
+      const linePath = 'M 14,88 L 26,82 L 38,70 L 50,84 L 62,54 L 74,68 L 86,62 L 98,58 L 110,66 L 122,56 L 134,72 L 146,58 L 156,52';
+      const areaPath = 'M 14,88 L 26,82 L 38,70 L 50,84 L 62,54 L 74,68 L 86,62 L 98,58 L 110,66 L 122,56 L 134,72 L 146,58 L 156,52 L 156,98 L 14,98 Z';
+
+      return `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 170 120' width='100%' height='100%'>
+  <defs>
+    <linearGradient id='kpiAreaGrad' x1='0' y1='0' x2='0' y2='1'>
+      <stop offset='0%' stop-color='${areaColor}' stop-opacity='0.45' />
+      <stop offset='100%' stop-color='${areaColor}' stop-opacity='0.03' />
+    </linearGradient>
+  </defs>
+  <rect x='1' y='1' width='168' height='118' rx='8' fill='#FFFFFF' stroke='#E2E8F0' stroke-width='1.5' />
+  <text x='12' y='18' font-family='Segoe UI, sans-serif' font-size='8' font-weight='500' fill='#64748B'>${title}</text>
+  <text x='12' y='36' font-family='Segoe UI, sans-serif' font-size='17' font-weight='900' fill='#0F172A'>${value}</text>
+  <text x='100' y='35' font-family='Segoe UI, sans-serif' font-size='9.5' font-weight='700' fill='${deltaColor}'>${arrow} ${Math.abs(delta).toFixed(1)}%</text>
+  <text x='12' y='47' font-family='Segoe UI, sans-serif' font-size='7' font-weight='500' fill='#94A3B8'>${subtext}</text>
+  <path d='${areaPath}' fill='url(#kpiAreaGrad)' />
+  <line x1='14' y1='98' x2='156' y2='98' stroke='#F1F5F9' stroke-width='1' />
+  <path d='${linePath}' fill='none' stroke='${lineColor}' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' />
+  <circle cx='62' cy='54' r='4' fill='#FFFFFF' stroke='${peakColor}' stroke-width='2' />
+  <circle cx='62' cy='54' r='2' fill='${peakColor}' />
+  <text x='62' y='47' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6' font-weight='700' fill='${peakColor}'>Peak</text>
+  <text x='14' y='109' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>Jan</text>
+  <text x='50' y='109' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>Apr</text>
+  <text x='86' y='109' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>Jul</text>
+  <text x='122' y='109' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>Oct</text>
+  <text x='156' y='109' text-anchor='end' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>Dec</text>
+</svg>`;
+    },
+    generateDax: (params, measureName = 'SVG_KPI_Card_Area_Sparkline') => {
+      return buildDaxMeasure({
+        measureName,
+        description: 'Executive KPI card featuring a soft gradient area sparkline and peak marker.',
+        configVars: [
+          { name: '_Title', value: params.title ?? 'Profit as at 30/12/2024', type: 'text' },
+          { name: '_MetricValue', value: params.value ?? '$95,926', type: 'text' },
+          { name: '_DeltaPct', value: params.delta ?? 16.0, type: 'number' },
+          { name: '_Subtext', value: params.subtext ?? 'Last Year : $82,665 (+13.2k)', type: 'text' },
+          { name: '_LineColor', value: params.lineColor || '#3B82F6', type: 'color' },
+          { name: '_AreaColor', value: params.areaColor || '#93C5FD', type: 'color' },
+          { name: '_PeakColor', value: params.peakColor || '#1D4ED8', type: 'color' },
+        ],
+        calcVars: [
+          { name: '_IsPos', expression: '_DeltaPct >= 0' },
+          { name: '_DeltaColor', expression: 'IF( _IsPos, "#10B981", "#EF4444" )' },
+          { name: '_DeltaArrow', expression: 'IF( _IsPos, "▲ ", "▼ " )' },
+          { name: '_DeltaFormatted', expression: '_DeltaArrow & FORMAT( ABS( _DeltaPct ), "0.0" ) & "%"' },
+        ],
+        svgElements: [
+          {
+            name: '_Defs',
+            expression: `"<defs><linearGradient id='kpiAreaGrad' x1='0' y1='0' x2='0' y2='1'>" &
+    "<stop offset='0%' stop-color='" & _AreaColor & "' stop-opacity='0.45'/>" &
+    "<stop offset='100%' stop-color='" & _AreaColor & "' stop-opacity='0.03'/>" &
+    "</linearGradient></defs>"`,
+          },
+          {
+            name: '_CardFrame',
+            expression: `"<rect x='1' y='1' width='168' height='118' rx='8' fill='#FFFFFF' stroke='#E2E8F0' stroke-width='1.5'/>"`,
+          },
+          {
+            name: '_Header',
+            expression: `"<text x='12' y='18' font-family='Segoe UI, sans-serif' font-size='8' font-weight='500' fill='#64748B'>" & _Title & "</text>" &
+    "<text x='12' y='36' font-family='Segoe UI, sans-serif' font-size='17' font-weight='900' fill='#0F172A'>" & _MetricValue & "</text>" &
+    "<text x='100' y='35' font-family='Segoe UI, sans-serif' font-size='9.5' font-weight='700' fill='" & _DeltaColor & "'>" & _DeltaFormatted & "</text>" &
+    "<text x='12' y='47' font-family='Segoe UI, sans-serif' font-size='7' font-weight='500' fill='#94A3B8'>" & _Subtext & "</text>"`,
+          },
+          {
+            name: '_ChartMarkup',
+            expression: `"<path d='M 14,88 L 26,82 L 38,70 L 50,84 L 62,54 L 74,68 L 86,62 L 98,58 L 110,66 L 122,56 L 134,72 L 146,58 L 156,52 L 156,98 L 14,98 Z' fill='url(#kpiAreaGrad)'/>" &
+    "<line x1='14' y1='98' x2='156' y2='98' stroke='#F1F5F9' stroke-width='1'/>" &
+    "<path d='M 14,88 L 26,82 L 38,70 L 50,84 L 62,54 L 74,68 L 86,62 L 98,58 L 110,66 L 122,56 L 134,72 L 146,58 L 156,52' fill='none' stroke='" & _LineColor & "' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/>" &
+    "<circle cx='62' cy='54' r='4' fill='#FFFFFF' stroke='" & _PeakColor & "' stroke-width='2'/>" &
+    "<circle cx='62' cy='54' r='2' fill='" & _PeakColor & "'/>" &
+    "<text x='62' y='47' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6' font-weight='700' fill='" & _PeakColor & "'>Peak</text>"`,
+          },
+          {
+            name: '_AxisMarkup',
+            expression: `"<text x='14' y='109' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>Jan</text>" &
+    "<text x='50' y='109' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>Apr</text>" &
+    "<text x='86' y='109' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>Jul</text>" &
+    "<text x='122' y='109' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>Oct</text>" &
+    "<text x='156' y='109' text-anchor='end' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>Dec</text>"`,
+          },
+        ],
+        viewBox: '0 0 170 120',
+      });
+    },
+  },
+
+  {
+    id: 'kpi-card-dual-trendline',
+    name: 'KPI Card: Dual Trendlines (CY vs LY)',
+    category: 'kpi',
+    description: 'Executive KPI card tracking Current Year vs Prior Year trajectories simultaneously with comparative legend.',
+    tags: ['kpi', 'card', 'dual', 'trendline', 'cy', 'ly', 'comparison', 'executive'],
+    viewBox: '0 0 170 120',
+    recommendedDimensions: { width: 170, height: 120 },
+    pbiTips: {
+      visualType: 'Card (new) / Table / Matrix / Image',
+      recommendedWidth: 170,
+      recommendedHeight: 120,
+      notes: 'Displays solid CY vs dashed LY lines side-by-side with interactive legend.',
+    },
+    params: [
+      { id: 'title', label: 'Metric Title', type: 'text', defaultValue: 'Profit as at 30/12/2024', daxVarName: '_Title' },
+      { id: 'value', label: 'Callout Value', type: 'text', defaultValue: '$95,926', daxVarName: '_MetricValue' },
+      { id: 'delta', label: 'Delta (%)', type: 'number', defaultValue: 16.0, step: 0.1, daxVarName: '_DeltaPct' },
+      { id: 'subtext', label: 'Secondary Context', type: 'text', defaultValue: 'Last Year : $82,665 (+13.2k)', daxVarName: '_Subtext' },
+      { id: 'cyColor', label: 'Current Year (CY) Color', type: 'color', defaultValue: '#2563EB', daxVarName: '_CYColor' },
+      { id: 'lyColor', label: 'Last Year (LY) Color', type: 'color', defaultValue: '#94A3B8', daxVarName: '_LYColor' },
+    ],
+    renderSvg: (params) => {
+      const title = String(params.title ?? 'Profit as at 30/12/2024');
+      const value = String(params.value ?? '$95,926');
+      const delta = Number(params.delta ?? 16.0);
+      const subtext = String(params.subtext ?? 'Last Year : $82,665 (+13.2k)');
+      const cyColor = params.cyColor || '#2563EB';
+      const lyColor = params.lyColor || '#94A3B8';
+      const isPos = delta >= 0;
+      const deltaColor = isPos ? '#10B981' : '#EF4444';
+      const arrow = isPos ? '▲' : '▼';
+      const months = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
+
+      const lyPath = 'M 14,84 L 26,80 L 38,76 L 50,78 L 62,72 L 74,74 L 86,68 L 98,66 L 110,64 L 122,62 L 134,60 L 146,58 L 156,56';
+      const cyPath = 'M 14,80 L 26,72 L 38,64 L 50,70 L 62,56 L 74,62 L 86,58 L 98,54 L 110,60 L 122,50 L 134,54 L 146,48 L 156,44';
+
+      const labelsSvg = months
+        .map((m, i) => {
+          const x = 15.75 + i * 11.5;
+          return `<text x='${x.toFixed(1)}' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>${m}</text>`;
+        })
+        .join('\n  ');
+
+      return `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 170 120' width='100%' height='100%'>
+  <rect x='1' y='1' width='168' height='118' rx='8' fill='#FFFFFF' stroke='#E2E8F0' stroke-width='1.5' />
+  <text x='12' y='18' font-family='Segoe UI, sans-serif' font-size='8' font-weight='500' fill='#64748B'>${title}</text>
+  <circle cx='120' cy='15' r='2.5' fill='${cyColor}' />
+  <text x='125' y='17.5' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='600' fill='#1E293B'>CY</text>
+  <circle cx='142' cy='15' r='2.5' fill='${lyColor}' />
+  <text x='147' y='17.5' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='600' fill='#64748B'>LY</text>
+  <text x='12' y='36' font-family='Segoe UI, sans-serif' font-size='17' font-weight='900' fill='#0F172A'>${value}</text>
+  <text x='100' y='35' font-family='Segoe UI, sans-serif' font-size='9.5' font-weight='700' fill='${deltaColor}'>${arrow} ${Math.abs(delta).toFixed(1)}%</text>
+  <text x='12' y='47' font-family='Segoe UI, sans-serif' font-size='7' font-weight='500' fill='#94A3B8'>${subtext}</text>
+  <line x1='12' y1='98' x2='158' y2='98' stroke='#F1F5F9' stroke-width='1' />
+  <path d='${lyPath}' fill='none' stroke='${lyColor}' stroke-width='1.5' stroke-dasharray='3 2' />
+  <path d='${cyPath}' fill='none' stroke='${cyColor}' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' />
+  <circle cx='156' cy='44' r='3' fill='${cyColor}' />
+  ${labelsSvg}
+</svg>`;
+    },
+    generateDax: (params, measureName = 'SVG_KPI_Card_Dual_Trendlines') => {
+      return buildDaxMeasure({
+        measureName,
+        description: 'Executive KPI card tracking Current Year vs Prior Year trajectories.',
+        configVars: [
+          { name: '_Title', value: params.title ?? 'Profit as at 30/12/2024', type: 'text' },
+          { name: '_MetricValue', value: params.value ?? '$95,926', type: 'text' },
+          { name: '_DeltaPct', value: params.delta ?? 16.0, type: 'number' },
+          { name: '_Subtext', value: params.subtext ?? 'Last Year : $82,665 (+13.2k)', type: 'text' },
+          { name: '_CYColor', value: params.cyColor || '#2563EB', type: 'color' },
+          { name: '_LYColor', value: params.lyColor || '#94A3B8', type: 'color' },
+        ],
+        calcVars: [
+          { name: '_IsPos', expression: '_DeltaPct >= 0' },
+          { name: '_DeltaColor', expression: 'IF( _IsPos, "#10B981", "#EF4444" )' },
+          { name: '_DeltaArrow', expression: 'IF( _IsPos, "▲ ", "▼ " )' },
+          { name: '_DeltaFormatted', expression: '_DeltaArrow & FORMAT( ABS( _DeltaPct ), "0.0" ) & "%"' },
+        ],
+        svgElements: [
+          {
+            name: '_CardFrame',
+            expression: `"<rect x='1' y='1' width='168' height='118' rx='8' fill='#FFFFFF' stroke='#E2E8F0' stroke-width='1.5'/>"`,
+          },
+          {
+            name: '_Header',
+            expression: `"<text x='12' y='18' font-family='Segoe UI, sans-serif' font-size='8' font-weight='500' fill='#64748B'>" & _Title & "</text>" &
+    "<circle cx='120' cy='15' r='2.5' fill='" & _CYColor & "'/>" &
+    "<text x='125' y='17.5' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='600' fill='#1E293B'>CY</text>" &
+    "<circle cx='142' cy='15' r='2.5' fill='" & _LYColor & "'/>" &
+    "<text x='147' y='17.5' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='600' fill='#64748B'>LY</text>" &
+    "<text x='12' y='36' font-family='Segoe UI, sans-serif' font-size='17' font-weight='900' fill='#0F172A'>" & _MetricValue & "</text>" &
+    "<text x='100' y='35' font-family='Segoe UI, sans-serif' font-size='9.5' font-weight='700' fill='" & _DeltaColor & "'>" & _DeltaFormatted & "</text>" &
+    "<text x='12' y='47' font-family='Segoe UI, sans-serif' font-size='7' font-weight='500' fill='#94A3B8'>" & _Subtext & "</text>"`,
+          },
+          {
+            name: '_LinesMarkup',
+            expression: `"<line x1='12' y1='98' x2='158' y2='98' stroke='#F1F5F9' stroke-width='1'/>" &
+    "<path d='M 14,84 L 26,80 L 38,76 L 50,78 L 62,72 L 74,74 L 86,68 L 98,66 L 110,64 L 122,62 L 134,60 L 146,58 L 156,56' fill='none' stroke='" & _LYColor & "' stroke-width='1.5' stroke-dasharray='3 2'/>" &
+    "<path d='M 14,80 L 26,72 L 38,64 L 50,70 L 62,56 L 74,62 L 86,58 L 98,54 L 110,60 L 122,50 L 134,54 L 146,48 L 156,44' fill='none' stroke='" & _CYColor & "' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/>" &
+    "<circle cx='156' cy='44' r='3' fill='" & _CYColor & "'/>"`,
+          },
+          {
+            name: '_LabelsMarkup',
+            expression: `"<text x='15.8' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>J</text>" &
+    "<text x='27.3' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>F</text>" &
+    "<text x='38.8' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>M</text>" &
+    "<text x='50.3' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>A</text>" &
+    "<text x='61.8' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>M</text>" &
+    "<text x='73.3' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>J</text>" &
+    "<text x='84.8' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>J</text>" &
+    "<text x='96.3' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>A</text>" &
+    "<text x='107.8' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>S</text>" &
+    "<text x='119.3' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>O</text>" &
+    "<text x='130.8' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>N</text>" &
+    "<text x='142.3' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>D</text>"`,
+          },
+        ],
+        viewBox: '0 0 170 120',
+      });
+    },
+  },
+
+  {
+    id: 'kpi-card-variance-columns',
+    name: 'KPI Card: MoM Variance Columns',
+    category: 'kpi',
+    description: 'Executive KPI card featuring 12 color-coded variance bars (Better in green, Worse in coral) around a central zero baseline.',
+    tags: ['kpi', 'card', 'variance', 'mom', 'columns', 'better', 'worse', 'executive'],
+    viewBox: '0 0 170 120',
+    recommendedDimensions: { width: 170, height: 120 },
+    pbiTips: {
+      visualType: 'Card (new) / Table / Matrix / Image',
+      recommendedWidth: 170,
+      recommendedHeight: 120,
+      notes: 'Displays month-over-month differences above and below a zero baseline.',
+    },
+    params: [
+      { id: 'title', label: 'Metric Title', type: 'text', defaultValue: 'Profit as at 30/12/2024', daxVarName: '_Title' },
+      { id: 'value', label: 'Callout Value', type: 'text', defaultValue: '$95,926', daxVarName: '_MetricValue' },
+      { id: 'delta', label: 'Delta (%)', type: 'number', defaultValue: 16.0, step: 0.1, daxVarName: '_DeltaPct' },
+      { id: 'subtext', label: 'Secondary Context', type: 'text', defaultValue: 'MoM diff: Better vs Worse', daxVarName: '_Subtext' },
+      { id: 'betterColor', label: 'Better Color (Positive)', type: 'color', defaultValue: '#10B981', daxVarName: '_BetterColor' },
+      { id: 'worseColor', label: 'Worse Color (Negative)', type: 'color', defaultValue: '#F43F5E', daxVarName: '_WorseColor' },
+    ],
+    renderSvg: (params) => {
+      const title = String(params.title ?? 'Profit as at 30/12/2024');
+      const value = String(params.value ?? '$95,926');
+      const delta = Number(params.delta ?? 16.0);
+      const subtext = String(params.subtext ?? 'MoM diff: Better vs Worse');
+      const betterColor = params.betterColor || '#10B981';
+      const worseColor = params.worseColor || '#F43F5E';
+      const isPos = delta >= 0;
+      const deltaColor = isPos ? '#10B981' : '#EF4444';
+      const arrow = isPos ? '▲' : '▼';
+      const months = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
+
+      const deltas = [14, -8, 20, -12, 24, 16, -10, 18, 10, -14, 8, 22];
+
+      const barsSvg = deltas
+        .map((d, i) => {
+          const x = 12 + i * 11.5;
+          const isBetter = d >= 0;
+          const h = Math.abs(d);
+          const y = isBetter ? 80 - h : 80;
+          const fill = isBetter ? betterColor : worseColor;
+          return `<rect x='${x.toFixed(1)}' y='${y}' width='7.5' height='${h}' rx='1' fill='${fill}' />`;
+        })
+        .join('\n  ');
+
+      const labelsSvg = months
+        .map((m, i) => {
+          const x = 15.75 + i * 11.5;
+          return `<text x='${x.toFixed(1)}' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>${m}</text>`;
+        })
+        .join('\n  ');
+
+      return `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 170 120' width='100%' height='100%'>
+  <rect x='1' y='1' width='168' height='118' rx='8' fill='#FFFFFF' stroke='#E2E8F0' stroke-width='1.5' />
+  <text x='12' y='18' font-family='Segoe UI, sans-serif' font-size='8' font-weight='500' fill='#64748B'>${title}</text>
+  <circle cx='108' cy='15' r='2' fill='${betterColor}' />
+  <text x='113' y='17.5' font-family='Segoe UI, sans-serif' font-size='6' fill='#64748B'>Better</text>
+  <circle cx='138' cy='15' r='2' fill='${worseColor}' />
+  <text x='143' y='17.5' font-family='Segoe UI, sans-serif' font-size='6' fill='#64748B'>Worse</text>
+  <text x='12' y='36' font-family='Segoe UI, sans-serif' font-size='17' font-weight='900' fill='#0F172A'>${value}</text>
+  <text x='100' y='35' font-family='Segoe UI, sans-serif' font-size='9.5' font-weight='700' fill='${deltaColor}'>${arrow} ${Math.abs(delta).toFixed(1)}%</text>
+  <text x='12' y='47' font-family='Segoe UI, sans-serif' font-size='7' font-weight='500' fill='#94A3B8'>${subtext}</text>
+  <line x1='12' y1='80' x2='158' y2='80' stroke='#CBD5E1' stroke-width='1' stroke-dasharray='2 2' />
+  ${barsSvg}
+  ${labelsSvg}
+</svg>`;
+    },
+    generateDax: (params, measureName = 'SVG_KPI_Card_Variance_Columns') => {
+      return buildDaxMeasure({
+        measureName,
+        description: 'Executive KPI card with 12 color-coded variance columns around a central zero baseline.',
+        configVars: [
+          { name: '_Title', value: params.title ?? 'Profit as at 30/12/2024', type: 'text' },
+          { name: '_MetricValue', value: params.value ?? '$95,926', type: 'text' },
+          { name: '_DeltaPct', value: params.delta ?? 16.0, type: 'number' },
+          { name: '_Subtext', value: params.subtext ?? 'MoM diff: Better vs Worse', type: 'text' },
+          { name: '_BetterColor', value: params.betterColor || '#10B981', type: 'color' },
+          { name: '_WorseColor', value: params.worseColor || '#F43F5E', type: 'color' },
+        ],
+        calcVars: [
+          { name: '_IsPos', expression: '_DeltaPct >= 0' },
+          { name: '_DeltaColor', expression: 'IF( _IsPos, "#10B981", "#EF4444" )' },
+          { name: '_DeltaArrow', expression: 'IF( _IsPos, "▲ ", "▼ " )' },
+          { name: '_DeltaFormatted', expression: '_DeltaArrow & FORMAT( ABS( _DeltaPct ), "0.0" ) & "%"' },
+        ],
+        svgElements: [
+          {
+            name: '_CardFrame',
+            expression: `"<rect x='1' y='1' width='168' height='118' rx='8' fill='#FFFFFF' stroke='#E2E8F0' stroke-width='1.5'/>"`,
+          },
+          {
+            name: '_Header',
+            expression: `"<text x='12' y='18' font-family='Segoe UI, sans-serif' font-size='8' font-weight='500' fill='#64748B'>" & _Title & "</text>" &
+    "<circle cx='108' cy='15' r='2' fill='" & _BetterColor & "'/>" &
+    "<text x='113' y='17.5' font-family='Segoe UI, sans-serif' font-size='6' fill='#64748B'>Better</text>" &
+    "<circle cx='138' cy='15' r='2' fill='" & _WorseColor & "'/>" &
+    "<text x='143' y='17.5' font-family='Segoe UI, sans-serif' font-size='6' fill='#64748B'>Worse</text>" &
+    "<text x='12' y='36' font-family='Segoe UI, sans-serif' font-size='17' font-weight='900' fill='#0F172A'>" & _MetricValue & "</text>" &
+    "<text x='100' y='35' font-family='Segoe UI, sans-serif' font-size='9.5' font-weight='700' fill='" & _DeltaColor & "'>" & _DeltaFormatted & "</text>" &
+    "<text x='12' y='47' font-family='Segoe UI, sans-serif' font-size='7' font-weight='500' fill='#94A3B8'>" & _Subtext & "</text>"`,
+          },
+          {
+            name: '_BarsMarkup',
+            expression: `"<line x1='12' y1='80' x2='158' y2='80' stroke='#CBD5E1' stroke-width='1' stroke-dasharray='2 2'/>" &
+    "<rect x='12.0' y='66' width='7.5' height='14' rx='1' fill='" & _BetterColor & "'/>" &
+    "<rect x='23.5' y='80' width='7.5' height='8' rx='1' fill='" & _WorseColor & "'/>" &
+    "<rect x='35.0' y='60' width='7.5' height='20' rx='1' fill='" & _BetterColor & "'/>" &
+    "<rect x='46.5' y='80' width='7.5' height='12' rx='1' fill='" & _WorseColor & "'/>" &
+    "<rect x='58.0' y='56' width='7.5' height='24' rx='1' fill='" & _BetterColor & "'/>" &
+    "<rect x='69.5' y='64' width='7.5' height='16' rx='1' fill='" & _BetterColor & "'/>" &
+    "<rect x='81.0' y='80' width='7.5' height='10' rx='1' fill='" & _WorseColor & "'/>" &
+    "<rect x='92.5' y='62' width='7.5' height='18' rx='1' fill='" & _BetterColor & "'/>" &
+    "<rect x='104.0' y='70' width='7.5' height='10' rx='1' fill='" & _BetterColor & "'/>" &
+    "<rect x='115.5' y='80' width='7.5' height='14' rx='1' fill='" & _WorseColor & "'/>" &
+    "<rect x='127.0' y='72' width='7.5' height='8' rx='1' fill='" & _BetterColor & "'/>" &
+    "<rect x='138.5' y='58' width='7.5' height='22' rx='1' fill='" & _BetterColor & "'/>"`,
+          },
+          {
+            name: '_LabelsMarkup',
+            expression: `"<text x='15.8' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>J</text>" &
+    "<text x='27.3' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>F</text>" &
+    "<text x='38.8' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>M</text>" &
+    "<text x='50.3' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>A</text>" &
+    "<text x='61.8' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>M</text>" &
+    "<text x='73.3' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>J</text>" &
+    "<text x='84.8' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>J</text>" &
+    "<text x='96.3' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>A</text>" &
+    "<text x='107.8' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>S</text>" &
+    "<text x='119.3' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>O</text>" &
+    "<text x='130.8' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>N</text>" &
+    "<text x='142.3' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>D</text>"`,
+          },
+        ],
+        viewBox: '0 0 170 120',
+      });
+    },
+  },
+
+  {
+    id: 'kpi-card-combo-line-variance',
+    name: 'KPI Card: Combo Trendline & Variance',
+    category: 'kpi',
+    description: 'Executive KPI card combining top actuals trendline with bottom diverging target variance bars.',
+    tags: ['kpi', 'card', 'combo', 'trendline', 'variance', 'diverging', 'executive'],
+    viewBox: '0 0 170 120',
+    recommendedDimensions: { width: 170, height: 120 },
+    pbiTips: {
+      visualType: 'Card (new) / Table / Matrix / Image',
+      recommendedWidth: 170,
+      recommendedHeight: 120,
+      notes: 'Provides two visual perspectives: absolute trajectory at top, and variance deltas below.',
+    },
+    params: [
+      { id: 'title', label: 'Metric Title', type: 'text', defaultValue: 'Profit as at 30/12/2024', daxVarName: '_Title' },
+      { id: 'value', label: 'Callout Value', type: 'text', defaultValue: '$95,926', daxVarName: '_MetricValue' },
+      { id: 'delta', label: 'Delta (%)', type: 'number', defaultValue: 16.0, step: 0.1, daxVarName: '_DeltaPct' },
+      { id: 'subtext', label: 'Secondary Context', type: 'text', defaultValue: 'Upper: Trend | Lower: Variance', daxVarName: '_Subtext' },
+      { id: 'trendColor', label: 'Trend Line Color', type: 'color', defaultValue: '#334155', daxVarName: '_TrendColor' },
+      { id: 'posColor', label: 'Positive Variance Color', type: 'color', defaultValue: '#10B981', daxVarName: '_PosColor' },
+      { id: 'negColor', label: 'Negative Variance Color', type: 'color', defaultValue: '#F43F5E', daxVarName: '_NegColor' },
+    ],
+    renderSvg: (params) => {
+      const title = String(params.title ?? 'Profit as at 30/12/2024');
+      const value = String(params.value ?? '$95,926');
+      const delta = Number(params.delta ?? 16.0);
+      const subtext = String(params.subtext ?? 'Upper: Trend | Lower: Variance');
+      const trendColor = params.trendColor || '#334155';
+      const posColor = params.posColor || '#10B981';
+      const negColor = params.negColor || '#F43F5E';
+      const isPos = delta >= 0;
+      const deltaColor = isPos ? '#10B981' : '#EF4444';
+      const arrow = isPos ? '▲' : '▼';
+      const months = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
+
+      const trendPath = 'M 14,70 L 26,66 L 38,58 L 50,64 L 62,54 L 74,56 L 86,52 L 98,50 L 110,54 L 122,48 L 134,52 L 146,46 L 156,44';
+      const varDeltas = [6, -4, 8, -5, 10, 7, -4, 9, 5, -6, 4, 11];
+
+      const varBarsSvg = varDeltas
+        .map((d, i) => {
+          const x = 13 + i * 11.5;
+          const isBetter = d >= 0;
+          const h = Math.abs(d);
+          const y = isBetter ? 90 - h : 90;
+          const fill = isBetter ? posColor : negColor;
+          return `<rect x='${x.toFixed(1)}' y='${y}' width='5.5' height='${h}' rx='1' fill='${fill}' />`;
+        })
+        .join('\n  ');
+
+      const labelsSvg = months
+        .map((m, i) => {
+          const x = 15.75 + i * 11.5;
+          return `<text x='${x.toFixed(1)}' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>${m}</text>`;
+        })
+        .join('\n  ');
+
+      return `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 170 120' width='100%' height='100%'>
+  <rect x='1' y='1' width='168' height='118' rx='8' fill='#FFFFFF' stroke='#E2E8F0' stroke-width='1.5' />
+  <text x='12' y='18' font-family='Segoe UI, sans-serif' font-size='8' font-weight='500' fill='#64748B'>${title}</text>
+  <text x='12' y='36' font-family='Segoe UI, sans-serif' font-size='17' font-weight='900' fill='#0F172A'>${value}</text>
+  <text x='100' y='35' font-family='Segoe UI, sans-serif' font-size='9.5' font-weight='700' fill='${deltaColor}'>${arrow} ${Math.abs(delta).toFixed(1)}%</text>
+  <text x='12' y='47' font-family='Segoe UI, sans-serif' font-size='7' font-weight='500' fill='#94A3B8'>${subtext}</text>
+  <path d='${trendPath}' fill='none' stroke='${trendColor}' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round' />
+  <circle cx='156' cy='44' r='2.5' fill='${trendColor}' />
+  <line x1='12' y1='76' x2='158' y2='76' stroke='#F1F5F9' stroke-width='1' />
+  <line x1='12' y1='90' x2='158' y2='90' stroke='#E2E8F0' stroke-width='0.75' stroke-dasharray='2 2' />
+  ${varBarsSvg}
+  ${labelsSvg}
+</svg>`;
+    },
+    generateDax: (params, measureName = 'SVG_KPI_Card_Combo_Trend_Variance') => {
+      return buildDaxMeasure({
+        measureName,
+        description: 'Executive KPI card combining top actuals trendline with bottom diverging target variance bars.',
+        configVars: [
+          { name: '_Title', value: params.title ?? 'Profit as at 30/12/2024', type: 'text' },
+          { name: '_MetricValue', value: params.value ?? '$95,926', type: 'text' },
+          { name: '_DeltaPct', value: params.delta ?? 16.0, type: 'number' },
+          { name: '_Subtext', value: params.subtext ?? 'Upper: Trend | Lower: Variance', type: 'text' },
+          { name: '_TrendColor', value: params.trendColor || '#334155', type: 'color' },
+          { name: '_PosColor', value: params.posColor || '#10B981', type: 'color' },
+          { name: '_NegColor', value: params.negColor || '#F43F5E', type: 'color' },
+        ],
+        calcVars: [
+          { name: '_IsPos', expression: '_DeltaPct >= 0' },
+          { name: '_DeltaColor', expression: 'IF( _IsPos, "#10B981", "#EF4444" )' },
+          { name: '_DeltaArrow', expression: 'IF( _IsPos, "▲ ", "▼ " )' },
+          { name: '_DeltaFormatted', expression: '_DeltaArrow & FORMAT( ABS( _DeltaPct ), "0.0" ) & "%"' },
+        ],
+        svgElements: [
+          {
+            name: '_CardFrame',
+            expression: `"<rect x='1' y='1' width='168' height='118' rx='8' fill='#FFFFFF' stroke='#E2E8F0' stroke-width='1.5'/>"`,
+          },
+          {
+            name: '_Header',
+            expression: `"<text x='12' y='18' font-family='Segoe UI, sans-serif' font-size='8' font-weight='500' fill='#64748B'>" & _Title & "</text>" &
+    "<text x='12' y='36' font-family='Segoe UI, sans-serif' font-size='17' font-weight='900' fill='#0F172A'>" & _MetricValue & "</text>" &
+    "<text x='100' y='35' font-family='Segoe UI, sans-serif' font-size='9.5' font-weight='700' fill='" & _DeltaColor & "'>" & _DeltaFormatted & "</text>" &
+    "<text x='12' y='47' font-family='Segoe UI, sans-serif' font-size='7' font-weight='500' fill='#94A3B8'>" & _Subtext & "</text>"`,
+          },
+          {
+            name: '_TrendMarkup',
+            expression: `"<path d='M 14,70 L 26,66 L 38,58 L 50,64 L 62,54 L 74,56 L 86,52 L 98,50 L 110,54 L 122,48 L 134,52 L 146,46 L 156,44' fill='none' stroke='" & _TrendColor & "' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/>" &
+    "<circle cx='156' cy='44' r='2.5' fill='" & _TrendColor & "'/>" &
+    "<line x1='12' y1='76' x2='158' y2='76' stroke='#F1F5F9' stroke-width='1'/>" &
+    "<line x1='12' y1='90' x2='158' y2='90' stroke='#E2E8F0' stroke-width='0.75' stroke-dasharray='2 2'/>"`,
+          },
+          {
+            name: '_BarsMarkup',
+            expression: `"<rect x='13.0' y='84' width='5.5' height='6' rx='1' fill='" & _PosColor & "'/>" &
+    "<rect x='24.5' y='90' width='5.5' height='4' rx='1' fill='" & _NegColor & "'/>" &
+    "<rect x='36.0' y='82' width='5.5' height='8' rx='1' fill='" & _PosColor & "'/>" &
+    "<rect x='47.5' y='90' width='5.5' height='5' rx='1' fill='" & _NegColor & "'/>" &
+    "<rect x='59.0' y='80' width='5.5' height='10' rx='1' fill='" & _PosColor & "'/>" &
+    "<rect x='70.5' y='83' width='5.5' height='7' rx='1' fill='" & _PosColor & "'/>" &
+    "<rect x='82.0' y='90' width='5.5' height='4' rx='1' fill='" & _NegColor & "'/>" &
+    "<rect x='93.5' y='81' width='5.5' height='9' rx='1' fill='" & _PosColor & "'/>" &
+    "<rect x='105.0' y='85' width='5.5' height='5' rx='1' fill='" & _PosColor & "'/>" &
+    "<rect x='116.5' y='90' width='5.5' height='6' rx='1' fill='" & _NegColor & "'/>" &
+    "<rect x='128.0' y='86' width='5.5' height='4' rx='1' fill='" & _PosColor & "'/>" &
+    "<rect x='139.5' y='79' width='5.5' height='11' rx='1' fill='" & _PosColor & "'/>"`,
+          },
+          {
+            name: '_LabelsMarkup',
+            expression: `"<text x='15.8' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>J</text>" &
+    "<text x='27.3' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>F</text>" &
+    "<text x='38.8' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>M</text>" &
+    "<text x='50.3' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>A</text>" &
+    "<text x='61.8' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>M</text>" &
+    "<text x='73.3' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>J</text>" &
+    "<text x='84.8' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>J</text>" &
+    "<text x='96.3' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>A</text>" &
+    "<text x='107.8' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>S</text>" &
+    "<text x='119.3' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>O</text>" &
+    "<text x='130.8' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>N</text>" &
+    "<text x='142.3' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>D</text>"`,
+          },
+        ],
+        viewBox: '0 0 170 120',
+      });
+    },
+  },
+
+  {
+    id: 'kpi-card-lollipop-variance',
+    name: 'KPI Card: Monthly Lollipop Variance',
+    category: 'kpi',
+    description: 'Executive KPI card with 12 monthly lollipop stems and circular heads color-coded by performance tier.',
+    tags: ['kpi', 'card', 'lollipop', 'stems', 'monthly', 'variance', 'executive'],
+    viewBox: '0 0 170 120',
+    recommendedDimensions: { width: 170, height: 120 },
+    pbiTips: {
+      visualType: 'Card (new) / Table / Matrix / Image',
+      recommendedWidth: 170,
+      recommendedHeight: 120,
+      notes: 'Clean lollipop chart with stem and head markers for monthly KPI pacing.',
+    },
+    params: [
+      { id: 'title', label: 'Metric Title', type: 'text', defaultValue: 'Profit as at 30/12/2024', daxVarName: '_Title' },
+      { id: 'value', label: 'Callout Value', type: 'text', defaultValue: '$95,926', daxVarName: '_MetricValue' },
+      { id: 'delta', label: 'Delta (%)', type: 'number', defaultValue: 16.0, step: 0.1, daxVarName: '_DeltaPct' },
+      { id: 'subtext', label: 'Secondary Context', type: 'text', defaultValue: 'Last Year : $82,665 (+13.2k)', daxVarName: '_Subtext' },
+      { id: 'stemColor', label: 'Stem Color', type: 'color', defaultValue: '#CBD5E1', daxVarName: '_StemColor' },
+      { id: 'headGood', label: 'Surplus Head Color', type: 'color', defaultValue: '#0D9488', daxVarName: '_HeadGood' },
+      { id: 'headDeficit', label: 'Deficit Head Color', type: 'color', defaultValue: '#E11D48', daxVarName: '_HeadDeficit' },
+    ],
+    renderSvg: (params) => {
+      const title = String(params.title ?? 'Profit as at 30/12/2024');
+      const value = String(params.value ?? '$95,926');
+      const delta = Number(params.delta ?? 16.0);
+      const subtext = String(params.subtext ?? 'Last Year : $82,665 (+13.2k)');
+      const stemColor = params.stemColor || '#CBD5E1';
+      const headGood = params.headGood || '#0D9488';
+      const headDeficit = params.headDeficit || '#E11D48';
+      const isPos = delta >= 0;
+      const deltaColor = isPos ? '#10B981' : '#EF4444';
+      const arrow = isPos ? '▲' : '▼';
+      const months = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
+
+      const lollipops = [
+        { y: 72, isGood: true },
+        { y: 84, isGood: false },
+        { y: 64, isGood: true },
+        { y: 88, isGood: false },
+        { y: 58, isGood: true },
+        { y: 66, isGood: true },
+        { y: 82, isGood: false },
+        { y: 62, isGood: true },
+        { y: 70, isGood: true },
+        { y: 86, isGood: false },
+        { y: 68, isGood: true },
+        { y: 56, isGood: true },
+      ];
+
+      const popsSvg = lollipops
+        .map((p, i) => {
+          const x = 15.75 + i * 11.5;
+          const fill = p.isGood ? headGood : headDeficit;
+          return `<line x1='${x.toFixed(1)}' y1='98' x2='${x.toFixed(1)}' y2='${p.y}' stroke='${stemColor}' stroke-width='1.5' />\n  <circle cx='${x.toFixed(1)}' cy='${p.y}' r='3' fill='${fill}' />`;
+        })
+        .join('\n  ');
+
+      const labelsSvg = months
+        .map((m, i) => {
+          const x = 15.75 + i * 11.5;
+          return `<text x='${x.toFixed(1)}' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>${m}</text>`;
+        })
+        .join('\n  ');
+
+      return `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 170 120' width='100%' height='100%'>
+  <rect x='1' y='1' width='168' height='118' rx='8' fill='#FFFFFF' stroke='#E2E8F0' stroke-width='1.5' />
+  <text x='12' y='18' font-family='Segoe UI, sans-serif' font-size='8' font-weight='500' fill='#64748B'>${title}</text>
+  <circle cx='118' cy='15' r='2' fill='${headGood}' />
+  <text x='123' y='17.5' font-family='Segoe UI, sans-serif' font-size='6' fill='#64748B'>Target</text>
+  <circle cx='145' cy='15' r='2' fill='${headDeficit}' />
+  <text x='150' y='17.5' font-family='Segoe UI, sans-serif' font-size='6' fill='#64748B'>Deficit</text>
+  <text x='12' y='36' font-family='Segoe UI, sans-serif' font-size='17' font-weight='900' fill='#0F172A'>${value}</text>
+  <text x='100' y='35' font-family='Segoe UI, sans-serif' font-size='9.5' font-weight='700' fill='${deltaColor}'>${arrow} ${Math.abs(delta).toFixed(1)}%</text>
+  <text x='12' y='47' font-family='Segoe UI, sans-serif' font-size='7' font-weight='500' fill='#94A3B8'>${subtext}</text>
+  <line x1='12' y1='98' x2='158' y2='98' stroke='#F1F5F9' stroke-width='1' />
+  ${popsSvg}
+  ${labelsSvg}
+</svg>`;
+    },
+    generateDax: (params, measureName = 'SVG_KPI_Card_Lollipop_Variance') => {
+      return buildDaxMeasure({
+        measureName,
+        description: 'Executive KPI card with 12 monthly lollipop stems and circular heads.',
+        configVars: [
+          { name: '_Title', value: params.title ?? 'Profit as at 30/12/2024', type: 'text' },
+          { name: '_MetricValue', value: params.value ?? '$95,926', type: 'text' },
+          { name: '_DeltaPct', value: params.delta ?? 16.0, type: 'number' },
+          { name: '_Subtext', value: params.subtext ?? 'Last Year : $82,665 (+13.2k)', type: 'text' },
+          { name: '_StemColor', value: params.stemColor || '#CBD5E1', type: 'color' },
+          { name: '_HeadGood', value: params.headGood || '#0D9488', type: 'color' },
+          { name: '_HeadDeficit', value: params.headDeficit || '#E11D48', type: 'color' },
+        ],
+        calcVars: [
+          { name: '_IsPos', expression: '_DeltaPct >= 0' },
+          { name: '_DeltaColor', expression: 'IF( _IsPos, "#10B981", "#EF4444" )' },
+          { name: '_DeltaArrow', expression: 'IF( _IsPos, "▲ ", "▼ " )' },
+          { name: '_DeltaFormatted', expression: '_DeltaArrow & FORMAT( ABS( _DeltaPct ), "0.0" ) & "%"' },
+        ],
+        svgElements: [
+          {
+            name: '_CardFrame',
+            expression: `"<rect x='1' y='1' width='168' height='118' rx='8' fill='#FFFFFF' stroke='#E2E8F0' stroke-width='1.5'/>"`,
+          },
+          {
+            name: '_Header',
+            expression: `"<text x='12' y='18' font-family='Segoe UI, sans-serif' font-size='8' font-weight='500' fill='#64748B'>" & _Title & "</text>" &
+    "<circle cx='118' cy='15' r='2' fill='" & _HeadGood & "'/>" &
+    "<text x='123' y='17.5' font-family='Segoe UI, sans-serif' font-size='6' fill='#64748B'>Target</text>" &
+    "<circle cx='145' cy='15' r='2' fill='" & _HeadDeficit & "'/>" &
+    "<text x='150' y='17.5' font-family='Segoe UI, sans-serif' font-size='6' fill='#64748B'>Deficit</text>" &
+    "<text x='12' y='36' font-family='Segoe UI, sans-serif' font-size='17' font-weight='900' fill='#0F172A'>" & _MetricValue & "</text>" &
+    "<text x='100' y='35' font-family='Segoe UI, sans-serif' font-size='9.5' font-weight='700' fill='" & _DeltaColor & "'>" & _DeltaFormatted & "</text>" &
+    "<text x='12' y='47' font-family='Segoe UI, sans-serif' font-size='7' font-weight='500' fill='#94A3B8'>" & _Subtext & "</text>"`,
+          },
+          {
+            name: '_LollipopsMarkup',
+            expression: `"<line x1='12' y1='98' x2='158' y2='98' stroke='#F1F5F9' stroke-width='1'/>" &
+    "<line x1='15.8' y1='98' x2='15.8' y2='72' stroke='" & _StemColor & "' stroke-width='1.5'/>" &
+    "<circle cx='15.8' cy='72' r='3' fill='" & _HeadGood & "'/>" &
+    "<line x1='27.3' y1='98' x2='27.3' y2='84' stroke='" & _StemColor & "' stroke-width='1.5'/>" &
+    "<circle cx='27.3' cy='84' r='3' fill='" & _HeadDeficit & "'/>" &
+    "<line x1='38.8' y1='98' x2='38.8' y2='64' stroke='" & _StemColor & "' stroke-width='1.5'/>" &
+    "<circle cx='38.8' cy='64' r='3' fill='" & _HeadGood & "'/>" &
+    "<line x1='50.3' y1='98' x2='50.3' y2='88' stroke='" & _StemColor & "' stroke-width='1.5'/>" &
+    "<circle cx='50.3' cy='88' r='3' fill='" & _HeadDeficit & "'/>" &
+    "<line x1='61.8' y1='98' x2='61.8' y2='58' stroke='" & _StemColor & "' stroke-width='1.5'/>" &
+    "<circle cx='61.8' cy='58' r='3' fill='" & _HeadGood & "'/>" &
+    "<line x1='73.3' y1='98' x2='73.3' y2='66' stroke='" & _StemColor & "' stroke-width='1.5'/>" &
+    "<circle cx='73.3' cy='66' r='3' fill='" & _HeadGood & "'/>" &
+    "<line x1='84.8' y1='98' x2='84.8' y2='82' stroke='" & _StemColor & "' stroke-width='1.5'/>" &
+    "<circle cx='84.8' cy='82' r='3' fill='" & _HeadDeficit & "'/>" &
+    "<line x1='96.3' y1='98' x2='96.3' y2='62' stroke='" & _StemColor & "' stroke-width='1.5'/>" &
+    "<circle cx='96.3' cy='62' r='3' fill='" & _HeadGood & "'/>" &
+    "<line x1='107.8' y1='98' x2='107.8' y2='70' stroke='" & _StemColor & "' stroke-width='1.5'/>" &
+    "<circle cx='107.8' cy='70' r='3' fill='" & _HeadGood & "'/>" &
+    "<line x1='119.3' y1='98' x2='119.3' y2='86' stroke='" & _StemColor & "' stroke-width='1.5'/>" &
+    "<circle cx='119.3' cy='86' r='3' fill='" & _HeadDeficit & "'/>" &
+    "<line x1='130.8' y1='98' x2='130.8' y2='68' stroke='" & _StemColor & "' stroke-width='1.5'/>" &
+    "<circle cx='130.8' cy='68' r='3' fill='" & _HeadGood & "'/>" &
+    "<line x1='142.3' y1='98' x2='142.3' y2='56' stroke='" & _StemColor & "' stroke-width='1.5'/>" &
+    "<circle cx='142.3' cy='56' r='3' fill='" & _HeadGood & "'/>"`,
+          },
+          {
+            name: '_LabelsMarkup',
+            expression: `"<text x='15.8' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>J</text>" &
+    "<text x='27.3' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>F</text>" &
+    "<text x='38.8' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>M</text>" &
+    "<text x='50.3' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>A</text>" &
+    "<text x='61.8' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>M</text>" &
+    "<text x='73.3' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>J</text>" &
+    "<text x='84.8' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>J</text>" &
+    "<text x='96.3' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>A</text>" &
+    "<text x='107.8' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>S</text>" &
+    "<text x='119.3' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>O</text>" &
+    "<text x='130.8' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>N</text>" &
+    "<text x='142.3' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>D</text>"`,
+          },
+        ],
+        viewBox: '0 0 170 120',
+      });
+    },
+  },
+
+  {
+    id: 'kpi-card-stepped-area',
+    name: 'KPI Card: Stepped Area Run-Rate',
+    category: 'kpi',
+    description: 'Executive KPI card with stepped area progression showing monthly run-rate tiers and milestone markers.',
+    tags: ['kpi', 'card', 'stepped', 'area', 'run-rate', 'milestones', 'executive'],
+    viewBox: '0 0 170 120',
+    recommendedDimensions: { width: 170, height: 120 },
+    pbiTips: {
+      visualType: 'Card (new) / Table / Matrix / Image',
+      recommendedWidth: 170,
+      recommendedHeight: 120,
+      notes: 'Visualizes cumulative performance tiers with crisp right-angle step transitions.',
+    },
+    params: [
+      { id: 'title', label: 'Metric Title', type: 'text', defaultValue: 'Profit as at 30/12/2024', daxVarName: '_Title' },
+      { id: 'value', label: 'Callout Value', type: 'text', defaultValue: '$95,926', daxVarName: '_MetricValue' },
+      { id: 'delta', label: 'Delta (%)', type: 'number', defaultValue: 16.0, step: 0.1, daxVarName: '_DeltaPct' },
+      { id: 'subtext', label: 'Secondary Context', type: 'text', defaultValue: 'Run-Rate: Milestone Tiers', daxVarName: '_Subtext' },
+      { id: 'stepColor', label: 'Step Line Color', type: 'color', defaultValue: '#6366F1', daxVarName: '_StepColor' },
+      { id: 'fillColor', label: 'Area Fill Color', type: 'color', defaultValue: '#EEF2FF', daxVarName: '_FillColor' },
+    ],
+    renderSvg: (params) => {
+      const title = String(params.title ?? 'Profit as at 30/12/2024');
+      const value = String(params.value ?? '$95,926');
+      const delta = Number(params.delta ?? 16.0);
+      const subtext = String(params.subtext ?? 'Run-Rate: Milestone Tiers');
+      const stepColor = params.stepColor || '#6366F1';
+      const fillColor = params.fillColor || '#EEF2FF';
+      const isPos = delta >= 0;
+      const deltaColor = isPos ? '#10B981' : '#EF4444';
+      const arrow = isPos ? '▲' : '▼';
+
+      const stepLine = 'M 14,90 H 26 V 84 H 38 V 78 H 50 V 80 H 62 V 68 H 74 V 70 H 86 V 62 H 98 V 56 H 110 V 58 H 122 V 50 H 134 V 52 H 146 V 46 H 156';
+      const stepArea = 'M 14,90 H 26 V 84 H 38 V 78 H 50 V 80 H 62 V 68 H 74 V 70 H 86 V 62 H 98 V 56 H 110 V 58 H 122 V 50 H 134 V 52 H 146 V 46 H 156 V 98 H 14 Z';
+
+      return `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 170 120' width='100%' height='100%'>
+  <rect x='1' y='1' width='168' height='118' rx='8' fill='#FFFFFF' stroke='#E2E8F0' stroke-width='1.5' />
+  <text x='12' y='18' font-family='Segoe UI, sans-serif' font-size='8' font-weight='500' fill='#64748B'>${title}</text>
+  <text x='12' y='36' font-family='Segoe UI, sans-serif' font-size='17' font-weight='900' fill='#0F172A'>${value}</text>
+  <text x='100' y='35' font-family='Segoe UI, sans-serif' font-size='9.5' font-weight='700' fill='${deltaColor}'>${arrow} ${Math.abs(delta).toFixed(1)}%</text>
+  <text x='12' y='47' font-family='Segoe UI, sans-serif' font-size='7' font-weight='500' fill='#94A3B8'>${subtext}</text>
+  <path d='${stepArea}' fill='${fillColor}' />
+  <line x1='14' y1='98' x2='156' y2='98' stroke='#E2E8F0' stroke-width='1' />
+  <path d='${stepLine}' fill='none' stroke='${stepColor}' stroke-width='2' stroke-linejoin='miter' />
+  <circle cx='50' cy='80' r='2.5' fill='${stepColor}' />
+  <circle cx='86' cy='62' r='2.5' fill='${stepColor}' />
+  <circle cx='122' cy='50' r='2.5' fill='${stepColor}' />
+  <circle cx='156' cy='46' r='3.5' fill='#FFFFFF' stroke='${stepColor}' stroke-width='2' />
+  <text x='14' y='109' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>Q1</text>
+  <text x='50' y='109' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>Q2</text>
+  <text x='86' y='109' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>Q3</text>
+  <text x='122' y='109' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>Q4</text>
+  <text x='156' y='109' text-anchor='end' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='600' fill='${stepColor}'>YTD</text>
+</svg>`;
+    },
+    generateDax: (params, measureName = 'SVG_KPI_Card_Stepped_Area') => {
+      return buildDaxMeasure({
+        measureName,
+        description: 'Executive KPI card with stepped area progression showing monthly run-rate tiers.',
+        configVars: [
+          { name: '_Title', value: params.title ?? 'Profit as at 30/12/2024', type: 'text' },
+          { name: '_MetricValue', value: params.value ?? '$95,926', type: 'text' },
+          { name: '_DeltaPct', value: params.delta ?? 16.0, type: 'number' },
+          { name: '_Subtext', value: params.subtext ?? 'Run-Rate: Milestone Tiers', type: 'text' },
+          { name: '_StepColor', value: params.stepColor || '#6366F1', type: 'color' },
+          { name: '_FillColor', value: params.fillColor || '#EEF2FF', type: 'color' },
+        ],
+        calcVars: [
+          { name: '_IsPos', expression: '_DeltaPct >= 0' },
+          { name: '_DeltaColor', expression: 'IF( _IsPos, "#10B981", "#EF4444" )' },
+          { name: '_DeltaArrow', expression: 'IF( _IsPos, "▲ ", "▼ " )' },
+          { name: '_DeltaFormatted', expression: '_DeltaArrow & FORMAT( ABS( _DeltaPct ), "0.0" ) & "%"' },
+        ],
+        svgElements: [
+          {
+            name: '_CardFrame',
+            expression: `"<rect x='1' y='1' width='168' height='118' rx='8' fill='#FFFFFF' stroke='#E2E8F0' stroke-width='1.5'/>"`,
+          },
+          {
+            name: '_Header',
+            expression: `"<text x='12' y='18' font-family='Segoe UI, sans-serif' font-size='8' font-weight='500' fill='#64748B'>" & _Title & "</text>" &
+    "<text x='12' y='36' font-family='Segoe UI, sans-serif' font-size='17' font-weight='900' fill='#0F172A'>" & _MetricValue & "</text>" &
+    "<text x='100' y='35' font-family='Segoe UI, sans-serif' font-size='9.5' font-weight='700' fill='" & _DeltaColor & "'>" & _DeltaFormatted & "</text>" &
+    "<text x='12' y='47' font-family='Segoe UI, sans-serif' font-size='7' font-weight='500' fill='#94A3B8'>" & _Subtext & "</text>"`,
+          },
+          {
+            name: '_ChartMarkup',
+            expression: `"<path d='M 14,90 H 26 V 84 H 38 V 78 H 50 V 80 H 62 V 68 H 74 V 70 H 86 V 62 H 98 V 56 H 110 V 58 H 122 V 50 H 134 V 52 H 146 V 46 H 156 V 98 H 14 Z' fill='" & _FillColor & "'/>" &
+    "<line x1='14' y1='98' x2='156' y2='98' stroke='#E2E8F0' stroke-width='1'/>" &
+    "<path d='M 14,90 H 26 V 84 H 38 V 78 H 50 V 80 H 62 V 68 H 74 V 70 H 86 V 62 H 98 V 56 H 110 V 58 H 122 V 50 H 134 V 52 H 146 V 46 H 156' fill='none' stroke='" & _StepColor & "' stroke-width='2' stroke-linejoin='miter'/>" &
+    "<circle cx='50' cy='80' r='2.5' fill='" & _StepColor & "'/>" &
+    "<circle cx='86' cy='62' r='2.5' fill='" & _StepColor & "'/>" &
+    "<circle cx='122' cy='50' r='2.5' fill='" & _StepColor & "'/>" &
+    "<circle cx='156' cy='46' r='3.5' fill='#FFFFFF' stroke='" & _StepColor & "' stroke-width='2'/>"`,
+          },
+          {
+            name: '_AxisMarkup',
+            expression: `"<text x='14' y='109' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>Q1</text>" &
+    "<text x='50' y='109' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>Q2</text>" &
+    "<text x='86' y='109' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>Q3</text>" &
+    "<text x='122' y='109' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>Q4</text>" &
+    "<text x='156' y='109' text-anchor='end' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='600' fill='" & _StepColor & "'>YTD</text>"`,
+          },
+        ],
+        viewBox: '0 0 170 120',
+      });
+    },
+  },
+
+  {
+    id: 'kpi-card-benchmark-horizon',
+    name: 'KPI Card: Benchmark Horizon Band',
+    category: 'kpi',
+    description: 'Executive KPI card tracking actual metric line through a shaded target corridor band with achievement status.',
+    tags: ['kpi', 'card', 'benchmark', 'horizon', 'target', 'corridor', 'band', 'executive'],
+    viewBox: '0 0 170 120',
+    recommendedDimensions: { width: 170, height: 120 },
+    pbiTips: {
+      visualType: 'Card (new) / Table / Matrix / Image',
+      recommendedWidth: 170,
+      recommendedHeight: 120,
+      notes: 'Visualizes actual trend against an expected target band corridor.',
+    },
+    params: [
+      { id: 'title', label: 'Metric Title', type: 'text', defaultValue: 'Profit as at 30/12/2024', daxVarName: '_Title' },
+      { id: 'value', label: 'Callout Value', type: 'text', defaultValue: '$95,926', daxVarName: '_MetricValue' },
+      { id: 'delta', label: 'Delta (%)', type: 'number', defaultValue: 16.0, step: 0.1, daxVarName: '_DeltaPct' },
+      { id: 'subtext', label: 'Secondary Context', type: 'text', defaultValue: 'Target Corridor: 80k - 100k', daxVarName: '_Subtext' },
+      { id: 'lineColor', label: 'Actual Trend Color', type: 'color', defaultValue: '#0284C7', daxVarName: '_LineColor' },
+      { id: 'bandFill', label: 'Corridor Fill Color', type: 'color', defaultValue: '#F0FDF4', daxVarName: '_BandFill' },
+      { id: 'bandBorder', label: 'Corridor Border Color', type: 'color', defaultValue: '#86EFAC', daxVarName: '_BandBorder' },
+    ],
+    renderSvg: (params) => {
+      const title = String(params.title ?? 'Profit as at 30/12/2024');
+      const value = String(params.value ?? '$95,926');
+      const delta = Number(params.delta ?? 16.0);
+      const subtext = String(params.subtext ?? 'Target Corridor: 80k - 100k');
+      const lineColor = params.lineColor || '#0284C7';
+      const bandFill = params.bandFill || '#F0FDF4';
+      const bandBorder = params.bandBorder || '#86EFAC';
+      const isPos = delta >= 0;
+      const deltaColor = isPos ? '#10B981' : '#EF4444';
+      const arrow = isPos ? '▲' : '▼';
+      const months = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
+
+      const linePath = 'M 14,86 L 26,80 L 38,72 L 50,76 L 62,64 L 74,68 L 86,60 L 98,56 L 110,62 L 122,54 L 134,58 L 146,50 L 156,48';
+
+      const labelsSvg = months
+        .map((m, i) => {
+          const x = 15.75 + i * 11.5;
+          return `<text x='${x.toFixed(1)}' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>${m}</text>`;
+        })
+        .join('\n  ');
+
+      return `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 170 120' width='100%' height='100%'>
+  <rect x='1' y='1' width='168' height='118' rx='8' fill='#FFFFFF' stroke='#E2E8F0' stroke-width='1.5' />
+  <text x='12' y='18' font-family='Segoe UI, sans-serif' font-size='8' font-weight='500' fill='#64748B'>${title}</text>
+  <text x='12' y='36' font-family='Segoe UI, sans-serif' font-size='17' font-weight='900' fill='#0F172A'>${value}</text>
+  <text x='100' y='35' font-family='Segoe UI, sans-serif' font-size='9.5' font-weight='700' fill='${deltaColor}'>${arrow} ${Math.abs(delta).toFixed(1)}%</text>
+  <text x='12' y='47' font-family='Segoe UI, sans-serif' font-size='7' font-weight='500' fill='#94A3B8'>${subtext}</text>
+  <rect x='14' y='58' width='142' height='24' rx='3' fill='${bandFill}' stroke='${bandBorder}' stroke-width='1' stroke-dasharray='2 2' />
+  <text x='152' y='72' text-anchor='end' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='600' fill='#16A34A'>Target Corridor</text>
+  <line x1='14' y1='98' x2='156' y2='98' stroke='#F1F5F9' stroke-width='1' />
+  <path d='${linePath}' fill='none' stroke='${lineColor}' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' />
+  <circle cx='156' cy='48' r='3.5' fill='#FFFFFF' stroke='${lineColor}' stroke-width='2' />
+  <circle cx='156' cy='48' r='1.5' fill='${lineColor}' />
+  ${labelsSvg}
+</svg>`;
+    },
+    generateDax: (params, measureName = 'SVG_KPI_Card_Benchmark_Horizon') => {
+      return buildDaxMeasure({
+        measureName,
+        description: 'Executive KPI card tracking actual metric line through a shaded target corridor band.',
+        configVars: [
+          { name: '_Title', value: params.title ?? 'Profit as at 30/12/2024', type: 'text' },
+          { name: '_MetricValue', value: params.value ?? '$95,926', type: 'text' },
+          { name: '_DeltaPct', value: params.delta ?? 16.0, type: 'number' },
+          { name: '_Subtext', value: params.subtext ?? 'Target Corridor: 80k - 100k', type: 'text' },
+          { name: '_LineColor', value: params.lineColor || '#0284C7', type: 'color' },
+          { name: '_BandFill', value: params.bandFill || '#F0FDF4', type: 'color' },
+          { name: '_BandBorder', value: params.bandBorder || '#86EFAC', type: 'color' },
+        ],
+        calcVars: [
+          { name: '_IsPos', expression: '_DeltaPct >= 0' },
+          { name: '_DeltaColor', expression: 'IF( _IsPos, "#10B981", "#EF4444" )' },
+          { name: '_DeltaArrow', expression: 'IF( _IsPos, "▲ ", "▼ " )' },
+          { name: '_DeltaFormatted', expression: '_DeltaArrow & FORMAT( ABS( _DeltaPct ), "0.0" ) & "%"' },
+        ],
+        svgElements: [
+          {
+            name: '_CardFrame',
+            expression: `"<rect x='1' y='1' width='168' height='118' rx='8' fill='#FFFFFF' stroke='#E2E8F0' stroke-width='1.5'/>"`,
+          },
+          {
+            name: '_Header',
+            expression: `"<text x='12' y='18' font-family='Segoe UI, sans-serif' font-size='8' font-weight='500' fill='#64748B'>" & _Title & "</text>" &
+    "<text x='12' y='36' font-family='Segoe UI, sans-serif' font-size='17' font-weight='900' fill='#0F172A'>" & _MetricValue & "</text>" &
+    "<text x='100' y='35' font-family='Segoe UI, sans-serif' font-size='9.5' font-weight='700' fill='" & _DeltaColor & "'>" & _DeltaFormatted & "</text>" &
+    "<text x='12' y='47' font-family='Segoe UI, sans-serif' font-size='7' font-weight='500' fill='#94A3B8'>" & _Subtext & "</text>"`,
+          },
+          {
+            name: '_BandMarkup',
+            expression: `"<rect x='14' y='58' width='142' height='24' rx='3' fill='" & _BandFill & "' stroke='" & _BandBorder & "' stroke-width='1' stroke-dasharray='2 2'/>" &
+    "<text x='152' y='72' text-anchor='end' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='600' fill='#16A34A'>Target Corridor</text>" &
+    "<line x1='14' y1='98' x2='156' y2='98' stroke='#F1F5F9' stroke-width='1'/>"`,
+          },
+          {
+            name: '_LineMarkup',
+            expression: `"<path d='M 14,86 L 26,80 L 38,72 L 50,76 L 62,64 L 74,68 L 86,60 L 98,56 L 110,62 L 122,54 L 134,58 L 146,50 L 156,48' fill='none' stroke='" & _LineColor & "' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/>" &
+    "<circle cx='156' cy='48' r='3.5' fill='#FFFFFF' stroke='" & _LineColor & "' stroke-width='2'/>" &
+    "<circle cx='156' cy='48' r='1.5' fill='" & _LineColor & "'/>"`,
+          },
+          {
+            name: '_LabelsMarkup',
+            expression: `"<text x='15.8' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>J</text>" &
+    "<text x='27.3' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>F</text>" &
+    "<text x='38.8' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>M</text>" &
+    "<text x='50.3' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>A</text>" &
+    "<text x='61.8' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>M</text>" &
+    "<text x='73.3' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>J</text>" &
+    "<text x='84.8' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>J</text>" &
+    "<text x='96.3' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>A</text>" &
+    "<text x='107.8' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>S</text>" &
+    "<text x='119.3' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>O</text>" &
+    "<text x='130.8' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>N</text>" &
+    "<text x='142.3' y='110' text-anchor='middle' font-family='Segoe UI, sans-serif' font-size='6.5' font-weight='500' fill='#94A3B8'>D</text>"`,
+          },
+        ],
+        viewBox: '0 0 170 120',
       });
     },
   },
