@@ -10,6 +10,31 @@ export function adaptLayoutPresetToCanvas(
   preset: LayoutPresetDefinition,
   state: DashCanvasState
 ): VisualContainerConfig[] {
+  // Mobile presets have exact, fixed portrait dimensions (390x844)
+  const isMobilePreset = preset.category === 'mobile' || preset.dimensions.preset === '390x844';
+  if (isMobilePreset) {
+    return preset.visuals.map((v, i) => {
+      const isKpi = v.type === 'kpi' || v.type === 'card' || v.type === 'gauge';
+      return {
+        id: `slot-preset-${Date.now().toString(36)}-${i + 1}`,
+        title: v.name,
+        subtitle: '',
+        showTitle: true,
+        showSubtitle: false,
+        x: v.x,
+        y: v.y,
+        width: v.width,
+        height: v.height,
+        visualType: v.type,
+        zIndex: v.zIndex || i + 1,
+        color: v.color || '#8B5CF6',
+        showKpiIcon: isKpi,
+        kpiIconType: v.type === 'kpi' ? 'trending-up' : v.type === 'gauge' ? 'activity' : 'dollar',
+        kpiIconPosition: 'top-right',
+      };
+    });
+  }
+
   const targetW = state.dimensions.width;
   const targetH = state.dimensions.height;
 

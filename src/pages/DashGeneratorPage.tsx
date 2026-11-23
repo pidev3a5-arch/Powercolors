@@ -238,7 +238,11 @@ export const DashGeneratorPage: React.FC<DashGeneratorPageProps> = ({ onNavigate
             dimensions: {
               width: preset.dimensions.width,
               height: preset.dimensions.height,
-              preset: preset.dimensions.preset as any,
+              preset: 'custom' as any,
+            },
+            navBar: {
+              ...prev.navBar,
+              show: false,
             },
           }
         : {}),

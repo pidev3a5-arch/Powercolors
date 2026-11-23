@@ -63,7 +63,12 @@ export const LayoutSidebar: React.FC<LayoutSidebarProps> = ({
   onSyncFromSlots,
   onOpenExport,
 }) => {
-  const [activeTab, setActiveTab] = React.useState<'add' | 'inspect' | 'canvas' | 'presets'>('add');
+  const [activeTab, setActiveTab] = React.useState<'add' | 'inspect' | 'canvas' | 'presets'>(() => {
+    if (typeof window !== 'undefined' && window.location.hash.includes('presets')) {
+      return 'presets';
+    }
+    return 'add';
+  });
 
   const selectedVisual = visuals.find((v) => v.id === selectedId);
 
@@ -73,6 +78,16 @@ export const LayoutSidebar: React.FC<LayoutSidebarProps> = ({
       setActiveTab('inspect');
     }
   }, [selectedId]);
+
+  React.useEffect(() => {
+    if (activeTab === 'presets' && typeof window !== 'undefined' && window.location.hash.includes('mobile')) {
+      const container = document.getElementById('layout-presets-list');
+      const el = document.getElementById('preset-card-mobile-portrait');
+      if (container && el) {
+        container.scrollTop = el.offsetTop - container.offsetTop;
+      }
+    }
+  }, [activeTab]);
 
   return (
     <aside className="w-full space-y-4">
@@ -503,10 +518,11 @@ export const LayoutSidebar: React.FC<LayoutSidebarProps> = ({
             </p>
           </div>
 
-          <div className="space-y-2.5 max-h-[460px] overflow-y-auto pr-1">
+          <div id="layout-presets-list" className="space-y-2.5 max-h-[460px] overflow-y-auto pr-1">
             {CURATED_LAYOUT_PRESETS.map((preset) => (
               <div
                 key={preset.id}
+                id={`preset-card-${preset.id}`}
                 className="p-3.5 rounded-2xl border-2 border-[#1E293B] bg-slate-50 dark:bg-slate-800/80 shadow-[2px_2px_0px_0px_#1E293B] space-y-2"
               >
                 <div className="flex items-center justify-between gap-2">

@@ -27,12 +27,12 @@ export const NavigationHeader: React.FC<NavigationHeaderProps> = ({
 
   const navItems: Array<{ id: AppPage; label: string; icon: React.ComponentType<{ className?: string }> }> = [
     { id: 'landing', label: 'Home', icon: Home },
-    { id: 'theme-generator', label: 'Theme Studio', icon: Palette },
-    { id: 'palette-harmony', label: 'Palette Harmony', icon: Wand2 },
     { id: 'dash-generator', label: 'Dash Canvas', icon: Layout },
-    { id: 'svg-visual-maker', label: 'SVG Visuals', icon: Sparkles },
+    { id: 'palette-harmony', label: 'Palette Harmony', icon: Wand2 },
+    { id: 'theme-generator', label: 'Theme Studio', icon: Palette },
     { id: 'icon-library', label: 'Icon Library', icon: Image },
     { id: 'dax-toolkit', label: 'DAX Toolkit', icon: Terminal },
+    { id: 'svg-visual-maker', label: 'SVG Visuals', icon: Sparkles },
   ];
 
   const renderNavTabs = (className?: string) => (

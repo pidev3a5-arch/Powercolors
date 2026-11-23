@@ -105,4 +105,29 @@ describe('Layout Preset Adaptation to Nav Bar & Page Header', () => {
       expect(c.y + c.height).toBeLessThanOrEqual(720);
     }
   });
+
+  it('preserves exact coordinates and dimensions for mobile portrait preset', () => {
+    const mobilePreset = CURATED_LAYOUT_PRESETS.find((p) => p.id === 'mobile-portrait')!;
+    expect(mobilePreset).toBeDefined();
+
+    const adaptedContainers = adaptLayoutPresetToCanvas(mobilePreset, DEFAULT_DASH_CANVAS_STATE);
+
+    expect(adaptedContainers).toHaveLength(6);
+    expect(adaptedContainers[0].title).toBe('Executive Header');
+    expect(adaptedContainers[0].width).toBe(358);
+    expect(adaptedContainers[0].height).toBe(48);
+
+    const matrixVisual = adaptedContainers.find((c) => c.visualType === 'matrix');
+    expect(matrixVisual).toBeDefined();
+    expect(matrixVisual?.title).toBe('Financial Statement Matrix (P&L)');
+    expect(matrixVisual?.width).toBe(358);
+    expect(matrixVisual?.height).toBe(552);
+
+    for (const c of adaptedContainers) {
+      expect(c.x).toBeGreaterThanOrEqual(0);
+      expect(c.y).toBeGreaterThanOrEqual(0);
+      expect(c.x + c.width).toBeLessThanOrEqual(390);
+      expect(c.y + c.height).toBeLessThanOrEqual(844);
+    }
+  });
 });

@@ -244,72 +244,70 @@ export const SvgVisualMakerPage: React.FC<SvgVisualMakerPageProps> = ({ onNaviga
   }, [customSvgInput, converterMeasureName, extractColors]);
 
   return (
-    <div className="min-h-screen bg-[#FFFDF5] dark:bg-[#0F172A] text-[#1E293B] dark:text-slate-100 transition-colors pb-24">
-      {/* Hero Header */}
-      <section className="border-b-2 border-[#1E293B] dark:border-slate-800 bg-white/70 dark:bg-slate-900/60 backdrop-blur-md pt-8 pb-10 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-[1280px] mx-auto text-center space-y-4">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#8B5CF6] text-white text-xs font-heading font-black border-2 border-[#1E293B] shadow-[2px_2px_0px_0px_#1E293B]">
-            <Sparkles className="w-3.5 h-3.5 fill-white" />
-            <span>Power BI Micro-Visuals & DAX Studio</span>
-          </div>
+    <>
+      <main className="flex-1 max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full space-y-6 pb-24">
+        {/* Top Banner & Header - Left-aligned matching other pages */}
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-5 pb-6 border-b-2 border-[#1E293B] dark:border-slate-800">
+          <div className="space-y-2 text-left max-w-2xl">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#8B5CF6]/20 text-[#8B5CF6] dark:text-purple-300 text-xs font-heading font-black border border-[#8B5CF6]/30 shadow-[1.5px_1.5px_0px_0px_#1E293B]">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>POWER BI MICRO-VISUALS & DAX STUDIO</span>
+            </div>
 
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-heading font-black tracking-tight text-[#1E293B] dark:text-white">
-            SVG Visual Maker & <span className="text-[#8B5CF6]">DAX Generator</span>
-          </h1>
+            <h1 className="text-3xl sm:text-4xl font-heading font-black text-[#1E293B] dark:text-white tracking-tight">
+              SVG Visual Maker & <span className="text-[#8B5CF6]">DAX Generator</span>
+            </h1>
 
-          <p className="max-w-2xl mx-auto text-sm sm:text-base font-semibold text-slate-600 dark:text-slate-300">
-            Generate error-free Power BI DAX measures for matrix and table micro-charts.
-            Pick from dozens of curated visuals or convert any custom SVG into a copyable measure with Image URL data category.
-          </p>
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-medium">
+              Generate error-free Power BI DAX measures for matrix and table micro-charts.
+              Pick from dozens of curated visuals or convert any custom SVG into a copyable measure with Image URL data category.
+            </p>
 
-          {/* Value Badges */}
-          <div className="flex flex-wrap items-center justify-center gap-2.5 pt-2 text-xs font-bold">
-            <span className="px-3 py-1 rounded-full bg-[#FEF08A] text-[#1E293B] border-2 border-[#1E293B] shadow-[1.5px_1.5px_0px_0px_#1E293B]">
-              ✓ Matrix & Table Ready
-            </span>
-            <span className="px-3 py-1 rounded-full bg-[#BBF7D0] text-[#1E293B] border-2 border-[#1E293B] shadow-[1.5px_1.5px_0px_0px_#1E293B]">
-              ✓ 100% In-Browser Privacy
-            </span>
-            <span className="px-3 py-1 rounded-full bg-[#BAE6FD] text-[#1E293B] border-2 border-[#1E293B] shadow-[1.5px_1.5px_0px_0px_#1E293B]">
-              ✓ Data Category: Image URL
-            </span>
+            {/* Value Badges */}
+            <div className="flex flex-wrap items-center gap-2 pt-1 text-xs font-bold">
+              <span className="px-2.5 py-0.5 rounded-full bg-[#FEF08A] text-[#1E293B] border-2 border-[#1E293B] shadow-[1.5px_1.5px_0px_0px_#1E293B]">
+                ✓ Matrix & Table Ready
+              </span>
+              <span className="px-2.5 py-0.5 rounded-full bg-[#BBF7D0] text-[#1E293B] border-2 border-[#1E293B] shadow-[1.5px_1.5px_0px_0px_#1E293B]">
+                ✓ 100% In-Browser Privacy
+              </span>
+              <span className="px-2.5 py-0.5 rounded-full bg-[#BAE6FD] text-[#1E293B] border-2 border-[#1E293B] shadow-[1.5px_1.5px_0px_0px_#1E293B]">
+                ✓ Data Category: Image URL
+              </span>
+            </div>
           </div>
 
           {/* Primary View Switcher Tabs */}
-          <div className="pt-4 flex justify-center">
-            <div className="inline-flex p-1.5 rounded-2xl bg-[#FFFDF5] dark:bg-slate-800 border-2 border-[#1E293B] shadow-[3px_3px_0px_0px_#1E293B]">
-              <button
-                type="button"
-                onClick={() => setActiveTab('gallery')}
-                className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-heading font-black transition-all cursor-pointer ${
-                  activeTab === 'gallery'
-                    ? 'bg-[#8B5CF6] text-white shadow-[2px_2px_0px_0px_#1E293B] border-2 border-[#1E293B]'
-                    : 'text-[#1E293B] dark:text-slate-200 hover:bg-[#FBBF24] hover:text-[#1E293B]'
-                }`}
-              >
-                <LayoutGrid className="w-4 h-4 stroke-[2.5]" />
-                <span>Visuals Gallery ({SVG_VISUALS_CATALOG.length})</span>
-              </button>
+          <div className="inline-flex p-1.5 rounded-2xl bg-white dark:bg-slate-800 border-2 border-[#1E293B] shadow-[3px_3px_0px_0px_#1E293B] self-start lg:self-center shrink-0">
+            <button
+              type="button"
+              onClick={() => setActiveTab('gallery')}
+              className={`inline-flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-xs sm:text-sm font-heading font-black transition-all cursor-pointer ${
+                activeTab === 'gallery'
+                  ? 'bg-[#8B5CF6] text-white shadow-[2px_2px_0px_0px_#1E293B] border-2 border-[#1E293B]'
+                  : 'text-[#1E293B] dark:text-slate-200 hover:bg-[#FBBF24] hover:text-[#1E293B]'
+              }`}
+            >
+              <LayoutGrid className="w-4 h-4 stroke-[2.5]" />
+              <span>Visuals Gallery ({SVG_VISUALS_CATALOG.length})</span>
+            </button>
 
-              <button
-                type="button"
-                onClick={() => setActiveTab('converter')}
-                className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-heading font-black transition-all cursor-pointer ${
-                  activeTab === 'converter'
-                    ? 'bg-[#8B5CF6] text-white shadow-[2px_2px_0px_0px_#1E293B] border-2 border-[#1E293B]'
-                    : 'text-[#1E293B] dark:text-slate-200 hover:bg-[#FBBF24] hover:text-[#1E293B]'
-                }`}
-              >
-                <FileUp className="w-4 h-4 stroke-[2.5]" />
-                <span>Import & Convert SVG to DAX</span>
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={() => setActiveTab('converter')}
+              className={`inline-flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-xs sm:text-sm font-heading font-black transition-all cursor-pointer ${
+                activeTab === 'converter'
+                  ? 'bg-[#8B5CF6] text-white shadow-[2px_2px_0px_0px_#1E293B] border-2 border-[#1E293B]'
+                  : 'text-[#1E293B] dark:text-slate-200 hover:bg-[#FBBF24] hover:text-[#1E293B]'
+              }`}
+            >
+              <FileUp className="w-4 h-4 stroke-[2.5]" />
+              <span>Import & Convert SVG to DAX</span>
+            </button>
           </div>
         </div>
-      </section>
 
-      {/* Main Workspace Content */}
-      <main className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+        {/* Main Workspace Content */}
         {activeTab === 'gallery' && (
           <div className="space-y-6">
             {/* Search and Category Filters Bar */}
@@ -1277,6 +1275,6 @@ export const SvgVisualMakerPage: React.FC<SvgVisualMakerPageProps> = ({ onNaviga
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
