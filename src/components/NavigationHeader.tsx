@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sun, Moon, Sparkles, Home, Palette, Layout, Wand2, Image, Terminal, Menu, X, Code2, FolderArchive } from 'lucide-react';
+import { Sun, Moon, Sparkles, Home, Palette, Layout, Wand2, Image, Terminal, Menu, X, Code2, MousePointerClick } from 'lucide-react';
 import { AppPage } from '../core/types';
 
 interface NavigationHeaderProps {
@@ -31,10 +31,10 @@ export const NavigationHeader: React.FC<NavigationHeaderProps> = ({
     { id: 'palette-harmony', label: 'Palette Harmony', icon: Wand2 },
     { id: 'theme-generator', label: 'Theme Studio', icon: Palette },
     { id: 'icon-library', label: 'Icon Library', icon: Image },
+    { id: 'button-studio', label: 'Button Studio', icon: MousePointerClick },
     { id: 'dax-toolkit', label: 'DAX Toolkit', icon: Terminal },
     { id: 'svg-visual-maker', label: 'SVG Visuals', icon: Sparkles },
     { id: 'deneb-studio', label: 'Deneb Studio', icon: Code2 },
-    { id: 'pbip-studio', label: 'Fabric PBIP', icon: FolderArchive },
   ];
 
   const renderNavTabs = (className?: string) => (

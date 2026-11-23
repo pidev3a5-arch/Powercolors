@@ -8,8 +8,10 @@ import {
   Sliders,
   X,
   CheckCircle2,
-  FileCode,
   Eye,
+  ChevronDown,
+  MousePointerClick,
+  FileCode,
 } from 'lucide-react';
 import { AppPage } from '../core/types';
 import { DenebCategory, DenebSpecTemplate } from '../core/deneb/types';
@@ -140,11 +142,11 @@ export const DenebStudioPage: React.FC<DenebStudioPageProps> = ({
           <div className="flex flex-wrap items-center gap-2.5 self-start lg:self-center shrink-0">
             <button
               type="button"
-              onClick={() => onNavigate('pbip-studio')}
+              onClick={() => onNavigate('button-studio')}
               className="pop-btn inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 text-[#1E293B] dark:text-white font-heading font-black text-xs border-2 border-[#1E293B] shadow-[2.5px_2.5px_0px_0px_#1E293B] cursor-pointer hover:bg-slate-50"
             >
-              <FileCode className="w-4 h-4 text-[#8B5CF6]" />
-              <span>Fabric PBIP Studio</span>
+              <MousePointerClick className="w-4 h-4 text-[#8B5CF6]" />
+              <span>Button Studio</span>
             </button>
 
             <button
@@ -181,25 +183,25 @@ export const DenebStudioPage: React.FC<DenebStudioPageProps> = ({
             )}
           </div>
 
-          {/* Category Tabs */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
-            {DENEB_CATEGORIES.map((cat) => (
-              <button
-                key={cat.id}
-                type="button"
-                onClick={() => setSelectedCategory(cat.id)}
-                className={`pop-btn px-3 py-1.5 rounded-xl text-xs font-heading font-black cursor-pointer transition-all whitespace-nowrap ${
-                  selectedCategory === cat.id
-                    ? 'bg-[#8B5CF6] text-white border-2 border-[#1E293B] shadow-[2px_2px_0px_0px_#1E293B]'
-                    : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-2 border-[#1E293B] hover:bg-purple-50'
-                }`}
+          {/* Category Dropdown Filter */}
+          <div className="relative min-w-[220px] sm:w-auto">
+            <div className="relative">
+              <select
+                aria-label="Filter Deneb templates by category"
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value as DenebCategory | 'all')}
+                className="w-full sm:w-64 appearance-none px-4 py-2.5 pr-10 rounded-xl bg-[#FFFDF5] dark:bg-slate-900 border-2 border-[#1E293B] text-xs sm:text-sm font-heading font-black text-[#1E293B] dark:text-white shadow-[2px_2px_0px_0px_#1E293B] cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#8B5CF6]"
               >
-                <span>{cat.label}</span>
-                <span className="ml-1.5 px-1.5 py-0.2 rounded-full text-[10px] bg-black/10 text-inherit">
-                  {cat.badge}
-                </span>
-              </button>
-            ))}
+                {DENEB_CATEGORIES.map((cat) => (
+                  <option key={cat.id} value={cat.id} className="font-heading font-bold text-slate-800 dark:text-slate-100">
+                    {cat.label} ({cat.badge})
+                  </option>
+                ))}
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[#1E293B] dark:text-white">
+                <ChevronDown className="w-4 h-4 stroke-[2.5]" />
+              </div>
+            </div>
           </div>
         </div>
 

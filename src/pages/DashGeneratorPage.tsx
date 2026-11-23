@@ -13,14 +13,7 @@ import {
   FileUp,
   Grid,
   Table,
-  FileCode,
 } from 'lucide-react';
-import {
-  buildPbipPackage,
-  exportPbipZipBlob,
-  downloadPbipZip,
-  sanitizeName,
-} from '../core/pbip/pbipEngine';
 import {
   DashCanvasState,
   CanvasDimension,
@@ -613,45 +606,6 @@ export const DashGeneratorPage: React.FC<DashGeneratorPageProps> = ({ onNavigate
     downloadDashSvg(dashState);
   }, [dashState]);
 
-  // Export full Fabric Power BI Project (.pbip.zip) with layout cards and wallpaper SVG
-  const [isExportingPbip, setIsExportingPbip] = useState(false);
-  const handleExportToPbip = useCallback(async () => {
-    setIsExportingPbip(true);
-    try {
-      const markup = generateDashSvg(dashState, false);
-      const pkg = buildPbipPackage({
-        projectName: sanitizeName(dashState.navBar.reportTitle || 'DashCanvas_Report'),
-        reportName: dashState.navBar.reportTitle || 'Dash Canvas Executive Report',
-        pageName: 'ReportPage_1',
-        pageDisplayName: dashState.pageTitles[0]?.title || 'Dashboard Overview',
-        connectionType: 'byConnection',
-        canvasWidth: dashState.dimensions.width,
-        canvasHeight: dashState.dimensions.height,
-        wallpaperSvg: markup,
-        visuals: dashState.containers.map((c, i) => ({
-          id: c.id,
-          name: c.title || `Visual Slot ${i + 1}`,
-          type: c.visualType || (c.showKpiIcon ? 'kpi' : 'card'),
-          x: c.x,
-          y: c.y,
-          width: c.width,
-          height: c.height,
-          zIndex: c.zIndex || (i + 1),
-          color: c.color,
-        })),
-      });
-
-      const blob = await exportPbipZipBlob(pkg);
-      downloadPbipZip(blob, pkg.projectName);
-      setImportNotification(`Exported complete Fabric Power BI Project (${pkg.projectName}.pbip.zip)! Ready to open in Power BI Desktop.`);
-      setTimeout(() => setImportNotification(null), 6000);
-    } catch (err: any) {
-      alert(`Could not export PBIP: ${err?.message || err}`);
-    } finally {
-      setIsExportingPbip(false);
-    }
-  }, [dashState]);
-
   // Listen for copy event triggered by header button
   useEffect(() => {
     const onCopyEvent = () => handleCopySvg();
@@ -800,17 +754,6 @@ export const DashGeneratorPage: React.FC<DashGeneratorPageProps> = ({ onNavigate
           >
             <Download className="w-4 h-4 stroke-[2.5]" />
             <span>Download Background (.svg)</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={handleExportToPbip}
-            disabled={isExportingPbip}
-            className="pop-btn inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs sm:text-sm font-heading font-black bg-[#8B5CF6] hover:bg-[#7C3AED] text-white border-2 border-[#1E293B] shadow-[3px_3px_0px_0px_#1E293B] transition-all cursor-pointer disabled:opacity-50"
-            title="Export complete Microsoft Fabric Power BI Project (.pbip.zip) with layout cards and wallpaper"
-          >
-            <FileCode className="w-4 h-4 stroke-[2.5]" />
-            <span>{isExportingPbip ? 'Packaging PBIP...' : 'Export Fabric PBIP (.zip)'}</span>
           </button>
         </div>
       </div>

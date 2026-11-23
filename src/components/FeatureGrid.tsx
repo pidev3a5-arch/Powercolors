@@ -11,7 +11,7 @@ import {
   Compass,
   Check,
   Code2,
-  FileCode,
+  MousePointerClick,
 } from 'lucide-react';
 import { AppPage } from '../core/types';
 
@@ -155,7 +155,7 @@ export const FeatureGrid: React.FC<FeatureGridProps> = ({ onNavigate }) => {
             Everything You Need in One Unified Studio
           </h3>
           <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium max-w-2xl mx-auto">
-            Switch effortlessly between theme quantization, color harmonies, canvas layout planning, SVG micro-charts, icon picker, 56 DAX patterns, Deneb Vega-Lite specs, and Fabric PBIP project automation.
+            Switch effortlessly between theme quantization, color harmonies, canvas layout planning, SVG micro-charts, icon picker, 56 DAX patterns, Deneb Vega-Lite specs, and custom Power BI 4-state buttons.
           </p>
         </div>
 
@@ -489,49 +489,49 @@ export const FeatureGrid: React.FC<FeatureGridProps> = ({ onNavigate }) => {
             </button>
           </div>
 
-          {/* Workspace 8: Fabric PBIP Studio */}
+          {/* Workspace 8: Button Studio */}
           <div className="pop-card bg-white dark:bg-slate-900 p-6 sm:p-7 rounded-3xl border-3 border-[#1E293B] dark:border-slate-700 shadow-[6px_6px_0px_0px_#1E293B] flex flex-col justify-between space-y-5">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="w-12 h-12 rounded-2xl bg-[#059669] border-2 border-[#1E293B] flex items-center justify-center text-white shadow-[2.5px_2.5px_0px_0px_#1E293B]">
-                  <FileCode className="w-6 h-6 stroke-[2.5]" />
+                  <MousePointerClick className="w-6 h-6 stroke-[2.5]" />
                 </div>
                 <span className="px-2.5 py-0.5 rounded-full text-[11px] font-heading font-black bg-[#059669]/20 text-[#047857] dark:text-[#34D399] border border-[#059669]/40">
-                  Option A: PBIP Git
+                  4-State Buttons
                 </span>
               </div>
 
               <div>
                 <h4 className="text-xl sm:text-2xl font-heading font-black text-[#1E293B] dark:text-white">
-                  Fabric PBIP Studio
+                  Button Studio
                 </h4>
                 <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium mt-1.5 leading-relaxed">
-                  Automate full Microsoft Fabric Power BI Project (.pbip) repositories with modern PBIR report format. Interactive project tree explorer, code inspector, and 1-click .pbip.zip export.
+                  Build presentation-grade custom buttons for Power BI Desktop. Simulate 4 interactive states (Default, On hover, On press, Disabled), customize geometry, 120+ SVG icons & typography, and export ready-to-import SVGs, PNGs, or 1-click state bundles.
                 </p>
               </div>
 
               <div className="space-y-2 pt-1">
                 <div className="flex items-start gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
                   <CheckCircle2 className="w-4 h-4 text-[#059669] flex-shrink-0 mt-0.5" />
-                  <span>Standard PBIR 2.0 format with definition.pbir & version.json</span>
+                  <span>Live 4-state simulation (Default, Hover, Press, Disabled)</span>
                 </div>
                 <div className="flex items-start gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
                   <CheckCircle2 className="w-4 h-4 text-[#059669] flex-shrink-0 mt-0.5" />
-                  <span>Interactive file tree visualizer with syntax-highlighted code inspector</span>
+                  <span>Full control: Nav, Filter chips, Action CTAs, Icon-only, Badges</span>
                 </div>
                 <div className="flex items-start gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
                   <CheckCircle2 className="w-4 h-4 text-[#059669] flex-shrink-0 mt-0.5" />
-                  <span>1-click client-side .pbip.zip download with embedded theme & layout</span>
+                  <span>1-Click Power BI 4-state ZIP bundle & DAX Image URL output</span>
                 </div>
               </div>
             </div>
 
             <button
               type="button"
-              onClick={() => onNavigate('pbip-studio')}
+              onClick={() => onNavigate('button-studio')}
               className="pop-btn w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full text-xs sm:text-sm font-heading font-black bg-[#059669] hover:bg-[#047857] text-white shadow-[3px_3px_0px_0px_#1E293B] transition-all cursor-pointer group"
             >
-              <span>Launch PBIP Studio</span>
+              <span>Launch Button Studio</span>
               <ArrowRight className="w-4 h-4 stroke-[2.5] group-hover:translate-x-1 transition-transform" />
             </button>
           </div>

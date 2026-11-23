@@ -9,7 +9,7 @@ import { PaletteHarmonyPage } from './pages/PaletteHarmonyPage';
 import { IconLibraryPage } from './pages/IconLibraryPage';
 import { DaxToolkitPage } from './pages/DaxToolkitPage';
 import { DenebStudioPage } from './pages/DenebStudioPage';
-import { PbipStudioPage } from './pages/PbipStudioPage';
+import { ButtonStudioPage } from './pages/ButtonStudioPage';
 import { LinkedInIcon, FacebookIcon, YouTubeIcon, GitHubIcon } from './components/SocialIcons';
 import { extractThemeFromImage } from './core/colorEngine';
 import { createColorSwatch, deriveStructuralColors } from './core/colorHarmonics';
@@ -35,7 +35,7 @@ export default function App() {
       hash === 'icon-library' ||
       hash === 'dax-toolkit' ||
       hash === 'deneb-studio' ||
-      hash === 'pbip-studio' ||
+      hash === 'button-studio' ||
       hash === 'landing'
     ) {
       return hash as AppPage;
@@ -440,11 +440,10 @@ export default function App() {
         />
       )}
 
-      {currentPage === 'pbip-studio' && (
-        <PbipStudioPage
+      {currentPage === 'button-studio' && (
+        <ButtonStudioPage
           onNavigate={handleNavigate}
-          activeThemeJson={currentTheme}
-          themeName={themeName}
+          paletteHexes={swatches.map((s) => s.hex)}
         />
       )}
 
