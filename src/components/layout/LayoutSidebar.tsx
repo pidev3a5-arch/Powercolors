@@ -80,9 +80,9 @@ export const LayoutSidebar: React.FC<LayoutSidebarProps> = ({
   }, [selectedId]);
 
   React.useEffect(() => {
-    if (activeTab === 'presets' && typeof window !== 'undefined' && window.location.hash.includes('mobile')) {
+    if (activeTab === 'presets' && typeof window !== 'undefined' && (window.location.hash.includes('single') || window.location.hash.includes('spotlight'))) {
       const container = document.getElementById('layout-presets-list');
-      const el = document.getElementById('preset-card-mobile-portrait');
+      const el = document.getElementById('preset-card-single-big-slot');
       if (container && el) {
         container.scrollTop = el.offsetTop - container.offsetTop;
       }

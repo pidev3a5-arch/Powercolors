@@ -106,28 +106,39 @@ describe('Layout Preset Adaptation to Nav Bar & Page Header', () => {
     }
   });
 
-  it('preserves exact coordinates and dimensions for mobile portrait preset', () => {
-    const mobilePreset = CURATED_LAYOUT_PRESETS.find((p) => p.id === 'mobile-portrait')!;
-    expect(mobilePreset).toBeDefined();
+  it('correctly adapts single big slot desktop preset to fill usable canvas', () => {
+    const singlePreset = CURATED_LAYOUT_PRESETS.find((p) => p.id === 'single-big-slot')!;
+    expect(singlePreset).toBeDefined();
+    expect(singlePreset.visuals).toHaveLength(1);
+    expect(singlePreset.dimensions.width).toBe(1280);
+    expect(singlePreset.dimensions.height).toBe(720);
 
-    const adaptedContainers = adaptLayoutPresetToCanvas(mobilePreset, DEFAULT_DASH_CANVAS_STATE);
+    // Test on default canvas (1280x720)
+    const adaptedDefault = adaptLayoutPresetToCanvas(singlePreset, DEFAULT_DASH_CANVAS_STATE);
+    expect(adaptedDefault).toHaveLength(1);
+    expect(adaptedDefault[0].title).toBe('Primary Full-Canvas Slot');
+    expect(adaptedDefault[0].width).toBeGreaterThanOrEqual(1000);
+    expect(adaptedDefault[0].height).toBeGreaterThanOrEqual(550);
 
-    expect(adaptedContainers).toHaveLength(6);
-    expect(adaptedContainers[0].title).toBe('Executive Header');
-    expect(adaptedContainers[0].width).toBe(358);
-    expect(adaptedContainers[0].height).toBe(48);
+    // Test on high-res 1920x1080 canvas with left navigation bar
+    const stateWithLeftNav: DashCanvasState = {
+      ...DEFAULT_DASH_CANVAS_STATE,
+      dimensions: { width: 1920, height: 1080, preset: '1920x1080' },
+      navBar: {
+        ...DEFAULT_DASH_CANVAS_STATE.navBar,
+        show: true,
+        orientation: 'left',
+        size: 240,
+        backgroundColor: '#0F172A',
+        reportTitle: 'Report Menu',
+      },
+      pageTitles: [],
+    };
 
-    const matrixVisual = adaptedContainers.find((c) => c.visualType === 'matrix');
-    expect(matrixVisual).toBeDefined();
-    expect(matrixVisual?.title).toBe('Financial Statement Matrix (P&L)');
-    expect(matrixVisual?.width).toBe(358);
-    expect(matrixVisual?.height).toBe(552);
-
-    for (const c of adaptedContainers) {
-      expect(c.x).toBeGreaterThanOrEqual(0);
-      expect(c.y).toBeGreaterThanOrEqual(0);
-      expect(c.x + c.width).toBeLessThanOrEqual(390);
-      expect(c.y + c.height).toBeLessThanOrEqual(844);
-    }
+    const adaptedWithNav = adaptLayoutPresetToCanvas(singlePreset, stateWithLeftNav);
+    expect(adaptedWithNav).toHaveLength(1);
+    expect(adaptedWithNav[0].x).toBeGreaterThanOrEqual(240);
+    expect(adaptedWithNav[0].x + adaptedWithNav[0].width).toBeLessThanOrEqual(1920);
+    expect(adaptedWithNav[0].y + adaptedWithNav[0].height).toBeLessThanOrEqual(1080);
   });
 });
