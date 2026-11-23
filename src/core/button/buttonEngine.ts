@@ -4,6 +4,7 @@ import {
   ButtonState,
   ButtonCornerRadius,
   ButtonStateOverrides,
+  ButtonIconPosition,
 } from './types';
 import { SVG_ICONS_COLLECTION } from '../iconLibrary/icons';
 
@@ -34,6 +35,116 @@ export function resolveCornerRadius(
   }
 }
 
+export interface EffectiveButtonConfig {
+  title: string;
+  showTitle: boolean;
+  fontFamily: string;
+  fontSize: number;
+  fontWeight: 'normal' | 'bold' | 'black';
+  textAlign: 'center' | 'left' | 'right';
+  showIcon: boolean;
+  iconName: string;
+  customIconSvg?: string;
+  iconPosition: ButtonIconPosition;
+  iconSize: number;
+  showBadge: boolean;
+  badgeText: string;
+  badgeBgColor: string;
+  badgeTextColor: string;
+  fillColor: string;
+  borderColor: string;
+  borderWidth: number;
+  textColor: string;
+  iconColor: string;
+  opacity: number;
+  offsetY: number;
+  shadowOffset: number;
+}
+
+/**
+ * Resolve effective button configuration for any state,
+ * cascading from base config to state overrides.
+ */
+export function resolveEffectiveStateConfig(
+  config: ButtonConfig,
+  state: ButtonState = 'default'
+): EffectiveButtonConfig {
+  const overrides: ButtonStateOverrides = config.stateOverrides?.[state] || {};
+  const baseShadow = config.hasShadow ? config.shadowOffset : 0;
+
+  let defaultFill = config.fillColor;
+  let defaultBorder = config.borderColor;
+  let defaultText = config.textColor;
+  let defaultIconColor = config.iconColor;
+  let defaultOpacity = 1;
+  let defaultOffsetY = 0;
+  let defaultShadowOffset = baseShadow;
+
+  switch (state) {
+    case 'hover':
+      defaultOffsetY = -1;
+      defaultShadowOffset = baseShadow > 0 ? baseShadow + 1 : 0;
+      break;
+
+    case 'pressed':
+      defaultFill = config.styleVariant === 'outline-ghost' ? config.borderColor : config.fillColor;
+      defaultText = config.styleVariant === 'outline-ghost' ? '#FFFFFF' : config.textColor;
+      defaultIconColor = config.styleVariant === 'outline-ghost' ? '#FFFFFF' : config.iconColor;
+      defaultOffsetY = 2;
+      defaultShadowOffset = baseShadow > 1 ? 1 : 0;
+      break;
+
+    case 'inactive':
+      defaultFill = '#F8FAFC';
+      defaultBorder = '#CBD5E1';
+      defaultText = '#64748B';
+      defaultIconColor = '#94A3B8';
+      defaultOffsetY = 0;
+      defaultShadowOffset = baseShadow > 0 ? 1 : 0;
+      break;
+
+    case 'disabled':
+      defaultFill = '#E2E8F0';
+      defaultBorder = '#94A3B8';
+      defaultText = '#94A3B8';
+      defaultIconColor = '#94A3B8';
+      defaultOpacity = 0.55;
+      defaultOffsetY = 0;
+      defaultShadowOffset = 0;
+      break;
+
+    case 'default':
+    default:
+      break;
+  }
+
+  return {
+    title: overrides.title !== undefined ? overrides.title : config.title,
+    showTitle: overrides.showTitle !== undefined ? overrides.showTitle : config.showTitle,
+    fontFamily: overrides.fontFamily !== undefined ? overrides.fontFamily : config.fontFamily,
+    fontSize: overrides.fontSize !== undefined ? overrides.fontSize : config.fontSize,
+    fontWeight: overrides.fontWeight !== undefined ? overrides.fontWeight : config.fontWeight,
+    textAlign: overrides.textAlign !== undefined ? overrides.textAlign : config.textAlign,
+    showIcon: overrides.showIcon !== undefined ? overrides.showIcon : config.showIcon,
+    iconName: overrides.iconName !== undefined ? overrides.iconName : config.iconName,
+    customIconSvg: overrides.customIconSvg !== undefined ? overrides.customIconSvg : config.customIconSvg,
+    iconPosition: overrides.iconPosition !== undefined ? overrides.iconPosition : config.iconPosition,
+    iconSize: overrides.iconSize !== undefined ? overrides.iconSize : config.iconSize,
+    showBadge: overrides.showBadge !== undefined ? overrides.showBadge : config.showBadge,
+    badgeText: overrides.badgeText !== undefined ? overrides.badgeText : config.badgeText,
+    badgeBgColor: overrides.badgeBgColor !== undefined ? overrides.badgeBgColor : config.badgeBgColor,
+    badgeTextColor: overrides.badgeTextColor !== undefined ? overrides.badgeTextColor : config.badgeTextColor,
+    fillColor: overrides.fillColor !== undefined ? overrides.fillColor : defaultFill,
+    borderColor: overrides.borderColor !== undefined ? overrides.borderColor : defaultBorder,
+    borderWidth: overrides.borderWidth !== undefined ? overrides.borderWidth : config.borderWidth,
+    textColor: overrides.textColor !== undefined ? overrides.textColor : defaultText,
+    iconColor: overrides.iconColor !== undefined ? overrides.iconColor : defaultIconColor,
+    opacity: overrides.opacity !== undefined ? overrides.opacity : defaultOpacity,
+    offsetY: overrides.offsetY !== undefined ? overrides.offsetY : defaultOffsetY,
+    shadowOffset: overrides.shadowOffset !== undefined ? overrides.shadowOffset : defaultShadowOffset,
+  };
+}
+
 /**
  * Compute effective styles for any state (default, inactive, hover, pressed, disabled)
  */
@@ -49,66 +160,16 @@ export function resolveEffectiveStyles(
   offsetY: number;
   shadowOffset: number;
 } {
-  const baseShadow = config.hasShadow ? config.shadowOffset : 0;
-  const overrides: ButtonStateOverrides = config.stateOverrides?.[state] || {};
-
-  switch (state) {
-    case 'hover':
-      return {
-        fillColor: overrides.fillColor || config.fillColor,
-        borderColor: overrides.borderColor || config.borderColor,
-        textColor: overrides.textColor || config.textColor,
-        iconColor: overrides.iconColor || config.iconColor,
-        opacity: overrides.opacity ?? 1,
-        offsetY: overrides.offsetY ?? -1,
-        shadowOffset: overrides.shadowOffset ?? (baseShadow > 0 ? baseShadow + 1 : 0),
-      };
-
-    case 'pressed':
-      return {
-        fillColor: overrides.fillColor || (config.styleVariant === 'outline-ghost' ? config.borderColor : config.fillColor),
-        borderColor: overrides.borderColor || config.borderColor,
-        textColor: overrides.textColor || (config.styleVariant === 'outline-ghost' ? '#FFFFFF' : config.textColor),
-        iconColor: overrides.iconColor || (config.styleVariant === 'outline-ghost' ? '#FFFFFF' : config.iconColor),
-        opacity: overrides.opacity ?? 1,
-        offsetY: overrides.offsetY ?? 2,
-        shadowOffset: overrides.shadowOffset ?? (baseShadow > 1 ? 1 : 0),
-      };
-
-    case 'inactive':
-      return {
-        fillColor: overrides.fillColor || '#F8FAFC',
-        borderColor: overrides.borderColor || '#CBD5E1',
-        textColor: overrides.textColor || '#64748B',
-        iconColor: overrides.iconColor || '#94A3B8',
-        opacity: overrides.opacity ?? 1,
-        offsetY: overrides.offsetY ?? 0,
-        shadowOffset: overrides.shadowOffset ?? (baseShadow > 0 ? 1 : 0),
-      };
-
-    case 'disabled':
-      return {
-        fillColor: overrides.fillColor || '#E2E8F0',
-        borderColor: overrides.borderColor || '#94A3B8',
-        textColor: overrides.textColor || '#94A3B8',
-        iconColor: overrides.iconColor || '#94A3B8',
-        opacity: overrides.opacity ?? 0.55,
-        offsetY: overrides.offsetY ?? 0,
-        shadowOffset: 0,
-      };
-
-    case 'default':
-    default:
-      return {
-        fillColor: config.fillColor,
-        borderColor: config.borderColor,
-        textColor: config.textColor,
-        iconColor: config.iconColor,
-        opacity: 1,
-        offsetY: 0,
-        shadowOffset: baseShadow,
-      };
-  }
+  const eff = resolveEffectiveStateConfig(config, state);
+  return {
+    fillColor: eff.fillColor,
+    borderColor: eff.borderColor,
+    textColor: eff.textColor,
+    iconColor: eff.iconColor,
+    opacity: eff.opacity,
+    offsetY: eff.offsetY,
+    shadowOffset: eff.shadowOffset,
+  };
 }
 
 /**
@@ -149,24 +210,24 @@ export function generateButtonSvg(
   config: ButtonConfig,
   state: ButtonState = 'default'
 ): string {
-  const styles = resolveEffectiveStyles(config, state);
+  const eff = resolveEffectiveStateConfig(config, state);
   const rx = resolveCornerRadius(config.cornerRadius, config.height, config.customRadius);
 
   // SVG canvas dimensions (including space for pop shadow offset)
-  const maxShadow = Math.max(config.shadowOffset, styles.shadowOffset, 4);
+  const maxShadow = Math.max(config.shadowOffset, eff.shadowOffset, 4);
   const paddingMargin = config.hasShadow ? maxShadow + 2 : 2;
   const svgWidth = config.width + paddingMargin * 2;
   const svgHeight = config.height + paddingMargin * 2;
 
   // Button box position
   const btnX = paddingMargin;
-  const btnY = paddingMargin + styles.offsetY;
+  const btnY = paddingMargin + eff.offsetY;
   const btnW = config.width;
   const btnH = config.height;
 
   // Shadow position
-  const shadowX = btnX + styles.shadowOffset;
-  const shadowY = btnY + styles.shadowOffset;
+  const shadowX = btnX + eff.shadowOffset;
+  const shadowY = btnY + eff.shadowOffset;
 
   // Gradient ID
   const gradId = `btn-grad-${config.id}-${state}`;
@@ -176,8 +237,8 @@ export function generateButtonSvg(
     config.styleVariant === 'gradient'
       ? `<defs>
     <linearGradient id="${gradId}" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="${styles.fillColor}" />
-      <stop offset="100%" stop-color="${config.gradientEndColor || styles.fillColor}" />
+      <stop offset="0%" stop-color="${eff.fillColor}" />
+      <stop offset="100%" stop-color="${config.gradientEndColor || eff.fillColor}" />
     </linearGradient>
   </defs>`
       : '';
@@ -185,46 +246,46 @@ export function generateButtonSvg(
   const activeFill =
     config.styleVariant === 'gradient'
       ? `url(#${gradId})`
-      : styles.fillColor;
+      : eff.fillColor;
 
   // Build Neo-Pop Hard Shadow
   const shadowElem =
-    config.hasShadow && styles.shadowOffset > 0
+    config.hasShadow && eff.shadowOffset > 0
       ? `<rect x="${shadowX}" y="${shadowY}" width="${btnW}" height="${btnH}" rx="${rx}" fill="${config.shadowColor}" opacity="0.95" />`
       : '';
 
   // Calculate internal layout: icon + text + badge
-  const iconBody = config.showIcon ? getButtonIconBody(config) : '';
-  const iconSz = config.iconSize;
-  const fontSize = config.fontSize;
+  const iconBody = eff.showIcon ? getButtonIconBody({ iconName: eff.iconName, customIconSvg: eff.customIconSvg }) : '';
+  const iconSz = eff.iconSize;
+  const fontSize = eff.fontSize;
   const fontWeightVal =
-    config.fontWeight === 'black' ? '900' : config.fontWeight === 'bold' ? '700' : '500';
+    eff.fontWeight === 'black' ? '900' : eff.fontWeight === 'bold' ? '700' : '500';
 
   let contentElements = '';
 
-  if (config.type === 'icon-only' || config.iconPosition === 'icon-only') {
+  if (config.type === 'icon-only' || eff.iconPosition === 'icon-only') {
     // Center icon inside button
     const icX = btnX + (btnW - iconSz) / 2;
     const icY = btnY + (btnH - iconSz) / 2;
     contentElements = `
-      <g transform="translate(${icX}, ${icY})" fill="none" stroke="${styles.iconColor}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <g transform="translate(${icX}, ${icY})" fill="none" stroke="${eff.iconColor}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <svg viewBox="0 0 24 24" width="${iconSz}" height="${iconSz}">
           ${iconBody}
         </svg>
       </g>
     `;
-  } else if (config.iconPosition === 'top') {
+  } else if (eff.iconPosition === 'top') {
     // Icon on top, text below
     const edgeMargin = Math.max(14, Math.round(rx * 0.35) + 6);
     let icX = btnX + (btnW - iconSz) / 2;
     let txtX = btnX + btnW / 2;
     let textAnchor: 'start' | 'middle' | 'end' = 'middle';
 
-    if (config.textAlign === 'left') {
+    if (eff.textAlign === 'left') {
       icX = btnX + edgeMargin;
       txtX = btnX + edgeMargin;
       textAnchor = 'start';
-    } else if (config.textAlign === 'right') {
+    } else if (eff.textAlign === 'right') {
       icX = btnX + btnW - iconSz - edgeMargin;
       txtX = btnX + btnW - edgeMargin;
       textAnchor = 'end';
@@ -235,8 +296,8 @@ export function generateButtonSvg(
 
     contentElements = `
       ${
-        config.showIcon
-          ? `<g transform="translate(${icX}, ${icY})" fill="none" stroke="${styles.iconColor}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        eff.showIcon
+          ? `<g transform="translate(${icX}, ${icY})" fill="none" stroke="${eff.iconColor}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <svg viewBox="0 0 24 24" width="${iconSz}" height="${iconSz}">
                 ${iconBody}
               </svg>
@@ -244,9 +305,9 @@ export function generateButtonSvg(
           : ''
       }
       ${
-        config.showTitle
-          ? `<text x="${txtX}" y="${txtY}" text-anchor="${textAnchor}" dominant-baseline="central" font-family="${config.fontFamily}, sans-serif" font-size="${fontSize}px" font-weight="${fontWeightVal}" fill="${styles.textColor}">
-              ${escapeXml(config.title)}
+        eff.showTitle
+          ? `<text x="${txtX}" y="${txtY}" text-anchor="${textAnchor}" dominant-baseline="central" font-family="${eff.fontFamily}, sans-serif" font-size="${fontSize}px" font-weight="${fontWeightVal}" fill="${eff.textColor}">
+              ${escapeXml(eff.title)}
             </text>`
           : ''
       }
@@ -255,20 +316,20 @@ export function generateButtonSvg(
     // Horizontal row: [Icon] [Title] [Badge]
     // Calculate total estimated content width to center or align properly
     const approxCharWidth = fontSize * 0.58;
-    const textWidth = config.showTitle ? config.title.length * approxCharWidth : 0;
-    const badgeWidth = config.showBadge ? config.badgeText.length * (fontSize * 0.5) + 16 : 0;
+    const textWidth = eff.showTitle ? eff.title.length * approxCharWidth : 0;
+    const badgeWidth = eff.showBadge ? eff.badgeText.length * (fontSize * 0.5) + 16 : 0;
     const spacing = 8;
 
     let totalContentWidth = 0;
-    if (config.showIcon) totalContentWidth += iconSz;
-    if (config.showTitle) totalContentWidth += (totalContentWidth > 0 ? spacing : 0) + textWidth;
-    if (config.showBadge) totalContentWidth += (totalContentWidth > 0 ? spacing : 0) + badgeWidth;
+    if (eff.showIcon) totalContentWidth += iconSz;
+    if (eff.showTitle) totalContentWidth += (totalContentWidth > 0 ? spacing : 0) + textWidth;
+    if (eff.showBadge) totalContentWidth += (totalContentWidth > 0 ? spacing : 0) + badgeWidth;
 
     const edgeMargin = Math.max(14, Math.round(rx * 0.35) + 6);
     let startX = btnX + (btnW - totalContentWidth) / 2;
-    if (config.textAlign === 'left') {
+    if (eff.textAlign === 'left') {
       startX = btnX + edgeMargin;
-    } else if (config.textAlign === 'right') {
+    } else if (eff.textAlign === 'right') {
       startX = btnX + btnW - totalContentWidth - edgeMargin;
     }
 
@@ -276,9 +337,9 @@ export function generateButtonSvg(
     let currX = startX;
 
     let iconSvg = '';
-    if (config.showIcon && config.iconPosition === 'left') {
+    if (eff.showIcon && eff.iconPosition === 'left') {
       iconSvg = `
-        <g transform="translate(${currX}, ${centerY - iconSz / 2})" fill="none" stroke="${styles.iconColor}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <g transform="translate(${currX}, ${centerY - iconSz / 2})" fill="none" stroke="${eff.iconColor}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <svg viewBox="0 0 24 24" width="${iconSz}" height="${iconSz}">
             ${iconBody}
           </svg>
@@ -288,20 +349,20 @@ export function generateButtonSvg(
     }
 
     let textSvg = '';
-    if (config.showTitle) {
+    if (eff.showTitle) {
       const textAnchor = 'start';
       textSvg = `
-        <text x="${currX}" y="${centerY}" text-anchor="${textAnchor}" dominant-baseline="central" font-family="${config.fontFamily}, sans-serif" font-size="${fontSize}px" font-weight="${fontWeightVal}" fill="${styles.textColor}">
-          ${escapeXml(config.title)}
+        <text x="${currX}" y="${centerY}" text-anchor="${textAnchor}" dominant-baseline="central" font-family="${eff.fontFamily}, sans-serif" font-size="${fontSize}px" font-weight="${fontWeightVal}" fill="${eff.textColor}">
+          ${escapeXml(eff.title)}
         </text>
       `;
       currX += textWidth + spacing;
     }
 
     let rightIconSvg = '';
-    if (config.showIcon && config.iconPosition === 'right') {
+    if (eff.showIcon && eff.iconPosition === 'right') {
       rightIconSvg = `
-        <g transform="translate(${currX}, ${centerY - iconSz / 2})" fill="none" stroke="${styles.iconColor}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <g transform="translate(${currX}, ${centerY - iconSz / 2})" fill="none" stroke="${eff.iconColor}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <svg viewBox="0 0 24 24" width="${iconSz}" height="${iconSz}">
             ${iconBody}
           </svg>
@@ -311,15 +372,15 @@ export function generateButtonSvg(
     }
 
     let badgeSvg = '';
-    if (config.showBadge && config.badgeText.trim()) {
+    if (eff.showBadge && eff.badgeText.trim()) {
       const bH = fontSize + 4;
       const bW = badgeWidth;
       const bY = centerY - bH / 2;
       badgeSvg = `
         <g transform="translate(${currX}, ${bY})">
-          <rect width="${bW}" height="${bH}" rx="${Math.round(bH / 2)}" fill="${config.badgeBgColor}" />
-          <text x="${bW / 2}" y="${bH / 2}" text-anchor="middle" dominant-baseline="central" font-family="${config.fontFamily}, sans-serif" font-size="${Math.max(9, fontSize - 2)}px" font-weight="800" fill="${config.badgeTextColor}">
-            ${escapeXml(config.badgeText)}
+          <rect width="${bW}" height="${bH}" rx="${Math.round(bH / 2)}" fill="${eff.badgeBgColor}" />
+          <text x="${bW / 2}" y="${bH / 2}" text-anchor="middle" dominant-baseline="central" font-family="${eff.fontFamily}, sans-serif" font-size="${Math.max(9, fontSize - 2)}px" font-weight="800" fill="${eff.badgeTextColor}">
+            ${escapeXml(eff.badgeText)}
           </text>
         </g>
       `;
@@ -331,9 +392,9 @@ export function generateButtonSvg(
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${svgWidth} ${svgHeight}" width="${svgWidth}" height="${svgHeight}">
   ${defs}
-  <g opacity="${styles.opacity}">
+  <g opacity="${eff.opacity}">
     ${shadowElem}
-    <rect x="${btnX}" y="${btnY}" width="${btnW}" height="${btnH}" rx="${rx}" fill="${activeFill}" stroke="${styles.borderColor}" stroke-width="${config.borderWidth}" />
+    <rect x="${btnX}" y="${btnY}" width="${btnW}" height="${btnH}" rx="${rx}" fill="${activeFill}" stroke="${eff.borderColor}" stroke-width="${eff.borderWidth}" />
     ${contentElements}
   </g>
 </svg>`.trim();

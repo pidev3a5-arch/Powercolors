@@ -21,8 +21,31 @@ export type ButtonIconPosition = 'left' | 'right' | 'top' | 'icon-only';
 export type ButtonCornerRadius = 'square' | 'subtle' | 'smooth' | 'rounded' | 'pill';
 
 export interface ButtonStateOverrides {
+  // Typography & Label
+  title?: string;
+  showTitle?: boolean;
+  fontFamily?: string;
+  fontSize?: number;
+  fontWeight?: 'normal' | 'bold' | 'black';
+  textAlign?: 'center' | 'left' | 'right';
+
+  // Icon System
+  showIcon?: boolean;
+  iconName?: string;
+  customIconSvg?: string;
+  iconPosition?: ButtonIconPosition;
+  iconSize?: number;
+
+  // Subtitle / Notification Badge
+  showBadge?: boolean;
+  badgeText?: string;
+  badgeBgColor?: string;
+  badgeTextColor?: string;
+
+  // Visual Colors & Geometry
   fillColor?: string;
   borderColor?: string;
+  borderWidth?: number;
   textColor?: string;
   iconColor?: string;
   opacity?: number;

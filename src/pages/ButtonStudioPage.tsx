@@ -15,6 +15,7 @@ import {
   AlignRight,
   Upload,
   X,
+  RotateCcw,
 } from 'lucide-react';
 import { AppPage } from '../core/types';
 import {
@@ -32,6 +33,7 @@ import {
   downloadButtonBundleZip,
   generateButtonDaxExpression,
   sanitizeCustomSvg,
+  resolveEffectiveStateConfig,
 } from '../core/button/buttonEngine';
 import { CURATED_BUTTON_PRESETS } from '../core/button/presets';
 import { SVG_ICONS_COLLECTION } from '../core/iconLibrary/icons';
@@ -52,20 +54,85 @@ export const ButtonStudioPage: React.FC<ButtonStudioPageProps> = ({
   // Active button configuration
   const [buttonConfig, setButtonConfig] = useState<ButtonConfig>(CURATED_BUTTON_PRESETS[0].config);
 
-  // Active simulated state
+  // Active simulated state in live simulator
   const [activeState, setActiveState] = useState<ButtonState>('default');
+
+  // Active state currently selected for editing in inspector
+  const [editingState, setEditingState] = useState<ButtonState>('default');
 
   // Inspector tabs
   const [inspectorTab, setInspectorTab] = useState<'presets' | 'geometry' | 'style' | 'typography' | 'icon'>('presets');
 
-  // State override tab (when customizing states in geometry/style tab)
-  const [overrideStateTab, setOverrideStateTab] = useState<'hover' | 'pressed' | 'inactive' | 'disabled'>('hover');
+  // Computed effective state configuration for the state currently being edited
+  const effectiveActiveState = useMemo(
+    () => resolveEffectiveStateConfig(buttonConfig, editingState),
+    [buttonConfig, editingState]
+  );
 
   // Icon search query & custom icon upload ref
   const [iconSearch, setIconSearch] = useState('');
   const [isPastingSvg, setIsPastingSvg] = useState(false);
   const [rawSvgInput, setRawSvgInput] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Unified property updater for either default base or specific state override
+  const updateActiveStateProperty = (key: string, val: any) => {
+    if (editingState === 'default') {
+      setButtonConfig((prev) => ({ ...prev, [key]: val }));
+    } else {
+      setButtonConfig((prev) => ({
+        ...prev,
+        stateOverrides: {
+          ...prev.stateOverrides,
+          [editingState]: {
+            ...prev.stateOverrides?.[editingState],
+            [key]: val,
+          },
+        },
+      }));
+    }
+  };
+
+  const handleResetStateOverrides = (stateToReset: ButtonState) => {
+    if (stateToReset === 'default') return;
+    setButtonConfig((prev) => {
+      const nextOverrides = { ...prev.stateOverrides };
+      delete nextOverrides[stateToReset];
+      return { ...prev, stateOverrides: nextOverrides };
+    });
+  };
+
+  const handleCopyDefaultToState = (targetState: ButtonState) => {
+    if (targetState === 'default') return;
+    setButtonConfig((prev) => ({
+      ...prev,
+      stateOverrides: {
+        ...prev.stateOverrides,
+        [targetState]: {
+          title: prev.title,
+          showTitle: prev.showTitle,
+          fontFamily: prev.fontFamily,
+          fontSize: prev.fontSize,
+          fontWeight: prev.fontWeight,
+          textAlign: prev.textAlign,
+          showIcon: prev.showIcon,
+          iconName: prev.iconName,
+          customIconSvg: prev.customIconSvg,
+          iconPosition: prev.iconPosition,
+          iconSize: prev.iconSize,
+          showBadge: prev.showBadge,
+          badgeText: prev.badgeText,
+          badgeBgColor: prev.badgeBgColor,
+          badgeTextColor: prev.badgeTextColor,
+          fillColor: prev.fillColor,
+          borderColor: prev.borderColor,
+          borderWidth: prev.borderWidth,
+          textColor: prev.textColor,
+          iconColor: prev.iconColor,
+        },
+      },
+    }));
+  };
 
   const handleUploadSvgFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -74,21 +141,24 @@ export const ButtonStudioPage: React.FC<ButtonStudioPageProps> = ({
     reader.onload = (event) => {
       const content = event.target?.result as string;
       if (content) {
-        updateConfig({ customIconSvg: content, showIcon: true });
+        updateActiveStateProperty('customIconSvg', content);
+        updateActiveStateProperty('showIcon', true);
       }
     };
     reader.readAsText(file);
+    e.target.value = '';
   };
 
   const handleApplyPastedSvg = () => {
     if (rawSvgInput.trim()) {
-      updateConfig({ customIconSvg: rawSvgInput.trim(), showIcon: true });
+      updateActiveStateProperty('customIconSvg', rawSvgInput.trim());
+      updateActiveStateProperty('showIcon', true);
       setIsPastingSvg(false);
     }
   };
 
   const handleClearCustomIcon = () => {
-    updateConfig({ customIconSvg: undefined });
+    updateActiveStateProperty('customIconSvg', undefined);
     setRawSvgInput('');
     setIsPastingSvg(false);
   };
@@ -120,27 +190,11 @@ export const ButtonStudioPage: React.FC<ButtonStudioPageProps> = ({
   const handleApplyPreset = (presetConfig: ButtonConfig) => {
     setButtonConfig({ ...presetConfig });
     setActiveState('default');
+    setEditingState('default');
   };
 
   const updateConfig = (updates: Partial<ButtonConfig>) => {
     setButtonConfig((prev) => ({ ...prev, ...updates }));
-  };
-
-  const updateStateOverride = (
-    state: 'hover' | 'pressed' | 'inactive' | 'disabled',
-    key: string,
-    val: any
-  ) => {
-    setButtonConfig((prev) => ({
-      ...prev,
-      stateOverrides: {
-        ...prev.stateOverrides,
-        [state]: {
-          ...prev.stateOverrides?.[state],
-          [key]: val,
-        },
-      },
-    }));
   };
 
   const handleCopySvg = () => {
@@ -273,7 +327,10 @@ export const ButtonStudioPage: React.FC<ButtonStudioPageProps> = ({
                   <button
                     key={st}
                     type="button"
-                    onClick={() => setActiveState(st)}
+                    onClick={() => {
+                      setActiveState(st);
+                      setEditingState(st);
+                    }}
                     className={`py-1.5 rounded-lg text-[11px] font-heading font-black capitalize transition-all cursor-pointer ${
                       activeState === st
                         ? 'bg-[#8B5CF6] text-white shadow-[1.5px_1.5px_0px_0px_#1E293B] border border-[#1E293B]'
@@ -362,16 +419,24 @@ export const ButtonStudioPage: React.FC<ButtonStudioPageProps> = ({
             <div className="grid grid-cols-2 gap-3">
               {/* Default */}
               <div
-                onClick={() => setActiveState('default')}
+                onClick={() => {
+                  setActiveState('default');
+                  setEditingState('default');
+                }}
                 className={`p-3 rounded-2xl border-2 border-[#1E293B] flex flex-col items-center justify-between space-y-2 cursor-pointer transition-all ${
                   activeState === 'default'
                     ? 'bg-purple-50 dark:bg-purple-950/40 ring-2 ring-[#8B5CF6]'
                     : 'bg-[#FFFDF5] dark:bg-slate-950 hover:bg-slate-50'
                 }`}
               >
-                <span className="text-[10px] font-heading font-black uppercase text-slate-600 dark:text-slate-400">
-                  1. Default
-                </span>
+                <div className="w-full flex items-center justify-between">
+                  <span className="text-[10px] font-heading font-black uppercase text-slate-600 dark:text-slate-400">
+                    1. Default
+                  </span>
+                  <span className="text-[9px] font-mono font-bold text-purple-600 dark:text-purple-400 truncate max-w-[80px]">
+                    "{buttonConfig.title}"
+                  </span>
+                </div>
                 <div
                   className="max-w-full flex items-center justify-center py-1"
                   dangerouslySetInnerHTML={{ __html: defaultSvg }}
@@ -380,16 +445,24 @@ export const ButtonStudioPage: React.FC<ButtonStudioPageProps> = ({
 
               {/* On Hover */}
               <div
-                onClick={() => setActiveState('hover')}
+                onClick={() => {
+                  setActiveState('hover');
+                  setEditingState('hover');
+                }}
                 className={`p-3 rounded-2xl border-2 border-[#1E293B] flex flex-col items-center justify-between space-y-2 cursor-pointer transition-all ${
                   activeState === 'hover'
                     ? 'bg-purple-50 dark:bg-purple-950/40 ring-2 ring-[#8B5CF6]'
                     : 'bg-[#FFFDF5] dark:bg-slate-950 hover:bg-slate-50'
                 }`}
               >
-                <span className="text-[10px] font-heading font-black uppercase text-slate-600 dark:text-slate-400">
-                  2. On Hover
-                </span>
+                <div className="w-full flex items-center justify-between">
+                  <span className="text-[10px] font-heading font-black uppercase text-slate-600 dark:text-slate-400">
+                    2. On Hover
+                  </span>
+                  <span className="text-[9px] font-mono font-bold text-purple-600 dark:text-purple-400 truncate max-w-[80px]">
+                    "{buttonConfig.stateOverrides?.hover?.title || buttonConfig.title}"
+                  </span>
+                </div>
                 <div
                   className="max-w-full flex items-center justify-center py-1"
                   dangerouslySetInnerHTML={{ __html: hoverSvg }}
@@ -398,16 +471,24 @@ export const ButtonStudioPage: React.FC<ButtonStudioPageProps> = ({
 
               {/* On Press */}
               <div
-                onClick={() => setActiveState('pressed')}
+                onClick={() => {
+                  setActiveState('pressed');
+                  setEditingState('pressed');
+                }}
                 className={`p-3 rounded-2xl border-2 border-[#1E293B] flex flex-col items-center justify-between space-y-2 cursor-pointer transition-all ${
                   activeState === 'pressed'
                     ? 'bg-purple-50 dark:bg-purple-950/40 ring-2 ring-[#8B5CF6]'
                     : 'bg-[#FFFDF5] dark:bg-slate-950 hover:bg-slate-50'
                 }`}
               >
-                <span className="text-[10px] font-heading font-black uppercase text-slate-600 dark:text-slate-400">
-                  3. On Press
-                </span>
+                <div className="w-full flex items-center justify-between">
+                  <span className="text-[10px] font-heading font-black uppercase text-slate-600 dark:text-slate-400">
+                    3. On Press
+                  </span>
+                  <span className="text-[9px] font-mono font-bold text-purple-600 dark:text-purple-400 truncate max-w-[80px]">
+                    "{buttonConfig.stateOverrides?.pressed?.title || buttonConfig.title}"
+                  </span>
+                </div>
                 <div
                   className="max-w-full flex items-center justify-center py-1"
                   dangerouslySetInnerHTML={{ __html: pressedSvg }}
@@ -416,16 +497,24 @@ export const ButtonStudioPage: React.FC<ButtonStudioPageProps> = ({
 
               {/* Disabled */}
               <div
-                onClick={() => setActiveState('disabled')}
+                onClick={() => {
+                  setActiveState('disabled');
+                  setEditingState('disabled');
+                }}
                 className={`p-3 rounded-2xl border-2 border-[#1E293B] flex flex-col items-center justify-between space-y-2 cursor-pointer transition-all ${
                   activeState === 'disabled'
                     ? 'bg-purple-50 dark:bg-purple-950/40 ring-2 ring-[#8B5CF6]'
                     : 'bg-[#FFFDF5] dark:bg-slate-950 hover:bg-slate-50'
                 }`}
               >
-                <span className="text-[10px] font-heading font-black uppercase text-slate-600 dark:text-slate-400">
-                  4. Disabled
-                </span>
+                <div className="w-full flex items-center justify-between">
+                  <span className="text-[10px] font-heading font-black uppercase text-slate-600 dark:text-slate-400">
+                    4. Disabled
+                  </span>
+                  <span className="text-[9px] font-mono font-bold text-purple-600 dark:text-purple-400 truncate max-w-[80px]">
+                    "{buttonConfig.stateOverrides?.disabled?.title || buttonConfig.title}"
+                  </span>
+                </div>
                 <div
                   className="max-w-full flex items-center justify-center py-1"
                   dangerouslySetInnerHTML={{ __html: disabledSvg }}
@@ -438,6 +527,92 @@ export const ButtonStudioPage: React.FC<ButtonStudioPageProps> = ({
         {/* RIGHT COLUMN: INSPECTOR CONTROLS TABS (7 cols) */}
         <div className="lg:col-span-7 space-y-6">
           <div className="pop-card p-6 rounded-3xl bg-white dark:bg-slate-900 border-3 border-[#1E293B] dark:border-slate-700 shadow-[6px_6px_0px_0px_#1E293B] space-y-5">
+            {/* STATE SELECTOR & CUSTOMIZATION HEADER */}
+            <div className="p-3.5 rounded-2xl bg-gradient-to-r from-purple-50 via-white to-amber-50 dark:from-slate-800 dark:via-slate-850 dark:to-slate-800 border-2 border-[#1E293B] shadow-[2.5px_2.5px_0px_0px_#1E293B] space-y-2.5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-[11px] font-heading font-black text-slate-500 uppercase tracking-wider">
+                    Editing Button State:
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded-lg text-xs font-heading font-black bg-[#8B5CF6] text-white shadow-[1px_1px_0px_0px_#1E293B]">
+                    {editingState === 'default'
+                      ? '1. DEFAULT (BASE)'
+                      : editingState === 'hover'
+                      ? '2. ON HOVER'
+                      : editingState === 'pressed'
+                      ? '3. ON PRESS'
+                      : editingState === 'inactive'
+                      ? 'INACTIVE (NAV)'
+                      : '4. DISABLED'}
+                  </span>
+                  {editingState !== 'default' && buttonConfig.stateOverrides?.[editingState] && Object.keys(buttonConfig.stateOverrides[editingState] || {}).length > 0 && (
+                    <span className="text-[10px] font-bold text-amber-800 dark:text-amber-300 bg-amber-100 dark:bg-amber-950/70 px-2 py-0.5 rounded-md border border-amber-300 dark:border-amber-700">
+                      Overrides Active
+                    </span>
+                  )}
+                </div>
+
+                {editingState !== 'default' && (
+                  <div className="flex items-center gap-2 self-start sm:self-auto">
+                    <button
+                      type="button"
+                      onClick={() => handleCopyDefaultToState(editingState)}
+                      className="text-[11px] font-heading font-bold text-slate-600 dark:text-slate-400 hover:text-[#8B5CF6] transition-colors cursor-pointer"
+                      title="Clone base default values to this state"
+                    >
+                      Clone Base
+                    </button>
+                    <span className="text-slate-300 dark:text-slate-700">•</span>
+                    <button
+                      type="button"
+                      onClick={() => handleResetStateOverrides(editingState)}
+                      className="text-[11px] font-heading font-bold text-red-500 hover:text-red-700 dark:hover:text-red-400 transition-colors cursor-pointer flex items-center gap-1"
+                      title="Clear all overrides for this state and inherit from default"
+                    >
+                      <RotateCcw className="w-3 h-3" />
+                      <span>Reset Overrides</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* State Selector Buttons */}
+              <div className="grid grid-cols-5 gap-1.5 p-1 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-[#1E293B]/40">
+                {[
+                  { id: 'default', label: 'Default', tag: 'Base' },
+                  { id: 'hover', label: 'On Hover', tag: 'Action' },
+                  { id: 'pressed', label: 'On Press', tag: 'Push' },
+                  { id: 'inactive', label: 'Inactive', tag: 'Idle' },
+                  { id: 'disabled', label: 'Disabled', tag: 'Lock' },
+                ].map((st) => {
+                  const isSelected = editingState === st.id;
+                  const hasOverrides = st.id !== 'default' && buttonConfig.stateOverrides?.[st.id as ButtonState] && Object.keys(buttonConfig.stateOverrides[st.id as ButtonState] || {}).length > 0;
+                  return (
+                    <button
+                      key={st.id}
+                      type="button"
+                      onClick={() => {
+                        setEditingState(st.id as ButtonState);
+                        setActiveState(st.id as ButtonState);
+                      }}
+                      className={`py-1.5 px-2 rounded-lg text-xs font-heading font-black flex flex-col items-center justify-center transition-all cursor-pointer relative ${
+                        isSelected
+                          ? 'bg-[#8B5CF6] text-white shadow-[2px_2px_0px_0px_#1E293B] border border-[#1E293B]'
+                          : 'bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-purple-50 dark:hover:bg-slate-600'
+                      }`}
+                    >
+                      <span>{st.label}</span>
+                      <span className={`text-[9px] font-bold ${isSelected ? 'text-purple-200' : 'text-slate-400'}`}>
+                        {st.tag}
+                      </span>
+                      {hasOverrides && !isSelected && (
+                        <span className="w-2 h-2 rounded-full bg-amber-500 absolute top-1 right-1 border border-white dark:border-slate-800" title="State has custom overrides" />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
             {/* Inspector Tab Bar */}
             <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-slate-100 dark:bg-slate-800 border-2 border-[#1E293B] overflow-x-auto">
               <button
@@ -654,18 +829,21 @@ export const ButtonStudioPage: React.FC<ButtonStudioPageProps> = ({
               <div className="space-y-5">
                 {/* 1-Click Palette Binding */}
                 <div className="space-y-2">
-                  <span className="text-xs font-heading font-black text-slate-700 dark:text-slate-300 block">
-                    1-Click Color Swatches (Active Theme):
-                  </span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-heading font-black text-slate-700 dark:text-slate-300">
+                      1-Click Color Swatches (Apply to {editingState.toUpperCase()} fill):
+                    </span>
+                    <span className="text-[10px] font-mono text-slate-400">Target: {editingState}</span>
+                  </div>
                   <div className="flex items-center gap-2 overflow-x-auto pb-1">
                     {paletteHexes.map((hex) => (
                       <button
                         key={hex}
                         type="button"
-                        onClick={() => updateConfig({ fillColor: hex })}
+                        onClick={() => updateActiveStateProperty('fillColor', hex)}
                         style={{ backgroundColor: hex }}
                         className="w-8 h-8 rounded-xl border-2 border-[#1E293B] shadow-[1.5px_1.5px_0px_0px_#1E293B] hover:scale-110 transition-transform cursor-pointer shrink-0"
-                        title={`Apply ${hex} to button fill`}
+                        title={`Apply ${hex} to ${editingState} button fill`}
                       />
                     ))}
                   </div>
@@ -675,19 +853,19 @@ export const ButtonStudioPage: React.FC<ButtonStudioPageProps> = ({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-slate-200 dark:border-slate-800">
                   <div className="space-y-1.5">
                     <label className="text-xs font-heading font-black text-slate-700 dark:text-slate-300">
-                      Fill Color (Hex)
+                      Fill Color ({editingState.toUpperCase()})
                     </label>
                     <div className="flex items-center gap-2">
                       <input
                         type="color"
-                        value={buttonConfig.fillColor}
-                        onChange={(e) => updateConfig({ fillColor: e.target.value })}
+                        value={effectiveActiveState.fillColor}
+                        onChange={(e) => updateActiveStateProperty('fillColor', e.target.value)}
                         className="w-9 h-9 rounded-xl border-2 border-[#1E293B] cursor-pointer"
                       />
                       <input
                         type="text"
-                        value={buttonConfig.fillColor}
-                        onChange={(e) => updateConfig({ fillColor: e.target.value })}
+                        value={effectiveActiveState.fillColor}
+                        onChange={(e) => updateActiveStateProperty('fillColor', e.target.value)}
                         className="flex-1 px-3 py-2 rounded-xl border-2 border-[#1E293B] text-xs font-mono font-bold uppercase bg-[#FFFDF5] dark:bg-slate-800 text-[#1E293B] dark:text-white"
                       />
                     </div>
@@ -695,19 +873,19 @@ export const ButtonStudioPage: React.FC<ButtonStudioPageProps> = ({
 
                   <div className="space-y-1.5">
                     <label className="text-xs font-heading font-black text-slate-700 dark:text-slate-300">
-                      Border Color (Hex)
+                      Border Color ({editingState.toUpperCase()})
                     </label>
                     <div className="flex items-center gap-2">
                       <input
                         type="color"
-                        value={buttonConfig.borderColor}
-                        onChange={(e) => updateConfig({ borderColor: e.target.value })}
+                        value={effectiveActiveState.borderColor}
+                        onChange={(e) => updateActiveStateProperty('borderColor', e.target.value)}
                         className="w-9 h-9 rounded-xl border-2 border-[#1E293B] cursor-pointer"
                       />
                       <input
                         type="text"
-                        value={buttonConfig.borderColor}
-                        onChange={(e) => updateConfig({ borderColor: e.target.value })}
+                        value={effectiveActiveState.borderColor}
+                        onChange={(e) => updateActiveStateProperty('borderColor', e.target.value)}
                         className="flex-1 px-3 py-2 rounded-xl border-2 border-[#1E293B] text-xs font-mono font-bold uppercase bg-[#FFFDF5] dark:bg-slate-800 text-[#1E293B] dark:text-white"
                       />
                     </div>
@@ -718,87 +896,84 @@ export const ButtonStudioPage: React.FC<ButtonStudioPageProps> = ({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between text-xs font-heading font-black">
-                      <span>Border Width: {buttonConfig.borderWidth}px</span>
+                      <span>Border Width: {effectiveActiveState.borderWidth}px</span>
                     </div>
                     <input
                       type="range"
                       min="0"
                       max="5"
                       step="1"
-                      value={buttonConfig.borderWidth}
-                      onChange={(e) => updateConfig({ borderWidth: parseInt(e.target.value, 10) })}
+                      value={effectiveActiveState.borderWidth}
+                      onChange={(e) => updateActiveStateProperty('borderWidth', parseInt(e.target.value, 10))}
                       className="w-full accent-[#8B5CF6]"
                     />
                   </div>
 
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between text-xs font-heading font-black">
-                      <span>Neo-Pop Shadow Offset: {buttonConfig.shadowOffset}px</span>
+                      <span>Neo-Pop Shadow Offset: {effectiveActiveState.shadowOffset}px</span>
                     </div>
                     <input
                       type="range"
                       min="0"
                       max="6"
                       step="1"
-                      value={buttonConfig.shadowOffset}
-                      onChange={(e) => updateConfig({ shadowOffset: parseInt(e.target.value, 10), hasShadow: parseInt(e.target.value, 10) > 0 })}
+                      value={effectiveActiveState.shadowOffset}
+                      onChange={(e) => updateActiveStateProperty('shadowOffset', parseInt(e.target.value, 10))}
                       className="w-full accent-[#8B5CF6]"
                     />
                   </div>
                 </div>
 
-                {/* State Override Customizer */}
-                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border-2 border-[#1E293B] space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-heading font-black text-slate-800 dark:text-slate-200">
-                      Customize State Overrides
-                    </span>
-                    <div className="flex items-center gap-1">
-                      {(['hover', 'pressed', 'inactive', 'disabled'] as const).map((st) => (
-                        <button
-                          key={st}
-                          type="button"
-                          onClick={() => setOverrideStateTab(st)}
-                          className={`px-2.5 py-1 rounded-lg text-[10px] font-heading font-black capitalize transition-all ${
-                            overrideStateTab === st
-                              ? 'bg-[#8B5CF6] text-white shadow-[1px_1px_0px_0px_#1E293B]'
-                              : 'bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300'
-                          }`}
-                        >
-                          {st}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3 text-xs">
-                    <div className="space-y-1">
-                      <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400">
-                        {overrideStateTab.toUpperCase()} Fill Color
+                {/* State-specific Physical Transforms */}
+                {editingState !== 'default' ? (
+                  <div className="p-4 rounded-2xl bg-purple-50/60 dark:bg-slate-800 border-2 border-[#1E293B] space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-heading font-black text-slate-800 dark:text-slate-200">
+                        {editingState.toUpperCase()} Interaction Physics & Depth
                       </span>
-                      <input
-                        type="text"
-                        value={buttonConfig.stateOverrides?.[overrideStateTab]?.fillColor || ''}
-                        placeholder={buttonConfig.fillColor}
-                        onChange={(e) => updateStateOverride(overrideStateTab, 'fillColor', e.target.value)}
-                        className="w-full px-2.5 py-1.5 rounded-lg border border-[#1E293B] text-xs font-mono font-bold bg-white dark:bg-slate-900"
-                      />
+                      <span className="text-[10px] font-mono text-purple-600 dark:text-purple-300 font-bold">
+                        PBI State Sync
+                      </span>
                     </div>
 
-                    <div className="space-y-1">
-                      <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400">
-                        {overrideStateTab.toUpperCase()} Text Color
-                      </span>
-                      <input
-                        type="text"
-                        value={buttonConfig.stateOverrides?.[overrideStateTab]?.textColor || ''}
-                        placeholder={buttonConfig.textColor}
-                        onChange={(e) => updateStateOverride(overrideStateTab, 'textColor', e.target.value)}
-                        className="w-full px-2.5 py-1.5 rounded-lg border border-[#1E293B] text-xs font-mono font-bold bg-white dark:bg-slate-900"
-                      />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <div className="flex items-center justify-between text-xs font-heading font-black">
+                          <span>Vertical Shift (Offset Y): {effectiveActiveState.offsetY}px</span>
+                        </div>
+                        <input
+                          type="range"
+                          min="-4"
+                          max="4"
+                          step="1"
+                          value={effectiveActiveState.offsetY}
+                          onChange={(e) => updateActiveStateProperty('offsetY', parseInt(e.target.value, 10))}
+                          className="w-full accent-[#8B5CF6]"
+                        />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <div className="flex items-center justify-between text-xs font-heading font-black">
+                          <span>Opacity: {Math.round(effectiveActiveState.opacity * 100)}%</span>
+                        </div>
+                        <input
+                          type="range"
+                          min="0.2"
+                          max="1"
+                          step="0.05"
+                          value={effectiveActiveState.opacity}
+                          onChange={(e) => updateActiveStateProperty('opacity', parseFloat(e.target.value))}
+                          className="w-full accent-[#8B5CF6]"
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
+                ) : (
+                  <div className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-dashed border-[#1E293B]/40 flex items-center justify-between text-xs text-slate-600 dark:text-slate-400">
+                    <span>💡 Editing Base Default Colors. Switch to <strong>On Hover</strong> or <strong>On Press</strong> above to customize state-specific colors or lift effects.</span>
+                  </div>
+                )}
               </div>
             )}
 
@@ -808,14 +983,21 @@ export const ButtonStudioPage: React.FC<ButtonStudioPageProps> = ({
                 {/* Title Text & Toggle */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <label className="text-xs font-heading font-black text-slate-700 dark:text-slate-300">
-                      Button Label
-                    </label>
+                    <div className="flex items-center gap-1.5">
+                      <label className="text-xs font-heading font-black text-slate-700 dark:text-slate-300">
+                        Button Label ({editingState.toUpperCase()} State)
+                      </label>
+                      {editingState !== 'default' && buttonConfig.stateOverrides?.[editingState]?.title !== undefined && (
+                        <span className="text-[9px] font-bold text-purple-600 bg-purple-100 dark:bg-purple-950 px-1.5 py-0.5 rounded">
+                          State Specific
+                        </span>
+                      )}
+                    </div>
                     <label className="flex items-center gap-1.5 text-xs font-bold cursor-pointer">
                       <input
                         type="checkbox"
-                        checked={buttonConfig.showTitle}
-                        onChange={(e) => updateConfig({ showTitle: e.target.checked })}
+                        checked={effectiveActiveState.showTitle}
+                        onChange={(e) => updateActiveStateProperty('showTitle', e.target.checked)}
                         className="rounded accent-[#8B5CF6]"
                       />
                       <span>Show Label</span>
@@ -823,9 +1005,10 @@ export const ButtonStudioPage: React.FC<ButtonStudioPageProps> = ({
                   </div>
                   <input
                     type="text"
-                    value={buttonConfig.title}
-                    disabled={!buttonConfig.showTitle}
-                    onChange={(e) => updateConfig({ title: e.target.value })}
+                    value={effectiveActiveState.title}
+                    disabled={!effectiveActiveState.showTitle}
+                    placeholder={buttonConfig.title}
+                    onChange={(e) => updateActiveStateProperty('title', e.target.value)}
                     className="w-full px-3 py-2 rounded-xl border-2 border-[#1E293B] text-xs sm:text-sm font-bold bg-[#FFFDF5] dark:bg-slate-800 text-[#1E293B] dark:text-white disabled:opacity-50"
                   />
                 </div>
@@ -837,8 +1020,8 @@ export const ButtonStudioPage: React.FC<ButtonStudioPageProps> = ({
                       Font Family
                     </label>
                     <select
-                      value={buttonConfig.fontFamily}
-                      onChange={(e) => updateConfig({ fontFamily: e.target.value })}
+                      value={effectiveActiveState.fontFamily}
+                      onChange={(e) => updateActiveStateProperty('fontFamily', e.target.value)}
                       className="w-full px-3 py-2 rounded-xl border-2 border-[#1E293B] text-xs font-bold bg-[#FFFDF5] dark:bg-slate-800 text-[#1E293B] dark:text-white"
                     >
                       {FONT_FAMILIES.map((f) => (
@@ -851,19 +1034,19 @@ export const ButtonStudioPage: React.FC<ButtonStudioPageProps> = ({
 
                   <div className="space-y-1.5">
                     <label className="text-xs font-heading font-black text-slate-700 dark:text-slate-300">
-                      Text Color
+                      Text Color ({editingState.toUpperCase()})
                     </label>
                     <div className="flex items-center gap-2">
                       <input
                         type="color"
-                        value={buttonConfig.textColor}
-                        onChange={(e) => updateConfig({ textColor: e.target.value })}
+                        value={effectiveActiveState.textColor}
+                        onChange={(e) => updateActiveStateProperty('textColor', e.target.value)}
                         className="w-9 h-9 rounded-xl border-2 border-[#1E293B] cursor-pointer"
                       />
                       <input
                         type="text"
-                        value={buttonConfig.textColor}
-                        onChange={(e) => updateConfig({ textColor: e.target.value })}
+                        value={effectiveActiveState.textColor}
+                        onChange={(e) => updateActiveStateProperty('textColor', e.target.value)}
                         className="flex-1 px-3 py-2 rounded-xl border-2 border-[#1E293B] text-xs font-mono font-bold uppercase bg-[#FFFDF5] dark:bg-slate-800 text-[#1E293B] dark:text-white"
                       />
                     </div>
@@ -874,15 +1057,15 @@ export const ButtonStudioPage: React.FC<ButtonStudioPageProps> = ({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between text-xs font-heading font-black">
-                      <span>Font Size: {buttonConfig.fontSize}px</span>
+                      <span>Font Size: {effectiveActiveState.fontSize}px</span>
                     </div>
                     <input
                       type="range"
                       min="10"
                       max="22"
                       step="1"
-                      value={buttonConfig.fontSize}
-                      onChange={(e) => updateConfig({ fontSize: parseInt(e.target.value, 10) })}
+                      value={effectiveActiveState.fontSize}
+                      onChange={(e) => updateActiveStateProperty('fontSize', parseInt(e.target.value, 10))}
                       className="w-full accent-[#8B5CF6]"
                     />
                   </div>
@@ -892,8 +1075,8 @@ export const ButtonStudioPage: React.FC<ButtonStudioPageProps> = ({
                       Font Weight
                     </label>
                     <select
-                      value={buttonConfig.fontWeight}
-                      onChange={(e) => updateConfig({ fontWeight: e.target.value as any })}
+                      value={effectiveActiveState.fontWeight}
+                      onChange={(e) => updateActiveStateProperty('fontWeight', e.target.value as any)}
                       className="w-full px-3 py-2 rounded-xl border-2 border-[#1E293B] text-xs font-bold bg-[#FFFDF5] dark:bg-slate-800 text-[#1E293B] dark:text-white"
                     >
                       <option value="normal">Normal (500)</option>
@@ -915,12 +1098,12 @@ export const ButtonStudioPage: React.FC<ButtonStudioPageProps> = ({
                       { id: 'right', label: 'Right', icon: AlignRight },
                     ].map((align) => {
                       const Icon = align.icon;
-                      const isSelected = buttonConfig.textAlign === align.id;
+                      const isSelected = effectiveActiveState.textAlign === align.id;
                       return (
                         <button
                           key={align.id}
                           type="button"
-                          onClick={() => updateConfig({ textAlign: align.id as any })}
+                          onClick={() => updateActiveStateProperty('textAlign', align.id as any)}
                           className={`py-2 px-3 rounded-xl text-xs font-heading font-black flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                             isSelected
                               ? 'bg-[#8B5CF6] text-white shadow-[2px_2px_0px_0px_#1E293B] border-2 border-[#1E293B]'
@@ -941,22 +1124,22 @@ export const ButtonStudioPage: React.FC<ButtonStudioPageProps> = ({
                     <label className="flex items-center gap-1.5 text-xs font-heading font-black text-slate-800 dark:text-slate-200 cursor-pointer">
                       <input
                         type="checkbox"
-                        checked={buttonConfig.showBadge}
-                        onChange={(e) => updateConfig({ showBadge: e.target.checked })}
+                        checked={effectiveActiveState.showBadge}
+                        onChange={(e) => updateActiveStateProperty('showBadge', e.target.checked)}
                         className="rounded accent-[#8B5CF6]"
                       />
-                      <span>Enable Notification / Status Badge</span>
+                      <span>Enable Notification / Status Badge ({editingState.toUpperCase()})</span>
                     </label>
                   </div>
 
-                  {buttonConfig.showBadge && (
+                  {effectiveActiveState.showBadge && (
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                       <div className="space-y-1">
                         <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400">Badge Text</span>
                         <input
                           type="text"
-                          value={buttonConfig.badgeText}
-                          onChange={(e) => updateConfig({ badgeText: e.target.value })}
+                          value={effectiveActiveState.badgeText}
+                          onChange={(e) => updateActiveStateProperty('badgeText', e.target.value)}
                           className="w-full px-2.5 py-1.5 rounded-lg border border-[#1E293B] text-xs font-bold bg-white dark:bg-slate-900"
                         />
                       </div>
@@ -964,8 +1147,8 @@ export const ButtonStudioPage: React.FC<ButtonStudioPageProps> = ({
                         <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400">Badge Fill</span>
                         <input
                           type="color"
-                          value={buttonConfig.badgeBgColor}
-                          onChange={(e) => updateConfig({ badgeBgColor: e.target.value })}
+                          value={effectiveActiveState.badgeBgColor}
+                          onChange={(e) => updateActiveStateProperty('badgeBgColor', e.target.value)}
                           className="w-full h-8 rounded-lg border border-[#1E293B] cursor-pointer"
                         />
                       </div>
@@ -973,8 +1156,8 @@ export const ButtonStudioPage: React.FC<ButtonStudioPageProps> = ({
                         <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400">Badge Text Color</span>
                         <input
                           type="color"
-                          value={buttonConfig.badgeTextColor}
-                          onChange={(e) => updateConfig({ badgeTextColor: e.target.value })}
+                          value={effectiveActiveState.badgeTextColor}
+                          onChange={(e) => updateActiveStateProperty('badgeTextColor', e.target.value)}
                           className="w-full h-8 rounded-lg border border-[#1E293B] cursor-pointer"
                         />
                       </div>
@@ -989,24 +1172,31 @@ export const ButtonStudioPage: React.FC<ButtonStudioPageProps> = ({
               <div className="space-y-5">
                 {/* Icon Toggle & Position */}
                 <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
-                  <label className="flex items-center gap-1.5 text-xs font-heading font-black text-slate-800 dark:text-slate-200 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={buttonConfig.showIcon}
-                      onChange={(e) => updateConfig({ showIcon: e.target.checked })}
-                      className="rounded accent-[#8B5CF6]"
-                    />
-                    <span>Show Icon</span>
-                  </label>
+                  <div className="flex items-center gap-1.5">
+                    <label className="flex items-center gap-1.5 text-xs font-heading font-black text-slate-800 dark:text-slate-200 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={effectiveActiveState.showIcon}
+                        onChange={(e) => updateActiveStateProperty('showIcon', e.target.checked)}
+                        className="rounded accent-[#8B5CF6]"
+                      />
+                      <span>Show Icon ({editingState.toUpperCase()} State)</span>
+                    </label>
+                    {editingState !== 'default' && (buttonConfig.stateOverrides?.[editingState]?.iconName !== undefined || buttonConfig.stateOverrides?.[editingState]?.customIconSvg !== undefined) && (
+                      <span className="text-[9px] font-bold text-purple-600 bg-purple-100 dark:bg-purple-950 px-1.5 py-0.5 rounded">
+                        State Specific
+                      </span>
+                    )}
+                  </div>
 
                   <div className="flex items-center gap-1">
                     {(['left', 'right', 'top', 'icon-only'] as ButtonIconPosition[]).map((pos) => (
                       <button
                         key={pos}
                         type="button"
-                        onClick={() => updateConfig({ iconPosition: pos })}
+                        onClick={() => updateActiveStateProperty('iconPosition', pos)}
                         className={`px-2.5 py-1 rounded-lg text-[10px] font-heading font-black capitalize transition-all ${
-                          buttonConfig.iconPosition === pos
+                          effectiveActiveState.iconPosition === pos
                             ? 'bg-[#8B5CF6] text-white shadow-[1px_1px_0px_0px_#1E293B]'
                             : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'
                         }`}
@@ -1021,34 +1211,34 @@ export const ButtonStudioPage: React.FC<ButtonStudioPageProps> = ({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between text-xs font-heading font-black">
-                      <span>Icon Size: {buttonConfig.iconSize}px</span>
+                      <span>Icon Size: {effectiveActiveState.iconSize}px</span>
                     </div>
                     <input
                       type="range"
                       min="12"
                       max="32"
                       step="1"
-                      value={buttonConfig.iconSize}
-                      onChange={(e) => updateConfig({ iconSize: parseInt(e.target.value, 10) })}
+                      value={effectiveActiveState.iconSize}
+                      onChange={(e) => updateActiveStateProperty('iconSize', parseInt(e.target.value, 10))}
                       className="w-full accent-[#8B5CF6]"
                     />
                   </div>
 
                   <div className="space-y-1.5">
                     <label className="text-xs font-heading font-black text-slate-700 dark:text-slate-300">
-                      Icon Color
+                      Icon Color ({editingState.toUpperCase()})
                     </label>
                     <div className="flex items-center gap-2">
                       <input
                         type="color"
-                        value={buttonConfig.iconColor}
-                        onChange={(e) => updateConfig({ iconColor: e.target.value })}
+                        value={effectiveActiveState.iconColor}
+                        onChange={(e) => updateActiveStateProperty('iconColor', e.target.value)}
                         className="w-9 h-9 rounded-xl border-2 border-[#1E293B] cursor-pointer"
                       />
                       <input
                         type="text"
-                        value={buttonConfig.iconColor}
-                        onChange={(e) => updateConfig({ iconColor: e.target.value })}
+                        value={effectiveActiveState.iconColor}
+                        onChange={(e) => updateActiveStateProperty('iconColor', e.target.value)}
                         className="flex-1 px-3 py-2 rounded-xl border-2 border-[#1E293B] text-xs font-mono font-bold uppercase bg-[#FFFDF5] dark:bg-slate-800 text-[#1E293B] dark:text-white"
                       />
                     </div>
@@ -1061,10 +1251,10 @@ export const ButtonStudioPage: React.FC<ButtonStudioPageProps> = ({
                     <div className="flex items-center gap-2">
                       <Upload className="w-4 h-4 text-[#8B5CF6]" />
                       <span className="text-xs font-heading font-black text-slate-800 dark:text-slate-200">
-                        Import Custom Icon (SVG)
+                        Import Custom Icon (SVG) - {editingState.toUpperCase()}
                       </span>
                     </div>
-                    {buttonConfig.customIconSvg && (
+                    {effectiveActiveState.customIconSvg && (
                       <button
                         type="button"
                         onClick={handleClearCustomIcon}
@@ -1085,7 +1275,7 @@ export const ButtonStudioPage: React.FC<ButtonStudioPageProps> = ({
                     className="hidden"
                   />
 
-                  {buttonConfig.customIconSvg ? (
+                  {effectiveActiveState.customIconSvg ? (
                     <div className="flex items-center justify-between p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-[#1E293B]">
                       <div className="flex items-center gap-3">
                         <div className="w-9 h-9 rounded-lg bg-purple-100 dark:bg-purple-900/50 flex items-center justify-center border border-[#1E293B]/20 overflow-hidden">
@@ -1097,15 +1287,15 @@ export const ButtonStudioPage: React.FC<ButtonStudioPageProps> = ({
                             stroke="currentColor"
                             strokeWidth="2"
                             className="text-[#8B5CF6]"
-                            dangerouslySetInnerHTML={{ __html: sanitizeCustomSvg(buttonConfig.customIconSvg) }}
+                            dangerouslySetInnerHTML={{ __html: sanitizeCustomSvg(effectiveActiveState.customIconSvg) }}
                           />
                         </div>
                         <div>
                           <div className="text-xs font-heading font-black text-[#1E293B] dark:text-white">
-                            Custom SVG Icon Active
+                            Custom SVG Icon Active ({editingState.toUpperCase()})
                           </div>
                           <div className="text-[10px] text-slate-500 font-mono">
-                            Applied to all button states
+                            {editingState === 'default' ? 'Applied as default base icon' : `Custom override for ${editingState} state`}
                           </div>
                         </div>
                       </div>
@@ -1120,7 +1310,7 @@ export const ButtonStudioPage: React.FC<ButtonStudioPageProps> = ({
                         <button
                           type="button"
                           onClick={() => {
-                            setRawSvgInput(buttonConfig.customIconSvg || '');
+                            setRawSvgInput(effectiveActiveState.customIconSvg || '');
                             setIsPastingSvg(true);
                           }}
                           className="pop-btn px-2.5 py-1 text-[11px] font-heading font-black rounded-lg border border-[#1E293B] bg-white dark:bg-slate-800 hover:bg-slate-100 cursor-pointer"
@@ -1192,7 +1382,7 @@ export const ButtonStudioPage: React.FC<ButtonStudioPageProps> = ({
                 <div className="space-y-2 pt-2 border-t border-slate-200 dark:border-slate-800">
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-xs font-heading font-black text-slate-700 dark:text-slate-300">
-                      Select Icon from Library
+                      Select Icon from Library ({editingState.toUpperCase()})
                     </span>
                     <input
                       type="text"
@@ -1205,12 +1395,12 @@ export const ButtonStudioPage: React.FC<ButtonStudioPageProps> = ({
 
                   <div className="grid grid-cols-6 sm:grid-cols-8 gap-2 p-2 rounded-2xl bg-slate-50 dark:bg-slate-950 border-2 border-[#1E293B] max-h-48 overflow-y-auto">
                     {filteredIcons.map((ic) => {
-                      const isSelected = buttonConfig.iconName === ic.id;
+                      const isSelected = effectiveActiveState.iconName === ic.id;
                       return (
                         <button
                           key={ic.id}
                           type="button"
-                          onClick={() => updateConfig({ iconName: ic.id })}
+                          onClick={() => updateActiveStateProperty('iconName', ic.id)}
                           className={`p-2 rounded-xl border flex flex-col items-center justify-center transition-all cursor-pointer ${
                             isSelected
                               ? 'bg-[#8B5CF6] text-white border-[#1E293B] shadow-[1.5px_1.5px_0px_0px_#1E293B]'

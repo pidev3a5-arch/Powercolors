@@ -1,9 +1,11 @@
 import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import {
   generateButtonSvg,
   resolveCornerRadius,
   generateButtonDaxExpression,
   exportButtonBundleZip,
+  resolveEffectiveStateConfig,
 } from '../core/button/buttonEngine';
 import { CURATED_BUTTON_PRESETS } from '../core/button/presets';
 import { ButtonConfig } from '../core/button/types';
@@ -155,5 +157,68 @@ describe('Button Studio Engine', () => {
 
     expect(poppinsBtn).toContain('font-family="Poppins');
     expect(outfitBtn).toContain('font-family="Outfit');
+  });
+
+  it('supports distinct title and icon customization per state (e.g. Press on default vs Go on hover)', () => {
+    const stateCustomConfig: ButtonConfig = {
+      ...sampleConfig,
+      title: 'Press',
+      iconName: 'nav-home',
+      stateOverrides: {
+        hover: {
+          title: 'Go',
+          iconName: 'action-export',
+          fillColor: '#10B981',
+        },
+        pressed: {
+          title: 'Executing...',
+          fillColor: '#059669',
+        },
+      },
+    };
+
+    const defaultSvg = generateButtonSvg(stateCustomConfig, 'default');
+    const hoverSvg = generateButtonSvg(stateCustomConfig, 'hover');
+    const pressedSvg = generateButtonSvg(stateCustomConfig, 'pressed');
+
+    // Default state title & icon
+    expect(defaultSvg).toContain('Press');
+    expect(defaultSvg).not.toContain('Go');
+
+    // Hover state title & icon
+    expect(hoverSvg).toContain('Go');
+    expect(hoverSvg).not.toContain('Press');
+    expect(hoverSvg).toContain('#10B981');
+
+    // Pressed state title
+    expect(pressedSvg).toContain('Executing...');
+
+    // Effective state helper checks
+    const effDefault = resolveEffectiveStateConfig(stateCustomConfig, 'default');
+    const effHover = resolveEffectiveStateConfig(stateCustomConfig, 'hover');
+    expect(effDefault.title).toBe('Press');
+    expect(effHover.title).toBe('Go');
+    expect(effHover.iconName).toBe('action-export');
+  });
+
+  it('supports distinct badge and icon visibility per state', () => {
+    const visibilityConfig: ButtonConfig = {
+      ...sampleConfig,
+      showBadge: false,
+      showIcon: true,
+      stateOverrides: {
+        hover: {
+          showBadge: true,
+          badgeText: 'Click!',
+          showIcon: false,
+        },
+      },
+    };
+
+    const defaultSvg = generateButtonSvg(visibilityConfig, 'default');
+    const hoverSvg = generateButtonSvg(visibilityConfig, 'hover');
+
+    expect(defaultSvg).not.toContain('Click!');
+    expect(hoverSvg).toContain('Click!');
   });
 });
