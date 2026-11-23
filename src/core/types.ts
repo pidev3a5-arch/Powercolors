@@ -5,7 +5,9 @@ export type AppPage =
   | 'dash-generator'
   | 'svg-visual-maker'
   | 'icon-library'
-  | 'dax-toolkit';
+  | 'dax-toolkit'
+  | 'deneb-studio'
+  | 'pbip-studio';
 
 export type RGB = [number, number, number];
 

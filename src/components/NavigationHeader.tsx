@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sun, Moon, Sparkles, Home, Palette, Layout, Wand2, Image, Terminal, Menu, X } from 'lucide-react';
+import { Sun, Moon, Sparkles, Home, Palette, Layout, Wand2, Image, Terminal, Menu, X, Code2, FolderArchive } from 'lucide-react';
 import { AppPage } from '../core/types';
 
 interface NavigationHeaderProps {
@@ -33,12 +33,14 @@ export const NavigationHeader: React.FC<NavigationHeaderProps> = ({
     { id: 'icon-library', label: 'Icon Library', icon: Image },
     { id: 'dax-toolkit', label: 'DAX Toolkit', icon: Terminal },
     { id: 'svg-visual-maker', label: 'SVG Visuals', icon: Sparkles },
+    { id: 'deneb-studio', label: 'Deneb Studio', icon: Code2 },
+    { id: 'pbip-studio', label: 'Fabric PBIP', icon: FolderArchive },
   ];
 
   const renderNavTabs = (className?: string) => (
     <nav
       aria-label="Main Navigation"
-      className={`items-center gap-1.5 p-1 rounded-full bg-white dark:bg-slate-800 border-2 border-[#1E293B] shadow-[2px_2px_0px_0px_#1E293B] ${
+      className={`items-center gap-1 p-1 rounded-full bg-white dark:bg-slate-800 border-2 border-[#1E293B] shadow-[2px_2px_0px_0px_#1E293B] ${
         className || ''
       }`}
     >
@@ -50,7 +52,7 @@ export const NavigationHeader: React.FC<NavigationHeaderProps> = ({
             key={item.id}
             type="button"
             onClick={() => onNavigate(item.id)}
-            className={`inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-heading font-black transition-all cursor-pointer ${
+            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11.5px] font-heading font-black transition-all cursor-pointer whitespace-nowrap ${
               isActive
                 ? 'bg-[#8B5CF6] text-white shadow-[2px_2px_0px_0px_#1E293B] border border-[#1E293B]'
                 : 'text-[#1E293B] dark:text-slate-300 hover:bg-[#FBBF24] hover:text-[#1E293B]'
@@ -68,7 +70,7 @@ export const NavigationHeader: React.FC<NavigationHeaderProps> = ({
     <header className={`border-b-2 border-[#1E293B] dark:border-slate-800 sticky top-0 z-40 backdrop-blur-md transition-colors duration-200 ${
       isDarkSite ? 'bg-[#0F172A]/90' : 'bg-[#FFFDF5]/90'
     }`}>
-      <div className="max-w-[1280px] mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-18 flex items-center justify-between gap-2 sm:gap-4">
+      <div className="max-w-[1440px] mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-18 flex items-center justify-between gap-2 sm:gap-4">
         {/* Left: Logo, Wordmark & Home Click */}
         <div 
           onClick={() => onNavigate('landing')}

@@ -1,50 +1,33 @@
 ---
-updated: 2026-11-22T18:13:00+01:00
+updated: 2026-11-23T11:48:00+01:00
 ---
 
 # Project State
 
 ## Current Position
 
-**Milestone:** v4.0 — Report Layout Planner, Color Accessibility Checker & DAX Measure Toolkit  
-**Status:** All 4 Phases Implemented & Verified (93/93 tests passing, clean Vite build)  
-**Branch:** `feat/v4-layout-accessibility-dax` (isolated from `main`)  
+**Milestone:** v5.0 — Fabric PBIP Project Studio & Deneb Vega-Lite Custom Visual Spec Studio  
+**Status:** Completed & Verified (Branch: `feat/v5-pbip-deneb-studio`, Ready for user merge command)  
+**Current Phase:** All 5 Phases Completed  
 
 ## Last Actions
 
-1. **Integrated Report Layout Planner directly as 4th Tab in Dash Canvas**:
-   - Single source of truth with `dashState.containers`.
-   - Every card added, moved, or resized is directly baked into the downloaded background SVG.
-   - Power BI Desktop imports the SVG wallpaper with all card shapes in place without needing manual coordinate entry.
-2. **Built Color Accessibility Checker (`src/pages/AccessibilityCheckerPage.tsx`)**:
-   - WCAG 2.1 AA/AAA matrix evaluating text contrast (4.5:1) and non-text visual object contrast (3.0:1) across 5+ backgrounds.
-   - Scientifically accurate CVD simulation engine (Deuteranopia, Protanopia, Tritanopia, Achromatopsia) using Vienot/Brettel matrices.
-   - Pairwise colorblind confusion conflict detector with Delta E alerts.
-   - LCH-based auto-fix color suggestion algorithm with 1-click apply.
-   - Live Power BI Visual Simulator (mock Bar chart, Donut chart, KPI cards).
-   - Audit Report Card modal with Markdown report export and theme JSON download.
-   - Direct "Audit WCAG" bridge button in Theme Studio.
-3. **Built DAX Measure Toolkit (`src/pages/DaxToolkitPage.tsx`)**:
-   - 20+ production-grade DAX measures across 6 categories: Time Intelligence, Rankings & Pareto, Dynamic Titles, KPI Logic, Conditional Formatting, Metric Switching.
-   - Interactive live placeholder parameter substitution.
-   - Power BI implementation guidelines, format strings, and performance notes.
-   - 1-click "Copy DAX", "Download .dax", and "Export All in Category" bundle exporter.
-4. **Unified Top Navigation & Landing Page**:
-   - Updated NavigationHeader with 5 workspaces: Home, Theme Studio, Accessibility, Dash Canvas, SVG Visual Maker, DAX Toolkit.
-   - Updated Landing page FeatureGrid with all specialized tools.
-   - 93/93 unit tests passing across 9 test suites (`npm test`).
-   - Clean production build (`npm run build`).
-
-## Next Steps
-
-1. Present the completed features to the user for review.
-2. When the user approves: merge `feat/v4-layout-accessibility-dax` into `main` and commit & push to GitHub.
+1. Completed Milestone v4.0 (Report Layout Planner, Palette Harmony, Icon Library, DAX Measure Toolkit).
+2. Checked out dedicated feature branch `feat/v5-pbip-deneb-studio` as instructed.
+3. Installed `jszip` and `@types/jszip` for client-side Power BI Project zip bundle generation.
+4. Defined Milestone v5.0 roadmap covering Fabric PBIP & Report Automation (Option A) and Deneb Vega-Lite Visual Studio (Option C).
+5. Implemented Phase 1: Fabric PBIP Core Engine (`src/core/pbip/pbipEngine.ts`, types, unit tests).
+6. Implemented Phase 2: Deneb & Vega-Lite Spec Engine & Catalog (`src/core/deneb/denebEngine.ts`, 20+ templates, unit tests).
+7. Implemented Phase 3: Deneb Vega-Lite Studio UI (`src/pages/DenebStudioPage.tsx` with live preview, spec editor, data binding map, and PBIR container snippet).
+8. Implemented Phase 4: Fabric PBIP Studio UI & Dash Canvas Integration (`src/pages/PbipStudioPage.tsx` with project configurator, tree viewer, code inspector, 1-click zip export; added PBIP export button to Dash Canvas).
+9. Implemented Phase 5: Navigation, Landing Page showcase (all 8 workspaces), and 113/113 passing vitest suite & clean build.
+10. Captured comprehensive verification screenshots.
 
 ## Active Decisions
 
 | Decision | Choice | Made | Affects |
 |----------|--------|------|---------|
-| DECISION-012 | Feature branch workflow (`feat/v4-layout-accessibility-dax`) — keep `main` protected until user review | 2026-11-22 | Milestone v4.0 |
-| DECISION-013 | Layout Planner unified inside Dash Canvas tab 4 as requested, sharing `dashState.containers` | 2026-11-22 | Dash Canvas & Layout Planner |
-| DECISION-014 | WCAG 2.1 Non-Text Contrast (3.0:1) prioritized for Power BI charts alongside standard 4.5:1 text | 2026-11-22 | Accessibility Checker |
-| DECISION-015 | Direct "Audit WCAG" button in Theme Studio so extracted palettes flow effortlessly into Accessibility Checker | 2026-11-22 | Theme Studio & Accessibility Checker |
+| DECISION-016 | Implement both Option A (Fabric PBIP) & Option C (Deneb Visual Studio) in Milestone v5.0 | 2026-11-23 | Milestone v5.0 |
+| DECISION-017 | Dedicated branch `feat/v5-pbip-deneb-studio` kept isolated until user commands merge | 2026-11-23 | Git Workflow |
+| DECISION-018 | Pure client-side PBIP ZIP packaging using `jszip` for instant zero-server project downloads | 2026-11-23 | PBIP Studio |
+| DECISION-019 | Standard certified Deneb GUID (`deneb7E15AEF80B9E4D4F8E12924291ECE89A`) for PBIR export | 2026-11-23 | Deneb Studio |

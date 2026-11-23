@@ -8,6 +8,8 @@ import { SvgVisualMakerPage } from './pages/SvgVisualMakerPage';
 import { PaletteHarmonyPage } from './pages/PaletteHarmonyPage';
 import { IconLibraryPage } from './pages/IconLibraryPage';
 import { DaxToolkitPage } from './pages/DaxToolkitPage';
+import { DenebStudioPage } from './pages/DenebStudioPage';
+import { PbipStudioPage } from './pages/PbipStudioPage';
 import { LinkedInIcon, FacebookIcon, YouTubeIcon, GitHubIcon } from './components/SocialIcons';
 import { extractThemeFromImage } from './core/colorEngine';
 import { createColorSwatch, deriveStructuralColors } from './core/colorHarmonics';
@@ -32,6 +34,8 @@ export default function App() {
       hash === 'svg-visual-maker' ||
       hash === 'icon-library' ||
       hash === 'dax-toolkit' ||
+      hash === 'deneb-studio' ||
+      hash === 'pbip-studio' ||
       hash === 'landing'
     ) {
       return hash as AppPage;
@@ -39,7 +43,7 @@ export default function App() {
     return null;
   };
 
-  // Navigation Page State ('landing' | 'theme-generator' | 'palette-harmony' | 'dash-generator' | 'svg-visual-maker' | 'icon-library' | 'dax-toolkit')
+  // Navigation Page State
   const [currentPage, setCurrentPage] = useState<AppPage>(() => {
     const fromHash = typeof window !== 'undefined' ? getPageFromHash() : null;
     if (fromHash) return fromHash;
@@ -51,6 +55,8 @@ export default function App() {
       saved === 'svg-visual-maker' ||
       saved === 'icon-library' ||
       saved === 'dax-toolkit' ||
+      saved === 'deneb-studio' ||
+      saved === 'pbip-studio' ||
       saved === 'landing'
     ) {
       return saved as AppPage;
@@ -425,6 +431,21 @@ export default function App() {
 
       {currentPage === 'dax-toolkit' && (
         <DaxToolkitPage onNavigate={handleNavigate} />
+      )}
+
+      {currentPage === 'deneb-studio' && (
+        <DenebStudioPage
+          onNavigate={handleNavigate}
+          paletteHexes={swatches.map((s) => s.hex)}
+        />
+      )}
+
+      {currentPage === 'pbip-studio' && (
+        <PbipStudioPage
+          onNavigate={handleNavigate}
+          activeThemeJson={currentTheme}
+          themeName={themeName}
+        />
       )}
 
       {/* Playful Footer */}

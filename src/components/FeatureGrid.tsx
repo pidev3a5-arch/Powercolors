@@ -10,6 +10,8 @@ import {
   Image,
   Compass,
   Check,
+  Code2,
+  FileCode,
 } from 'lucide-react';
 import { AppPage } from '../core/types';
 
@@ -143,17 +145,17 @@ export const FeatureGrid: React.FC<FeatureGridProps> = ({ onNavigate }) => {
         </div>
       </section>
 
-      {/* SECTION 2: SIX SPECIALIZED WORKSPACES */}
+      {/* SECTION 2: EIGHT SPECIALIZED WORKSPACES */}
       <section className="space-y-6 pt-4">
         <div className="text-center space-y-2">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#34D399]/20 text-[#059669] dark:text-[#34D399] text-xs font-heading font-black border border-[#34D399]/30">
-            <span>SUITE OF POWER BI SPECIALIZED WORKSPACES</span>
+            <span>SUITE OF 8 POWER BI SPECIALIZED WORKSPACES</span>
           </div>
           <h3 className="text-2xl sm:text-4xl font-heading font-black text-[#1E293B] dark:text-white">
             Everything You Need in One Unified Studio
           </h3>
-          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium max-w-xl mx-auto">
-            Switch effortlessly between theme quantization, color harmonies, canvas layout planning, SVG micro-charts, icon picker, and 56 DAX calculation patterns.
+          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium max-w-2xl mx-auto">
+            Switch effortlessly between theme quantization, color harmonies, canvas layout planning, SVG micro-charts, icon picker, 56 DAX patterns, Deneb Vega-Lite specs, and Fabric PBIP project automation.
           </p>
         </div>
 
@@ -436,6 +438,100 @@ export const FeatureGrid: React.FC<FeatureGridProps> = ({ onNavigate }) => {
               className="pop-btn w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full text-xs sm:text-sm font-heading font-black bg-[#6366F1] hover:bg-[#4F46E5] text-white shadow-[3px_3px_0px_0px_#1E293B] transition-all cursor-pointer group"
             >
               <span>Explore 56 DAX Measures</span>
+              <ArrowRight className="w-4 h-4 stroke-[2.5] group-hover:translate-x-1 transition-transform" />
+            </button>
+          </div>
+
+          {/* Workspace 7: Deneb & Vega-Lite Studio */}
+          <div className="pop-card bg-white dark:bg-slate-900 p-6 sm:p-7 rounded-3xl border-3 border-[#1E293B] dark:border-slate-700 shadow-[6px_6px_0px_0px_#1E293B] flex flex-col justify-between space-y-5">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="w-12 h-12 rounded-2xl bg-[#EC4899] border-2 border-[#1E293B] flex items-center justify-center text-white shadow-[2.5px_2.5px_0px_0px_#1E293B]">
+                  <Code2 className="w-6 h-6 stroke-[2.5]" />
+                </div>
+                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-heading font-black bg-[#EC4899]/20 text-[#BE185D] dark:text-[#F472B6] border border-[#EC4899]/40">
+                  Option C: Deneb
+                </span>
+              </div>
+
+              <div>
+                <h4 className="text-xl sm:text-2xl font-heading font-black text-[#1E293B] dark:text-white">
+                  Deneb & Vega-Lite Studio
+                </h4>
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium mt-1.5 leading-relaxed">
+                  Author certified Deneb custom visuals with full Vega-Lite specs. 20+ production templates, real-time JSON validation, theme palette injection, and PBIR drop-in snippets.
+                </p>
+              </div>
+
+              <div className="space-y-2 pt-1">
+                <div className="flex items-start gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
+                  <CheckCircle2 className="w-4 h-4 text-[#EC4899] flex-shrink-0 mt-0.5" />
+                  <span>20+ templates: Bullet charts, ridge plots, dumbbell, boxplots</span>
+                </div>
+                <div className="flex items-start gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
+                  <CheckCircle2 className="w-4 h-4 text-[#EC4899] flex-shrink-0 mt-0.5" />
+                  <span>Auto-injection of custom theme hex colors into spec</span>
+                </div>
+                <div className="flex items-start gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
+                  <CheckCircle2 className="w-4 h-4 text-[#EC4899] flex-shrink-0 mt-0.5" />
+                  <span>Generates compliant PBIR visual.json with certified Deneb GUID</span>
+                </div>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => onNavigate('deneb-studio')}
+              className="pop-btn w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full text-xs sm:text-sm font-heading font-black bg-[#EC4899] hover:bg-[#DB2777] text-white shadow-[3px_3px_0px_0px_#1E293B] transition-all cursor-pointer group"
+            >
+              <span>Launch Deneb Studio</span>
+              <ArrowRight className="w-4 h-4 stroke-[2.5] group-hover:translate-x-1 transition-transform" />
+            </button>
+          </div>
+
+          {/* Workspace 8: Fabric PBIP Studio */}
+          <div className="pop-card bg-white dark:bg-slate-900 p-6 sm:p-7 rounded-3xl border-3 border-[#1E293B] dark:border-slate-700 shadow-[6px_6px_0px_0px_#1E293B] flex flex-col justify-between space-y-5">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="w-12 h-12 rounded-2xl bg-[#059669] border-2 border-[#1E293B] flex items-center justify-center text-white shadow-[2.5px_2.5px_0px_0px_#1E293B]">
+                  <FileCode className="w-6 h-6 stroke-[2.5]" />
+                </div>
+                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-heading font-black bg-[#059669]/20 text-[#047857] dark:text-[#34D399] border border-[#059669]/40">
+                  Option A: PBIP Git
+                </span>
+              </div>
+
+              <div>
+                <h4 className="text-xl sm:text-2xl font-heading font-black text-[#1E293B] dark:text-white">
+                  Fabric PBIP Studio
+                </h4>
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium mt-1.5 leading-relaxed">
+                  Automate full Microsoft Fabric Power BI Project (.pbip) repositories with modern PBIR report format. Interactive project tree explorer, code inspector, and 1-click .pbip.zip export.
+                </p>
+              </div>
+
+              <div className="space-y-2 pt-1">
+                <div className="flex items-start gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
+                  <CheckCircle2 className="w-4 h-4 text-[#059669] flex-shrink-0 mt-0.5" />
+                  <span>Standard PBIR 2.0 format with definition.pbir & version.json</span>
+                </div>
+                <div className="flex items-start gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
+                  <CheckCircle2 className="w-4 h-4 text-[#059669] flex-shrink-0 mt-0.5" />
+                  <span>Interactive file tree visualizer with syntax-highlighted code inspector</span>
+                </div>
+                <div className="flex items-start gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
+                  <CheckCircle2 className="w-4 h-4 text-[#059669] flex-shrink-0 mt-0.5" />
+                  <span>1-click client-side .pbip.zip download with embedded theme & layout</span>
+                </div>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => onNavigate('pbip-studio')}
+              className="pop-btn w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full text-xs sm:text-sm font-heading font-black bg-[#059669] hover:bg-[#047857] text-white shadow-[3px_3px_0px_0px_#1E293B] transition-all cursor-pointer group"
+            >
+              <span>Launch PBIP Studio</span>
               <ArrowRight className="w-4 h-4 stroke-[2.5] group-hover:translate-x-1 transition-transform" />
             </button>
           </div>

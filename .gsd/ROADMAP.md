@@ -1,49 +1,50 @@
 # ROADMAP.md
 
-> **Current Milestone**: v4.0 — Report Layout Planner, Color Accessibility Checker & DAX Measure Toolkit
-> **Current Phase**: Phase 4: Navigation Integration, Landing Page & Verification
-> **Goal**: Add three high-value tools to PowerLab — a visual drag-and-drop report layout planner directly baked into Dash Canvas SVG wallpaper, a WCAG 2.1 AA/AAA accessibility checker with colorblind CVD simulation & auto-fix, and a curated DAX measure template toolkit with live parameter substitution.
+> **Current Milestone**: v5.0 — Fabric PBIP Project Studio & Deneb Vega-Lite Custom Visual Spec Studio
+> **Current Status**: Completed & Verified on branch `feat/v5-pbip-deneb-studio`
+> **Goal**: Equip PowerLab with two high-leverage developer engines: (1) Fabric PBIP & Report Automation Studio for scaffolding complete, openable Microsoft Fabric Power BI Project (.pbip) folder structures, definition.pbir, registered theme resources, and visual layouts with 1-click zip export; (2) Deneb & Vega-Lite Custom Visual Spec Studio for authoring, customizing, live previewing, and exporting certified Vega-Lite specs with PowerLab palette integration and PBIR visual.json generation.
 
-## Must-Haves (Milestone v4.0)
-- [x] **Report Layout Planner (4th Tab in Dash Canvas)**: drag-and-drop grid for designing Power BI visual placement directly linked to Dash Canvas SVG background slots
-- [x] Copy all coordinates as a reference table for precise visual positioning in Power BI Desktop
-- [x] Export layout coordinates as PBIR `visual.json` position snippets, Markdown, and CSV
-- [x] **Color Accessibility Checker page**: WCAG AA/AAA and Non-Text UI contrast matrix (3.0:1) for all theme palette colors against every background
-- [x] Colorblind simulation (Deuteranopia, Protanopia, Tritanopia, Achromatopsia) with live preview
-- [x] Auto-suggest color fixes for failing contrast pairs with 1-click apply to palette
-- [x] **DAX Measure Toolkit page**: curated library of ready-to-copy DAX measure templates (Time Intelligence, Rankings, Dynamic Titles, KPI Logic, Conditional Formatting, Metric Switching)
-- [x] Live placeholder substitution (replace `[Measure]`, `'Date'[Date]`, etc. with user's actual model fields)
-- [x] Copy formatted DAX and download single `.dax` or multi-measure category bundles
-- [x] Full integration into PowerLab header navigation, mobile menu, and landing page
-- [x] All 93 unit tests passing + clean production build
+## Must-Haves (Milestone v5.0)
+- [x] **Fabric PBIP Core Scaffolder**: Generate compliant `.pbip` folder structures (`<Name>.pbip`, `<Name>.Report/definition.pbir`, `definition/version.json`, `definition/report.json`, `definition/pages/pages.json`, `page.json`, `visuals/`, `StaticResources/RegisteredResources/`, `.platform`)
+- [x] **Dash Canvas to PBIP Export**: Export active wallpaper background + all visual containers directly into a fully structured, ready-to-open Power BI Project (`.pbip.zip`)
+- [x] **PBIP Connection & Config Flexibility**: Support `byConnection` (Fabric lakehouse/semantic model) and `byPath` (local model) modes, customizable page names, canvas dimensions, and embedded theme JSON
+- [x] **Deneb Vega-Lite Spec Catalog**: Curated library of 20+ certified, high-impact Vega-Lite/Vega visual templates (Bullet charts with target bands, Lollipop/Dumbbell charts, Radial gauge rings, Jitter distribution, Waterfall, Matrix heatmap)
+- [x] **Deneb Visual Studio Page**: Interactive workspace with search, category filtering, live template SVG preview, and schema-compliant Vega-Lite spec editor
+- [x] **Live Theme Palette Injection**: Seamlessly bind active PowerLab color palette swatches into Deneb spec color scales (`scale.range`)
+- [x] **PBIR Visual JSON Generation**: 1-click generation of Deneb PBIR `visual.json` with official GUID (`deneb7E15AEF80B9E4D4F8E12924291ECE89A`) and formatted config
+- [x] **Navigation & Landing Page Integration**: Unified into top navigation bar, landing page developer journey, and cross-workspace switchers
+- [x] **Testing & Quality Gate**: 100% test pass rate across all suites, zero TypeScript errors, clean Vite production build
 
 ## Nice-to-Haves
-- [x] Export layout coordinates as PBIR `visual.json` position snippets
-- [x] Snap-to-grid (8px) and coordinate pill overlays in Report Layout Planner
-- [x] Single source of truth: Layout Planner cards are baked directly into downloaded Dash Canvas SVG wallpaper
-- [x] Export Accessibility Audit Report Card as Markdown and downloadable theme JSON
-- [x] Live Power BI Visual Preview Simulator with CVD modes
+- [x] In-browser file tree preview showing the generated PBIP directory hierarchy
+- [x] Raw JSON vs formatted Vega-Lite code viewer with syntax highlighting
+- [x] Direct "Send Layout to PBIP Studio" button in Dash Canvas Layout Planner
 
 ## Phases
 
-### Phase 1: Report Layout Planner
-**Status**: 🟩 Completed
-**Objective**: Build layout planner with drag-and-drop canvas, 8-point handles, 8px snap grid, coordinate inspector, presets, and PBIR export, unified directly as Tab 4 inside Dash Canvas as requested.
+### Phase 1: Fabric PBIP & Report Automation Core Engine
+**Status**: ✅ Completed
+**Objective**: Build `src/core/pbip/` core library for generating schema-valid PBIP project directory models, `definition.pbir`, `report.json`, `pages.json`, `page.json`, `visual.json`, registered theme JSON, and JSZip export.
 
-### Phase 2: Color Accessibility Checker
-**Status**: 🟩 Completed
-**Objective**: Build a page that imports theme palettes and provides a WCAG 2.1 AA/AAA contrast matrix (3.0:1 non-text & 4.5:1 text), colorblind simulations (Deuteranopia, Protanopia, Tritanopia, Achromatopsia), pairwise conflict detection, and auto-fix color suggestions.
+### Phase 2: Deneb & Vega-Lite Custom Visual Spec Engine & Catalog
+**Status**: ✅ Completed
+**Objective**: Build `src/core/deneb/` with 20+ production-grade Vega-Lite specs, theme palette integration, parameter binding schemas, and PBIR Deneb `visual.json` formatter.
 
-### Phase 3: DAX Measure Toolkit
-**Status**: 🟩 Completed
-**Objective**: Build a curated library page of production-grade DAX measures across 6 categories with live parameter substitution, Power BI best-practice tips, and one-click copy and .dax bundle exports.
+### Phase 3: Deneb Vega-Lite Visual Studio Page
+**Status**: ✅ Completed
+**Objective**: Build `src/pages/DenebStudioPage.tsx` with search, category filters, template cards, interactive live preview simulator, custom parameter tuning, and one-click copy/download.
 
-### Phase 4: Navigation Integration, Landing Page & Verification
-**Status**: 🟩 Completed
-**Objective**: Wire all workspaces into header navigation, landing page 5-workspace spotlight, and Theme Studio "Audit WCAG" bridge. 93/93 unit tests passing and clean Vite production build.
+### Phase 4: Fabric PBIP Studio Page & Dash Canvas Integration
+**Status**: ✅ Completed
+**Objective**: Build `src/pages/PbipStudioPage.tsx` with project configuration, interactive folder tree visualizer, file code inspector, and integrate 1-click PBIP export into Dash Canvas.
+
+### Phase 5: Navigation, Landing Page Integration, Testing & Verification
+**Status**: ✅ Completed
+**Objective**: Wire both studios into header navigation, landing page roadmap, cross-workspace quick switchers, test suites, and verify production build.
 
 ## Completed Milestones
 
+### v4.0 — Report Layout Planner, Color Accessibility Checker & DAX Measure Toolkit ✅
 ### v3.0 — SVG Visual Maker & Power BI DAX Studio ✅
 ### v2.0 — Multi-Page & Dashboard SVG Generator ✅
 ### v1.0 — Theme Studio & Color Engine ✅
