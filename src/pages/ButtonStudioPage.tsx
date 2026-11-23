@@ -528,7 +528,7 @@ export const ButtonStudioPage: React.FC<ButtonStudioPageProps> = ({
         <div className="lg:col-span-7 space-y-6">
           <div className="pop-card p-6 rounded-3xl bg-white dark:bg-slate-900 border-3 border-[#1E293B] dark:border-slate-700 shadow-[6px_6px_0px_0px_#1E293B] space-y-5">
             {/* STATE SELECTOR & CUSTOMIZATION HEADER */}
-            <div className="p-3.5 rounded-2xl bg-gradient-to-r from-purple-50 via-white to-amber-50 dark:from-slate-800 dark:via-slate-850 dark:to-slate-800 border-2 border-[#1E293B] shadow-[2.5px_2.5px_0px_0px_#1E293B] space-y-2.5">
+            <div className="p-3.5 rounded-2xl bg-gradient-to-r from-purple-50 via-white to-amber-50 dark:from-slate-800 dark:via-slate-800 dark:to-slate-800 border-2 border-[#1E293B] dark:border-slate-700 shadow-[2.5px_2.5px_0px_0px_#1E293B] space-y-2.5">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-[11px] font-heading font-black text-slate-500 uppercase tracking-wider">
@@ -577,7 +577,7 @@ export const ButtonStudioPage: React.FC<ButtonStudioPageProps> = ({
               </div>
 
               {/* State Selector Buttons */}
-              <div className="grid grid-cols-5 gap-1.5 p-1 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-[#1E293B]/40">
+              <div className="grid grid-cols-5 gap-1.5 p-1 rounded-xl bg-slate-100 dark:bg-slate-900 border border-[#1E293B]/40 dark:border-slate-700">
                 {[
                   { id: 'default', label: 'Default', tag: 'Base' },
                   { id: 'hover', label: 'On Hover', tag: 'Action' },
@@ -598,7 +598,7 @@ export const ButtonStudioPage: React.FC<ButtonStudioPageProps> = ({
                       className={`py-1.5 px-2 rounded-lg text-xs font-heading font-black flex flex-col items-center justify-center transition-all cursor-pointer relative ${
                         isSelected
                           ? 'bg-[#8B5CF6] text-white shadow-[2px_2px_0px_0px_#1E293B] border border-[#1E293B]'
-                          : 'bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-purple-50 dark:hover:bg-slate-600'
+                          : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-purple-50 dark:hover:bg-slate-700'
                       }`}
                     >
                       <span>{st.label}</span>
