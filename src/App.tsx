@@ -459,7 +459,7 @@ export default function App() {
             <span className="font-heading font-black text-sm text-[#1E293B] dark:text-white">
               Power<span className="text-[#8B5CF6]">Lab</span>
             </span>
-            <span className="text-slate-500 font-medium">• 100% Client-Side Privacy • Playful Geometric</span>
+            <span className="text-slate-500 font-medium">• 100% Client-Side Privacy</span>
           </div>
 
           <div className="flex items-center justify-center sm:justify-end gap-3">
