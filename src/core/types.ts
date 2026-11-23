@@ -39,7 +39,9 @@ export interface TextClassStyle {
 export interface ThemeCustomizationOptions {
   fontFamily:
     | 'Segoe UI'
-    | 'Aptos'
+    | 'Poppins'
+    | 'Outfit'
+    | 'Plus Jakarta Sans'
     | 'DIN'
     | 'Arial'
     | 'Calibri'

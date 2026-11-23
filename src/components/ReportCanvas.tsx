@@ -17,8 +17,12 @@ interface ReportCanvasProps {
 
 export function getFontFamilyCss(font?: ThemeCustomizationOptions['fontFamily']): string {
   switch (font) {
-    case 'Aptos':
-      return "'Aptos', 'Segoe UI', system-ui, -apple-system, sans-serif";
+    case 'Poppins':
+      return "'Poppins', system-ui, -apple-system, sans-serif";
+    case 'Outfit':
+      return "'Outfit', system-ui, -apple-system, sans-serif";
+    case 'Plus Jakarta Sans':
+      return "'Plus Jakarta Sans', system-ui, -apple-system, sans-serif";
     case 'DIN':
       return "'DIN Alternate', 'DIN', 'Barlow', 'Arial Narrow', sans-serif";
     case 'Arial':

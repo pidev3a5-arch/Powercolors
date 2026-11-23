@@ -59,7 +59,8 @@ describe('Report Canvas & Visual Color Binding', () => {
 
   it('correctly converts Power BI font families to CSS font stack', () => {
     expect(getFontFamilyCss('Segoe UI')).toContain('Segoe UI');
-    expect(getFontFamilyCss('Aptos')).toContain('Aptos');
+    expect(getFontFamilyCss('Poppins')).toContain('Poppins');
+    expect(getFontFamilyCss('Outfit')).toContain('Outfit');
     expect(getFontFamilyCss('DIN')).toContain('DIN');
     expect(getFontFamilyCss('Arial')).toContain('Arial');
     expect(getFontFamilyCss('Calibri')).toContain('Calibri');

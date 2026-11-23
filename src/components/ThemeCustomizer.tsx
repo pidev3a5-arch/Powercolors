@@ -10,7 +10,9 @@ interface ThemeCustomizerProps {
 
 const FONT_OPTIONS: Array<ThemeCustomizationOptions['fontFamily']> = [
   'Segoe UI',
-  'Aptos',
+  'Poppins',
+  'Outfit',
+  'Plus Jakarta Sans',
   'DIN',
   'Arial',
   'Calibri',

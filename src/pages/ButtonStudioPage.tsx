@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import {
   Download,
   Copy,
@@ -10,6 +10,11 @@ import {
   Palette,
   Code,
   Box,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  Upload,
+  X,
 } from 'lucide-react';
 import { AppPage } from '../core/types';
 import {
@@ -26,6 +31,7 @@ import {
   exportButtonBundleZip,
   downloadButtonBundleZip,
   generateButtonDaxExpression,
+  sanitizeCustomSvg,
 } from '../core/button/buttonEngine';
 import { CURATED_BUTTON_PRESETS } from '../core/button/presets';
 import { SVG_ICONS_COLLECTION } from '../core/iconLibrary/icons';
@@ -37,7 +43,7 @@ interface ButtonStudioPageProps {
 
 const DEFAULT_PALETTE = ['#8B5CF6', '#FBBF24', '#34D399', '#38BDF8', '#F472B6', '#1E293B', '#10B981', '#EC4899'];
 
-const FONT_FAMILIES = ['Segoe UI', 'Aptos', 'DIN', 'Plus Jakarta Sans', 'Outfit', 'Arial', 'Verdana'];
+const FONT_FAMILIES = ['Segoe UI', 'Poppins', 'Outfit', 'Plus Jakarta Sans', 'DIN', 'Arial', 'Verdana'];
 
 export const ButtonStudioPage: React.FC<ButtonStudioPageProps> = ({
   onNavigate,
@@ -55,8 +61,37 @@ export const ButtonStudioPage: React.FC<ButtonStudioPageProps> = ({
   // State override tab (when customizing states in geometry/style tab)
   const [overrideStateTab, setOverrideStateTab] = useState<'hover' | 'pressed' | 'inactive' | 'disabled'>('hover');
 
-  // Icon search query
+  // Icon search query & custom icon upload ref
   const [iconSearch, setIconSearch] = useState('');
+  const [isPastingSvg, setIsPastingSvg] = useState(false);
+  const [rawSvgInput, setRawSvgInput] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleUploadSvgFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const content = event.target?.result as string;
+      if (content) {
+        updateConfig({ customIconSvg: content, showIcon: true });
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  const handleApplyPastedSvg = () => {
+    if (rawSvgInput.trim()) {
+      updateConfig({ customIconSvg: rawSvgInput.trim(), showIcon: true });
+      setIsPastingSvg(false);
+    }
+  };
+
+  const handleClearCustomIcon = () => {
+    updateConfig({ customIconSvg: undefined });
+    setRawSvgInput('');
+    setIsPastingSvg(false);
+  };
 
   // Notifications / Copied state
   const [copiedDax, setCopiedDax] = useState(false);
@@ -415,7 +450,7 @@ export const ButtonStudioPage: React.FC<ButtonStudioPageProps> = ({
                 }`}
               >
                 <Sparkles className="w-3.5 h-3.5" />
-                <span>Presets (8)</span>
+                <span>Presets (18)</span>
               </button>
 
               <button
@@ -868,6 +903,38 @@ export const ButtonStudioPage: React.FC<ButtonStudioPageProps> = ({
                   </div>
                 </div>
 
+                {/* Horizontal Alignment: Left, Middle / Center, Right */}
+                <div className="space-y-1.5 pt-2 border-t border-slate-200 dark:border-slate-800">
+                  <label className="text-xs font-heading font-black text-slate-700 dark:text-slate-300 block">
+                    Horizontal Content Alignment (Text & Icon)
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { id: 'left', label: 'Left', icon: AlignLeft },
+                      { id: 'center', label: 'Middle', icon: AlignCenter },
+                      { id: 'right', label: 'Right', icon: AlignRight },
+                    ].map((align) => {
+                      const Icon = align.icon;
+                      const isSelected = buttonConfig.textAlign === align.id;
+                      return (
+                        <button
+                          key={align.id}
+                          type="button"
+                          onClick={() => updateConfig({ textAlign: align.id as any })}
+                          className={`py-2 px-3 rounded-xl text-xs font-heading font-black flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                            isSelected
+                              ? 'bg-[#8B5CF6] text-white shadow-[2px_2px_0px_0px_#1E293B] border-2 border-[#1E293B]'
+                              : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-2 border-[#1E293B] hover:bg-purple-50'
+                          }`}
+                        >
+                          <Icon className="w-3.5 h-3.5 stroke-[2.5]" />
+                          <span>{align.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
                 {/* Subtitle / Counter Badge */}
                 <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border-2 border-[#1E293B] space-y-3">
                   <div className="flex items-center justify-between">
@@ -986,6 +1053,139 @@ export const ButtonStudioPage: React.FC<ButtonStudioPageProps> = ({
                       />
                     </div>
                   </div>
+                </div>
+
+                {/* Custom Icon Import Section */}
+                <div className="p-3.5 rounded-2xl bg-purple-50/70 dark:bg-purple-950/30 border-2 border-[#1E293B] space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Upload className="w-4 h-4 text-[#8B5CF6]" />
+                      <span className="text-xs font-heading font-black text-slate-800 dark:text-slate-200">
+                        Import Custom Icon (SVG)
+                      </span>
+                    </div>
+                    {buttonConfig.customIconSvg && (
+                      <button
+                        type="button"
+                        onClick={handleClearCustomIcon}
+                        className="text-[11px] font-heading font-bold text-red-600 dark:text-red-400 hover:underline flex items-center gap-1 cursor-pointer"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                        <span>Revert to Library Icon</span>
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Hidden file input */}
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleUploadSvgFile}
+                    accept=".svg,image/svg+xml"
+                    className="hidden"
+                  />
+
+                  {buttonConfig.customIconSvg ? (
+                    <div className="flex items-center justify-between p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-[#1E293B]">
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-lg bg-purple-100 dark:bg-purple-900/50 flex items-center justify-center border border-[#1E293B]/20 overflow-hidden">
+                          <svg
+                            viewBox="0 0 24 24"
+                            width="20"
+                            height="20"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            className="text-[#8B5CF6]"
+                            dangerouslySetInnerHTML={{ __html: sanitizeCustomSvg(buttonConfig.customIconSvg) }}
+                          />
+                        </div>
+                        <div>
+                          <div className="text-xs font-heading font-black text-[#1E293B] dark:text-white">
+                            Custom SVG Icon Active
+                          </div>
+                          <div className="text-[10px] text-slate-500 font-mono">
+                            Applied to all button states
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => fileInputRef.current?.click()}
+                          className="pop-btn px-2.5 py-1 text-[11px] font-heading font-black rounded-lg border border-[#1E293B] bg-white dark:bg-slate-800 hover:bg-slate-100 cursor-pointer"
+                        >
+                          Replace File
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setRawSvgInput(buttonConfig.customIconSvg || '');
+                            setIsPastingSvg(true);
+                          }}
+                          className="pop-btn px-2.5 py-1 text-[11px] font-heading font-black rounded-lg border border-[#1E293B] bg-white dark:bg-slate-800 hover:bg-slate-100 cursor-pointer"
+                        >
+                          Edit Markup
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="pop-btn flex-1 py-2 px-3 rounded-xl border-2 border-[#1E293B] bg-white dark:bg-slate-900 shadow-[2px_2px_0px_0px_#1E293B] text-xs font-heading font-black text-slate-800 dark:text-slate-200 hover:bg-purple-50 dark:hover:bg-purple-900/40 flex items-center justify-center gap-2 cursor-pointer"
+                      >
+                        <Upload className="w-3.5 h-3.5" />
+                        <span>Upload .SVG File</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setIsPastingSvg(!isPastingSvg)}
+                        className={`pop-btn py-2 px-3 rounded-xl border-2 border-[#1E293B] text-xs font-heading font-black flex items-center justify-center gap-1.5 cursor-pointer ${
+                          isPastingSvg
+                            ? 'bg-[#8B5CF6] text-white shadow-[2px_2px_0px_0px_#1E293B]'
+                            : 'bg-white dark:bg-slate-900 shadow-[2px_2px_0px_0px_#1E293B] text-slate-800 dark:text-slate-200 hover:bg-purple-50 dark:hover:bg-purple-900/40'
+                        }`}
+                      >
+                        <Code className="w-3.5 h-3.5" />
+                        <span>Paste SVG</span>
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Paste SVG Drawer */}
+                  {isPastingSvg && (
+                    <div className="space-y-2 pt-2 border-t border-purple-200 dark:border-purple-800">
+                      <textarea
+                        rows={3}
+                        value={rawSvgInput}
+                        onChange={(e) => setRawSvgInput(e.target.value)}
+                        placeholder="Paste raw <svg>...</svg> or path markup here..."
+                        className="w-full p-2.5 rounded-xl border-2 border-[#1E293B] font-mono text-[11px] bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200"
+                      />
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsPastingSvg(false);
+                            setRawSvgInput('');
+                          }}
+                          className="px-2.5 py-1 text-xs font-heading font-bold text-slate-600 dark:text-slate-400"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="button"
+                          disabled={!rawSvgInput.trim()}
+                          onClick={handleApplyPastedSvg}
+                          className="pop-btn px-3 py-1.5 rounded-xl border-2 border-[#1E293B] bg-[#8B5CF6] text-white text-xs font-heading font-black shadow-[2px_2px_0px_0px_#1E293B] disabled:opacity-50 cursor-pointer"
+                        >
+                          Apply Pasted SVG
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Icon Picker Grid */}

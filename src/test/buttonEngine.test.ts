@@ -111,7 +111,8 @@ describe('Button Studio Engine', () => {
     expect(zipBlob.size).toBeGreaterThan(500);
   });
 
-  it('renders all curated button presets without errors', () => {
+  it('contains exactly 18 curated button presets', () => {
+    expect(CURATED_BUTTON_PRESETS.length).toBe(18);
     for (const preset of CURATED_BUTTON_PRESETS) {
       const svg = generateButtonSvg(preset.config, 'default');
       expect(svg).toContain('<svg');
@@ -120,5 +121,39 @@ describe('Button Studio Engine', () => {
         expect(svg).toContain(preset.config.title);
       }
     }
+  });
+
+  it('handles horizontal text and icon alignment (left, center, right)', () => {
+    const leftBtn = generateButtonSvg({ ...sampleConfig, textAlign: 'left' }, 'default');
+    const centerBtn = generateButtonSvg({ ...sampleConfig, textAlign: 'center' }, 'default');
+    const rightBtn = generateButtonSvg({ ...sampleConfig, textAlign: 'right' }, 'default');
+
+    expect(leftBtn).toContain('<svg');
+    expect(centerBtn).toContain('<svg');
+    expect(rightBtn).toContain('<svg');
+    // Each alignment yields different coordinate offsets for icon and text
+    expect(leftBtn).not.toEqual(centerBtn);
+    expect(centerBtn).not.toEqual(rightBtn);
+  });
+
+  it('supports custom imported SVG icons with sanitization', () => {
+    const customMarkup = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>';
+    const btnWithCustomIcon = generateButtonSvg(
+      {
+        ...sampleConfig,
+        customIconSvg: customMarkup,
+      },
+      'default'
+    );
+
+    expect(btnWithCustomIcon).toContain('points="5 3 19 12 5 21 5 3"');
+  });
+
+  it('supports Poppins and Outfit font families in button rendering', () => {
+    const poppinsBtn = generateButtonSvg({ ...sampleConfig, fontFamily: 'Poppins' }, 'default');
+    const outfitBtn = generateButtonSvg({ ...sampleConfig, fontFamily: 'Outfit' }, 'default');
+
+    expect(poppinsBtn).toContain('font-family="Poppins');
+    expect(outfitBtn).toContain('font-family="Outfit');
   });
 });

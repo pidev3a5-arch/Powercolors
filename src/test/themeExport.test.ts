@@ -13,14 +13,14 @@ describe('Theme Export & Advanced Customization', () => {
   const structural = deriveStructuralColors(dummyColors[0], false);
 
   it('applies custom font family across textClasses', () => {
-    const themeAptos = buildPowerBITheme('Aptos Theme', dummyColors, structural, {
-      fontFamily: 'Aptos',
+    const themePoppins = buildPowerBITheme('Poppins Theme', dummyColors, structural, {
+      fontFamily: 'Poppins',
     });
 
-    expect(themeAptos.textClasses.title.fontFace).toBe('Aptos');
-    expect(themeAptos.textClasses.label.fontFace).toBe('Aptos');
-    expect(themeAptos.textClasses.callout.fontFace).toBe('Aptos');
-    expect(themeAptos.textClasses.header.fontFace).toBe('Aptos');
+    expect(themePoppins.textClasses.title.fontFace).toBe('Poppins');
+    expect(themePoppins.textClasses.label.fontFace).toBe('Poppins');
+    expect(themePoppins.textClasses.callout.fontFace).toBe('Poppins');
+    expect(themePoppins.textClasses.header.fontFace).toBe('Poppins');
   });
 
   it('propagates visual container border and shadow flags', () => {

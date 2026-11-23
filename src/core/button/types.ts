@@ -59,6 +59,7 @@ export interface ButtonConfig {
   // Icon
   showIcon: boolean;
   iconName: string;
+  customIconSvg?: string;
   iconPosition: ButtonIconPosition;
   iconSize: number;
 

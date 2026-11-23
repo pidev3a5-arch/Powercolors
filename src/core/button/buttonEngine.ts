@@ -112,11 +112,28 @@ export function resolveEffectiveStyles(
 }
 
 /**
- * Find icon SVG inner body from icon library
+ * Extract or sanitize SVG inner elements from a custom SVG string
  */
-export function getButtonIconBody(iconName: string): string {
+export function sanitizeCustomSvg(svgStr: string): string {
+  if (!svgStr || !svgStr.trim()) return '';
+  const trimmed = svgStr.trim();
+  const match = trimmed.match(/<svg[^>]*>([\s\S]*?)<\/svg>/i);
+  if (match && match[1]) {
+    return match[1].trim();
+  }
+  return trimmed;
+}
+
+/**
+ * Find icon SVG inner body from icon library or custom imported SVG
+ */
+export function getButtonIconBody(config: { iconName: string; customIconSvg?: string } | string): string {
+  if (typeof config === 'object' && config.customIconSvg && config.customIconSvg.trim()) {
+    return sanitizeCustomSvg(config.customIconSvg);
+  }
+  const name = typeof config === 'string' ? config : config.iconName;
   const found = SVG_ICONS_COLLECTION.find(
-    (i) => i.id === iconName || i.name.toLowerCase() === iconName.toLowerCase()
+    (i) => i.id === name || i.name.toLowerCase() === name.toLowerCase()
   );
   if (found) {
     return found.body;
@@ -177,7 +194,7 @@ export function generateButtonSvg(
       : '';
 
   // Calculate internal layout: icon + text + badge
-  const iconBody = config.showIcon ? getButtonIconBody(config.iconName) : '';
+  const iconBody = config.showIcon ? getButtonIconBody(config) : '';
   const iconSz = config.iconSize;
   const fontSize = config.fontSize;
   const fontWeightVal =
@@ -198,7 +215,21 @@ export function generateButtonSvg(
     `;
   } else if (config.iconPosition === 'top') {
     // Icon on top, text below
-    const icX = btnX + (btnW - iconSz) / 2;
+    const edgeMargin = Math.max(14, Math.round(rx * 0.35) + 6);
+    let icX = btnX + (btnW - iconSz) / 2;
+    let txtX = btnX + btnW / 2;
+    let textAnchor: 'start' | 'middle' | 'end' = 'middle';
+
+    if (config.textAlign === 'left') {
+      icX = btnX + edgeMargin;
+      txtX = btnX + edgeMargin;
+      textAnchor = 'start';
+    } else if (config.textAlign === 'right') {
+      icX = btnX + btnW - iconSz - edgeMargin;
+      txtX = btnX + btnW - edgeMargin;
+      textAnchor = 'end';
+    }
+
     const icY = btnY + (btnH - iconSz - fontSize - 6) / 2;
     const txtY = icY + iconSz + 12;
 
@@ -214,7 +245,7 @@ export function generateButtonSvg(
       }
       ${
         config.showTitle
-          ? `<text x="${btnX + btnW / 2}" y="${txtY}" text-anchor="middle" dominant-baseline="central" font-family="${config.fontFamily}, sans-serif" font-size="${fontSize}px" font-weight="${fontWeightVal}" fill="${styles.textColor}">
+          ? `<text x="${txtX}" y="${txtY}" text-anchor="${textAnchor}" dominant-baseline="central" font-family="${config.fontFamily}, sans-serif" font-size="${fontSize}px" font-weight="${fontWeightVal}" fill="${styles.textColor}">
               ${escapeXml(config.title)}
             </text>`
           : ''
@@ -233,11 +264,12 @@ export function generateButtonSvg(
     if (config.showTitle) totalContentWidth += (totalContentWidth > 0 ? spacing : 0) + textWidth;
     if (config.showBadge) totalContentWidth += (totalContentWidth > 0 ? spacing : 0) + badgeWidth;
 
+    const edgeMargin = Math.max(14, Math.round(rx * 0.35) + 6);
     let startX = btnX + (btnW - totalContentWidth) / 2;
     if (config.textAlign === 'left') {
-      startX = btnX + 16;
+      startX = btnX + edgeMargin;
     } else if (config.textAlign === 'right') {
-      startX = btnX + btnW - totalContentWidth - 16;
+      startX = btnX + btnW - totalContentWidth - edgeMargin;
     }
 
     const centerY = btnY + btnH / 2;

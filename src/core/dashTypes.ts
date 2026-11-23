@@ -87,7 +87,7 @@ export interface DashCanvasContainerStyle {
 }
 
 export interface DashTypographyConfig {
-  fontFamily: string; // 'Segoe UI' | 'Aptos' | 'DIN' | 'Arial' | 'Calibri' | 'Plus Jakarta Sans' | 'Outfit' | 'Inter'
+  fontFamily: string; // 'Segoe UI' | 'Poppins' | 'Outfit' | 'Plus Jakarta Sans' | 'DIN' | 'Arial' | 'Calibri' | 'Inter'
   titleSize: number; // e.g. 13
   titleColor: string; // e.g. '#1E293B'
   subtitleSize: number; // e.g. 10.5
