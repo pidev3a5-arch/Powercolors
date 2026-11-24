@@ -12,6 +12,7 @@ import {
   Check,
   Code2,
   MousePointerClick,
+  Target,
 } from 'lucide-react';
 import { AppPage } from '../core/types';
 
@@ -532,6 +533,53 @@ export const FeatureGrid: React.FC<FeatureGridProps> = ({ onNavigate }) => {
               className="pop-btn w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full text-xs sm:text-sm font-heading font-black bg-[#059669] hover:bg-[#047857] text-white shadow-[3px_3px_0px_0px_#1E293B] transition-all cursor-pointer group"
             >
               <span>Launch Button Studio</span>
+              <ArrowRight className="w-4 h-4 stroke-[2.5] group-hover:translate-x-1 transition-transform" />
+            </button>
+          </div>
+
+          {/* Workspace 9: Custom KPI & Executive Card Studio */}
+          <div className="pop-card bg-white dark:bg-slate-900 p-6 sm:p-7 rounded-3xl border-3 border-[#1E293B] dark:border-slate-700 shadow-[6px_6px_0px_0px_#1E293B] flex flex-col justify-between space-y-5">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="w-12 h-12 rounded-2xl bg-[#8B5CF6] border-2 border-[#1E293B] flex items-center justify-center text-white shadow-[2.5px_2.5px_0px_0px_#1E293B]">
+                  <Target className="w-6 h-6 stroke-[2.5]" />
+                </div>
+                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-heading font-black bg-[#8B5CF6]/20 text-[#8B5CF6] dark:text-purple-300 border border-[#8B5CF6]/40">
+                  Option C: KPI Studio
+                </span>
+              </div>
+
+              <div>
+                <h4 className="text-xl sm:text-2xl font-heading font-black text-[#1E293B] dark:text-white">
+                  KPI & Executive Card Studio
+                </h4>
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium mt-1.5 leading-relaxed">
+                  Design presentation-grade executive KPI cards and scorecards for Power BI. Customize typography, sparklines, variance delta badges, and radial progress rings, then export pure DAX Image URL measures or PBIR visual.json container definitions.
+                </p>
+              </div>
+
+              <div className="space-y-2 pt-1">
+                <div className="flex items-start gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
+                  <CheckCircle2 className="w-4 h-4 text-[#8B5CF6] flex-shrink-0 mt-0.5" />
+                  <span>12+ C-suite presets: Revenue, Quota, SaaS NDR, Churn, Margin, CSAT</span>
+                </div>
+                <div className="flex items-start gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
+                  <CheckCircle2 className="w-4 h-4 text-[#8B5CF6] flex-shrink-0 mt-0.5" />
+                  <span>Micro-graphics: Bezier spark-area, radial progress ring, bullet charts</span>
+                </div>
+                <div className="flex items-start gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
+                  <CheckCircle2 className="w-4 h-4 text-[#8B5CF6] flex-shrink-0 mt-0.5" />
+                  <span>1-Click export: DAX Image URL measure, PBIR container, SVG & PNG</span>
+                </div>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => onNavigate('kpi-studio')}
+              className="pop-btn w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full text-xs sm:text-sm font-heading font-black bg-[#8B5CF6] hover:bg-[#7C3AED] text-white shadow-[3px_3px_0px_0px_#1E293B] transition-all cursor-pointer group"
+            >
+              <span>Launch KPI Card Studio</span>
               <ArrowRight className="w-4 h-4 stroke-[2.5] group-hover:translate-x-1 transition-transform" />
             </button>
           </div>

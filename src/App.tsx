@@ -10,6 +10,7 @@ import { IconLibraryPage } from './pages/IconLibraryPage';
 import { DaxToolkitPage } from './pages/DaxToolkitPage';
 import { DenebStudioPage } from './pages/DenebStudioPage';
 import { ButtonStudioPage } from './pages/ButtonStudioPage';
+import { KpiStudioPage } from './pages/KpiStudioPage';
 import { LinkedInIcon, FacebookIcon, YouTubeIcon, GitHubIcon } from './components/SocialIcons';
 import { extractThemeFromImage } from './core/colorEngine';
 import { createColorSwatch, deriveStructuralColors } from './core/colorHarmonics';
@@ -36,6 +37,7 @@ export default function App() {
       hash === 'dax-toolkit' ||
       hash === 'deneb-studio' ||
       hash === 'button-studio' ||
+      hash === 'kpi-studio' ||
       hash === 'landing'
     ) {
       return hash as AppPage;
@@ -442,6 +444,13 @@ export default function App() {
 
       {currentPage === 'button-studio' && (
         <ButtonStudioPage
+          onNavigate={handleNavigate}
+          paletteHexes={swatches.map((s) => s.hex)}
+        />
+      )}
+
+      {currentPage === 'kpi-studio' && (
+        <KpiStudioPage
           onNavigate={handleNavigate}
           paletteHexes={swatches.map((s) => s.hex)}
         />

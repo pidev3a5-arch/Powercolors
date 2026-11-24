@@ -7,7 +7,8 @@ export type AppPage =
   | 'icon-library'
   | 'dax-toolkit'
   | 'deneb-studio'
-  | 'button-studio';
+  | 'button-studio'
+  | 'kpi-studio';
 
 export type RGB = [number, number, number];
 
