@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sun, Moon, Sparkles, Home, Palette, Layout, Wand2, Image, Terminal, Menu, X, Code2, MousePointerClick, Target } from 'lucide-react';
+import { Sun, Moon, Sparkles, Home, Palette, Layout, Image, Terminal, Menu, X, Code2, MousePointerClick, Target } from 'lucide-react';
 import { AppPage } from '../core/types';
 
 interface NavigationHeaderProps {
@@ -28,7 +28,6 @@ export const NavigationHeader: React.FC<NavigationHeaderProps> = ({
   const navItems: Array<{ id: AppPage; label: string; icon: React.ComponentType<{ className?: string }> }> = [
     { id: 'landing', label: 'Home', icon: Home },
     { id: 'dash-generator', label: 'Dash Canvas', icon: Layout },
-    { id: 'palette-harmony', label: 'Palette Harmony', icon: Wand2 },
     { id: 'theme-generator', label: 'Theme Studio', icon: Palette },
     { id: 'icon-library', label: 'Icon Library', icon: Image },
     { id: 'button-studio', label: 'Button Studio', icon: MousePointerClick },

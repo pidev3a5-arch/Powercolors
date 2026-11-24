@@ -32,7 +32,6 @@ import {
   generateKpiPbirSnippet,
   generateScorecardSvg,
   downloadKpiSvg,
-  downloadKpiPng,
   KPI_ICONS,
 } from '../core/kpiCard/kpiEngine';
 import { KPI_PRESETS } from '../core/kpiCard/catalog';
@@ -264,7 +263,7 @@ export const KpiStudioPage: React.FC<KpiStudioPageProps> = ({
             </div>
 
             {/* Quick Export Action Buttons Row */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
               <button
                 type="button"
                 onClick={() => copyToClipboard(activeDax, 'dax', 'Power BI DAX Measure')}
@@ -293,16 +292,6 @@ export const KpiStudioPage: React.FC<KpiStudioPageProps> = ({
               >
                 <Download className="w-3.5 h-3.5" />
                 <span>SVG File</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => downloadKpiPng(cardConfig)}
-                className="pop-btn flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-heading font-black bg-[#8B5CF6] hover:bg-[#7C3AED] text-white border-2 border-[#1E293B] shadow-[2px_2px_0px_0px_#1E293B] cursor-pointer"
-                title="Download high-resolution PNG image"
-              >
-                <Download className="w-3.5 h-3.5" />
-                <span>PNG (2x)</span>
               </button>
             </div>
 
@@ -569,6 +558,42 @@ export const KpiStudioPage: React.FC<KpiStudioPageProps> = ({
                       onChange={(e) => setCardConfig((prev) => ({ ...prev, borderWidth: Number(e.target.value) }))}
                       className="w-full accent-[#8B5CF6]"
                     />
+                  </div>
+                </div>
+
+                {/* Border Accent Color */}
+                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border-2 border-[#1E293B] space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <label className="text-xs font-heading font-black text-[#1E293B] dark:text-white">
+                        Border Accent Color
+                      </label>
+                      <div className="text-[11px] text-slate-500 dark:text-slate-400">
+                        Card outline and icon badge border stroke
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={cardConfig.borderColor}
+                        onChange={(e) => setCardConfig((prev) => ({ ...prev, borderColor: e.target.value }))}
+                        className="w-8 h-8 rounded border border-[#1E293B] cursor-pointer"
+                      />
+                      <input
+                        type="text"
+                        value={cardConfig.borderColor}
+                        onChange={(e) => setCardConfig((prev) => ({ ...prev, borderColor: e.target.value }))}
+                        className="w-24 px-2 py-1 rounded text-xs font-mono font-bold border border-[#1E293B]"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setCardConfig((prev) => ({ ...prev, borderColor: prev.accentBarColor }))}
+                        className="text-[10px] font-heading font-black px-2.5 py-1.5 rounded-lg bg-purple-50 dark:bg-purple-900/40 text-[#8B5CF6] border border-[#8B5CF6]/40 hover:bg-purple-100 transition-all cursor-pointer whitespace-nowrap"
+                        title="Match Decorative Accent Color"
+                      >
+                        Match Accent
+                      </button>
+                    </div>
                   </div>
                 </div>
 

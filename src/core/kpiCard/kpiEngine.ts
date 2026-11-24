@@ -226,9 +226,8 @@ export function generateKpiCardSvg(config: KpiCardConfig): string {
     customIconSvg,
   } = config;
 
-  const fontStack = fontFamily
-    ? `"${fontFamily}", "Plus Jakarta Sans", system-ui, sans-serif`
-    : `"Outfit", "Plus Jakarta Sans", system-ui, sans-serif`;
+  const cleanFont = (fontFamily || 'Outfit').replace(/['"]/g, '');
+  const fontStack = `${cleanFont}, Segoe UI, sans-serif`;
 
   const hasShadow = showShadow !== false && shadowOffset > 0;
   const totalW = width + (hasShadow ? shadowOffset : 0);
@@ -342,7 +341,7 @@ export function generateKpiCardSvg(config: KpiCardConfig): string {
   if (showCategory && category) {
     const weightClass = categoryFontWeight === 'black' ? '900' : categoryFontWeight === 'bold' ? '700' : '600';
     categoryElement = `
-      <text x="${padLeft}" y="${catY}" font-family=${fontStack} font-size="${categoryFontSize}" font-weight="${weightClass}" fill="${categoryColor}" letter-spacing="0.05em">
+      <text x="${padLeft}" y="${catY}" font-family="${fontStack}" font-size="${categoryFontSize}" font-weight="${weightClass}" fill="${categoryColor}" letter-spacing="0.05em">
         ${escapeXml(category.toUpperCase())}
       </text>
     `;
@@ -351,7 +350,7 @@ export function generateKpiCardSvg(config: KpiCardConfig): string {
   let subtitleElement = '';
   if (showSubtitle && subtitle) {
     subtitleElement = `
-      <text x="${padLeft}" y="${subY}" font-family=${fontStack} font-size="10.5" font-weight="500" fill="${subtitleColor}">
+      <text x="${padLeft}" y="${subY}" font-family="${fontStack}" font-size="10.5" font-weight="500" fill="${subtitleColor}">
         ${escapeXml(subtitle)}
       </text>
     `;
@@ -363,7 +362,7 @@ export function generateKpiCardSvg(config: KpiCardConfig): string {
   const suffixText = unitSuffix ? ` <tspan font-size="${Math.round(valueFontSize * 0.45)}" font-weight="600" fill="${categoryColor}">${escapeXml(unitSuffix)}</tspan>` : '';
 
   const valueElement = `
-    <text x="${padLeft}" y="${valY}" font-family=${fontStack} font-size="${valueFontSize}" font-weight="${valWeight}" fill="${valueColor}" letter-spacing="-0.03em">
+    <text x="${padLeft}" y="${valY}" font-family="${fontStack}" font-size="${valueFontSize}" font-weight="${valWeight}" fill="${valueColor}" letter-spacing="-0.03em">
       ${valText}${suffixText}
     </text>
   `;
@@ -380,10 +379,10 @@ export function generateKpiCardSvg(config: KpiCardConfig): string {
     badgeElement = `
       <g transform="translate(${badgeX}, ${badgeY})">
         <rect width="${badgeW}" height="${badgeH}" rx="10.5" fill="${badgeTheme.bg}" stroke="${badgeTheme.border}" stroke-width="${badgeStyle === 'outline' ? 1.5 : 1}" />
-        <text x="8" y="14" font-family=${fontStack} font-size="9" fill="${badgeTheme.text}" font-weight="800">
+        <text x="8" y="14" font-family="${fontStack}" font-size="9" fill="${badgeTheme.text}" font-weight="800">
           ${badgeTheme.arrow}
         </text>
-        <text x="22" y="14" font-family=${fontStack} font-size="10.5" font-weight="800" fill="${badgeTheme.text}">
+        <text x="22" y="14" font-family="${fontStack}" font-size="10.5" font-weight="800" fill="${badgeTheme.text}">
           ${escapeXml(badgeText)}
         </text>
       </g>
@@ -396,7 +395,7 @@ export function generateKpiCardSvg(config: KpiCardConfig): string {
     const targetX = showBadge ? padLeft + 84 : padLeft;
     const tY = showBadge ? (showTarget ? targetY + 19 : valY + 22) : targetY;
     targetElement = `
-      <text x="${targetX}" y="${tY}" font-family=${fontStack} font-size="11" font-weight="600" fill="${targetColor}">
+      <text x="${targetX}" y="${tY}" font-family="${fontStack}" font-size="11" font-weight="600" fill="${targetColor}">
         <tspan fill="${categoryColor}">${escapeXml(targetLabel || 'Target')}:</tspan> ${escapeXml(targetValue)}
       </text>
     `;
@@ -480,10 +479,10 @@ export function generateKpiCardSvg(config: KpiCardConfig): string {
         <!-- Progress Arc -->
         <path d="M -${gaugeRadius} 0 A ${gaugeRadius} ${gaugeRadius} 0 0 1 ${gaugeRadius} 0" fill="none" stroke="${progressBarColor}" stroke-width="5" stroke-linecap="round" stroke-dasharray="${arcCircumference}" stroke-dashoffset="${gaugeOffset}" />
         <!-- Center Value -->
-        <text x="0" y="-3" font-family=${fontStack} font-size="10.5" font-weight="800" fill="${valueColor}" text-anchor="middle">
+        <text x="0" y="-3" font-family="${fontStack}" font-size="10.5" font-weight="800" fill="${valueColor}" text-anchor="middle">
           ${Math.round(gaugePct)}%
         </text>
-        <text x="0" y="9" font-family=${fontStack} font-size="7.5" font-weight="700" fill="${categoryColor}" text-anchor="middle" letter-spacing="0.05em">
+        <text x="0" y="9" font-family="${fontStack}" font-size="7.5" font-weight="700" fill="${categoryColor}" text-anchor="middle" letter-spacing="0.05em">
           GAUGE
         </text>
       </g>
@@ -541,7 +540,7 @@ export function generateKpiCardSvg(config: KpiCardConfig): string {
 
     chartElement = `
       <g transform="translate(${waffleX}, ${waffleY})">
-        <text x="${waffleW}" y="-4" font-family=${fontStack} font-size="9" font-weight="800" fill="${valueColor}" text-anchor="end">
+        <text x="${waffleW}" y="-4" font-family="${fontStack}" font-size="9" font-weight="800" fill="${valueColor}" text-anchor="end">
           ${Math.round(wafflePct)}%
         </text>
         ${dots.join('\n')}
@@ -554,7 +553,7 @@ export function generateKpiCardSvg(config: KpiCardConfig): string {
         <circle cx="0" cy="0" r="${ringRadius}" fill="none" stroke="${borderColor === '#1E293B' ? '#E2E8F0' : 'rgba(255,255,255,0.15)'}" stroke-width="5" />
         <!-- Progress Arc -->
         <circle cx="0" cy="0" r="${ringRadius}" fill="none" stroke="${progressBarColor}" stroke-width="5" stroke-linecap="round" stroke-dasharray="${ringCircumference}" stroke-dashoffset="${ringOffset}" transform="rotate(-90)" />
-        <text x="0" y="3.5" font-family=${fontStack} font-size="10" font-weight="800" fill="${valueColor}" text-anchor="middle">
+        <text x="0" y="3.5" font-family="${fontStack}" font-size="10" font-weight="800" fill="${valueColor}" text-anchor="middle">
           ${Math.round(ringPct)}%
         </text>
       </g>
@@ -578,7 +577,7 @@ export function generateKpiCardSvg(config: KpiCardConfig): string {
         `
             : ''
         }
-        <text x="${barW}" y="-5" font-family=${fontStack} font-size="9.5" font-weight="700" fill="${categoryColor}" text-anchor="end">
+        <text x="${barW}" y="-5" font-family="${fontStack}" font-size="9.5" font-weight="700" fill="${categoryColor}" text-anchor="end">
           ${Math.round(ringPct)}% OF GOAL
         </text>
       </g>
@@ -644,10 +643,14 @@ export function generateKpiDaxMeasure(config: KpiCardConfig): string {
   const measureName = config.name.replace(/[^a-zA-Z0-9 ]/g, '').trim() || 'Executive KPI Card';
   const svg = generateKpiCardSvg(config);
 
-  // Encode SVG for DAX URL string
+  // Encode SVG for Power BI DAX Image URL
+  // 1. Minify whitespace
+  // 2. Replace double quotes with single quotes so DAX string literal doesn't break
+  // 3. Replace '#' with '%23' so Power BI URL parser doesn't truncate at hex color hashes
   const cleanSvg = svg
     .replace(/\r?\n\s*/g, ' ')
-    .replace(/"/g, "'");
+    .replace(/"/g, "'")
+    .replace(/#/g, '%23');
 
   return `
 ${measureName} = 
@@ -668,10 +671,10 @@ VAR _CurrentValue = 1248500  // Replace with: [Your Actual Measure]
 VAR _TargetValue  = 1150000  // Replace with: [Your Target Measure]
 VAR _VariancePct  = DIVIDE( _CurrentValue - _TargetValue, _TargetValue, 0 )
 
-// Dynamic variance badge color determination
+// Dynamic variance badge color determination (using %23 for Power BI URL compatibility)
 VAR _IsPositive = _VariancePct >= 0
-VAR _BadgeBg    = IF( _IsPositive, "#DCFCE7", "#FEE2E2" )
-VAR _BadgeText  = IF( _IsPositive, "#15803D", "#B91C1C" )
+VAR _BadgeBg    = IF( _IsPositive, "%23DCFCE7", "%23FEE2E2" )
+VAR _BadgeText  = IF( _IsPositive, "%2315803D", "%23B91C1C" )
 VAR _Arrow      = IF( _IsPositive, "▲", "▼" )
 VAR _DeltaStr   = FORMAT( _VariancePct, "+0.0%;-0.0%;0.0%" )
 

@@ -5,7 +5,6 @@ import { LandingPage } from './pages/LandingPage';
 import { ThemeGeneratorPage } from './pages/ThemeGeneratorPage';
 import { DashGeneratorPage } from './pages/DashGeneratorPage';
 import { SvgVisualMakerPage } from './pages/SvgVisualMakerPage';
-import { PaletteHarmonyPage } from './pages/PaletteHarmonyPage';
 import { IconLibraryPage } from './pages/IconLibraryPage';
 import { DaxToolkitPage } from './pages/DaxToolkitPage';
 import { DenebStudioPage } from './pages/DenebStudioPage';
@@ -46,19 +45,34 @@ export default function App() {
   };
 
   // Navigation Page State
+  const [themeStudioTab, setThemeStudioTab] = useState<'theme-generator' | 'palette-harmony'>(() => {
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash.replace(/^#\/?/, '').split('?')[0];
+      if (hash === 'palette-harmony') return 'palette-harmony';
+    }
+    const saved = localStorage.getItem('powerlab_current_page');
+    if (saved === 'palette-harmony') return 'palette-harmony';
+    return 'theme-generator';
+  });
+
   const [currentPage, setCurrentPage] = useState<AppPage>(() => {
     const fromHash = typeof window !== 'undefined' ? getPageFromHash() : null;
-    if (fromHash) return fromHash;
+    if (fromHash) {
+      if (fromHash === 'palette-harmony') return 'theme-generator';
+      return fromHash;
+    }
     const saved = localStorage.getItem('powerlab_current_page');
+    if (saved === 'palette-harmony') return 'theme-generator';
     if (
       saved === 'theme-generator' ||
-      saved === 'palette-harmony' ||
       saved === 'dash-generator' ||
       saved === 'svg-visual-maker' ||
       saved === 'icon-library' ||
       saved === 'dax-toolkit' ||
       saved === 'deneb-studio' ||
       saved === 'pbip-studio' ||
+      saved === 'button-studio' ||
+      saved === 'kpi-studio' ||
       saved === 'landing'
     ) {
       return saved as AppPage;
@@ -67,9 +81,19 @@ export default function App() {
   });
 
   const handleNavigate = useCallback((page: AppPage) => {
-    setCurrentPage(page);
-    window.location.hash = page;
-    localStorage.setItem('powerlab_current_page', page);
+    if (page === 'palette-harmony') {
+      setCurrentPage('theme-generator');
+      setThemeStudioTab('palette-harmony');
+      window.location.hash = 'theme-generator';
+      localStorage.setItem('powerlab_current_page', 'theme-generator');
+    } else {
+      if (page === 'theme-generator') {
+        setThemeStudioTab('theme-generator');
+      }
+      setCurrentPage(page);
+      window.location.hash = page;
+      localStorage.setItem('powerlab_current_page', page);
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
@@ -77,7 +101,13 @@ export default function App() {
   useEffect(() => {
     const onHashChange = () => {
       const fromHash = getPageFromHash();
-      if (fromHash && fromHash !== currentPage) {
+      if (fromHash === 'palette-harmony') {
+        setCurrentPage('theme-generator');
+        setThemeStudioTab('palette-harmony');
+      } else if (fromHash && fromHash !== currentPage) {
+        if (fromHash === 'theme-generator') {
+          setThemeStudioTab('theme-generator');
+        }
         setCurrentPage(fromHash);
       }
     };
@@ -381,6 +411,9 @@ export default function App() {
       {currentPage === 'theme-generator' && (
         <ThemeGeneratorPage
           onNavigate={handleNavigate}
+          activeTab={themeStudioTab}
+          onTabChange={setThemeStudioTab}
+          onApplyHarmony={handleApplyHarmonyToThemeStudio}
           swatches={swatches}
           structural={structural}
           themeName={themeName}
@@ -413,9 +446,39 @@ export default function App() {
       )}
 
       {currentPage === 'palette-harmony' && (
-        <PaletteHarmonyPage
+        <ThemeGeneratorPage
           onNavigate={handleNavigate}
-          onApplyToThemeStudio={handleApplyHarmonyToThemeStudio}
+          activeTab="palette-harmony"
+          onTabChange={setThemeStudioTab}
+          onApplyHarmony={handleApplyHarmonyToThemeStudio}
+          swatches={swatches}
+          structural={structural}
+          themeName={themeName}
+          setThemeName={setThemeName}
+          isDarkCanvas={isDarkCanvas}
+          isDarkSite={isDarkSite}
+          customizationOptions={customizationOptions}
+          onCustomizationOptionsChange={setCustomizationOptions}
+          handleUpdateStructuralColor={handleUpdateStructuralColor}
+          handleUpdateHex={handleUpdateHex}
+          handleToggleLock={handleToggleLock}
+          handleMoveLeft={handleMoveLeft}
+          handleMoveRight={handleMoveRight}
+          handleReversePalette={handleReversePalette}
+          handleToggleLockAll={handleToggleLockAll}
+          handleShuffleUnlocked={handleShuffleUnlocked}
+          handleImageSelected={handleImageSelected}
+          handleClearImage={handleClearImage}
+          currentImagePreview={currentImagePreview}
+          currentImageName={currentImageName}
+          isLoading={isLoading}
+          handleToggleCanvasMode={handleToggleCanvasMode}
+          handleDownloadJson={handleDownloadJson}
+          handleCopyJson={handleCopyJson}
+          jsonCopied={jsonCopied}
+          isModalOpen={isModalOpen}
+          setIsModalOpen={setIsModalOpen}
+          currentTheme={currentTheme}
         />
       )}
 

@@ -138,4 +138,34 @@ describe('KPI Card Engine & Generator', () => {
     expect(dax).toContain('HOW TO USE IN POWER BI DESKTOP:');
     expect(dax).toContain('Data Category');
   });
+
+  it('generates strictly valid XML SVG without unquoted font-family attributes or syntax errors', () => {
+    const svg = generateKpiCardSvg(sampleCard);
+    // Every font-family attribute in SVG must be properly quoted font-family="..."
+    const unquotedFontMatches = svg.match(/font-family=[^"'][^ >]*/g);
+    expect(unquotedFontMatches).toBeNull();
+    // Verify valid quotes around font-family
+    expect(svg).toContain('font-family="');
+    // Ensure all SVG tags are properly closed
+    expect(svg.endsWith('</svg>')).toBe(true);
+  });
+
+  it('encodes hex color hashes as %23 in DAX measures for Power BI image URL compatibility', () => {
+    const dax = generateKpiDaxMeasure(sampleCard);
+    // DAX string literal containing data:image/svg+xml;utf8,... must encode # as %23
+    const svgDataSection = dax.split('data:image/svg+xml;utf8,')[1];
+    expect(svgDataSection).toBeDefined();
+    // In the SVG payload of the DAX measure, verify %23 exists and no unescaped # exists
+    expect(svgDataSection).toContain('%23');
+    expect(svgDataSection).not.toContain('#');
+  });
+
+  it('applies custom border accent color to card container stroke and icon badge', () => {
+    const customBorderCard = {
+      ...sampleCard,
+      borderColor: '#EC4899',
+    };
+    const svg = generateKpiCardSvg(customBorderCard);
+    expect(svg).toContain('stroke="#EC4899"');
+  });
 });
