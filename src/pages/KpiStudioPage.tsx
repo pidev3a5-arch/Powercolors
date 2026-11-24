@@ -628,6 +628,63 @@ export const KpiStudioPage: React.FC<KpiStudioPageProps> = ({
                     </div>
                   )}
                 </div>
+
+                {/* Card Drop Shadow Toggle & Color */}
+                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border-2 border-[#1E293B] space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <label className="text-xs font-heading font-black text-[#1E293B] dark:text-white">
+                        Card Drop Shadow
+                      </label>
+                      <div className="text-[11px] text-slate-500 dark:text-slate-400">
+                        Toggle tactile solid neo-pop shadow behind card
+                      </div>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={cardConfig.showShadow !== false}
+                      onChange={(e) => setCardConfig((prev) => ({ ...prev, showShadow: e.target.checked }))}
+                      className="w-4 h-4 accent-[#8B5CF6] cursor-pointer"
+                    />
+                  </div>
+
+                  {cardConfig.showShadow !== false && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 border-t border-slate-200 dark:border-slate-700">
+                      <div className="space-y-1">
+                        <div className="flex justify-between text-xs font-heading font-black">
+                          <span>Shadow Offset</span>
+                          <span>{cardConfig.shadowOffset} px</span>
+                        </div>
+                        <input
+                          type="range"
+                          min="1"
+                          max="10"
+                          value={cardConfig.shadowOffset}
+                          onChange={(e) => setCardConfig((prev) => ({ ...prev, shadowOffset: Number(e.target.value) }))}
+                          className="w-full accent-[#8B5CF6]"
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <span className="text-[11px] font-bold text-slate-500">Shadow Color</span>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="color"
+                            value={cardConfig.shadowColor}
+                            onChange={(e) => setCardConfig((prev) => ({ ...prev, shadowColor: e.target.value }))}
+                            className="w-8 h-8 rounded border border-[#1E293B] cursor-pointer"
+                          />
+                          <input
+                            type="text"
+                            value={cardConfig.shadowColor}
+                            onChange={(e) => setCardConfig((prev) => ({ ...prev, shadowColor: e.target.value }))}
+                            className="w-24 px-2 py-1 rounded text-xs font-mono font-bold border border-[#1E293B]"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 
@@ -891,6 +948,11 @@ export const KpiStudioPage: React.FC<KpiStudioPageProps> = ({
                     {[
                       { id: 'sparkarea', label: 'Spark-Area', desc: 'Curved area gradient' },
                       { id: 'sparkline', label: 'Sparkline', desc: 'Minimal line trend' },
+                      { id: 'bar-chart', label: 'Mini Bar Chart', desc: 'Discrete period bars' },
+                      { id: 'stepped-area', label: 'Stepped Area', desc: 'Staircase step trend' },
+                      { id: 'semi-gauge', label: 'Semi-Gauge', desc: '180° speedometer arc' },
+                      { id: 'lollipop', label: 'Lollipop', desc: 'Stems with dot heads' },
+                      { id: 'waffle', label: 'Waffle Grid', desc: '10-dot matrix progress' },
                       { id: 'progress-ring', label: 'Progress Ring', desc: 'Radial circular gauge' },
                       { id: 'progress-bar', label: 'Progress Bar', desc: 'Horizontal completion' },
                       { id: 'bullet', label: 'Bullet Chart', desc: 'Bar with target marker' },
@@ -914,12 +976,12 @@ export const KpiStudioPage: React.FC<KpiStudioPageProps> = ({
                 </div>
 
                 {/* Specific controls based on chart type */}
-                {(cardConfig.chartType === 'sparkline' || cardConfig.chartType === 'sparkarea') && (
+                {['sparkline', 'sparkarea', 'bar-chart', 'stepped-area', 'lollipop'].includes(cardConfig.chartType) && (
                   <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border-2 border-[#1E293B] space-y-3">
-                    <h4 className="text-xs font-heading font-black uppercase text-slate-500">Sparkline Configuration</h4>
+                    <h4 className="text-xs font-heading font-black uppercase text-slate-500">Trend & Series Configuration</h4>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div>
-                        <span className="text-[11px] font-bold text-slate-500">Line Color</span>
+                        <span className="text-[11px] font-bold text-slate-500">Series Color</span>
                         <div className="flex items-center gap-2 pt-1">
                           <input
                             type="color"
@@ -936,15 +998,17 @@ export const KpiStudioPage: React.FC<KpiStudioPageProps> = ({
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-between pt-4">
-                        <span className="text-xs font-heading font-black">End Pulse Dot</span>
-                        <input
-                          type="checkbox"
-                          checked={cardConfig.showPulseDot}
-                          onChange={(e) => setCardConfig((prev) => ({ ...prev, showPulseDot: e.target.checked }))}
-                          className="w-4 h-4 accent-[#8B5CF6] cursor-pointer"
-                        />
-                      </div>
+                      {['sparkline', 'sparkarea', 'stepped-area'].includes(cardConfig.chartType) && (
+                        <div className="flex items-center justify-between pt-4">
+                          <span className="text-xs font-heading font-black">End Pulse Dot</span>
+                          <input
+                            type="checkbox"
+                            checked={cardConfig.showPulseDot}
+                            onChange={(e) => setCardConfig((prev) => ({ ...prev, showPulseDot: e.target.checked }))}
+                            className="w-4 h-4 accent-[#8B5CF6] cursor-pointer"
+                          />
+                        </div>
+                      )}
                     </div>
 
                     <div>
@@ -964,7 +1028,7 @@ export const KpiStudioPage: React.FC<KpiStudioPageProps> = ({
                   </div>
                 )}
 
-                {(cardConfig.chartType === 'progress-ring' || cardConfig.chartType === 'progress-bar' || cardConfig.chartType === 'bullet') && (
+                {['progress-ring', 'progress-bar', 'bullet', 'semi-gauge', 'waffle'].includes(cardConfig.chartType) && (
                   <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border-2 border-[#1E293B] space-y-3">
                     <h4 className="text-xs font-heading font-black uppercase text-slate-500">Progress Benchmark</h4>
                     <div className="space-y-1">
@@ -983,7 +1047,7 @@ export const KpiStudioPage: React.FC<KpiStudioPageProps> = ({
                     </div>
 
                     <div>
-                      <span className="text-[11px] font-bold text-slate-500">Bar Fill Color</span>
+                      <span className="text-[11px] font-bold text-slate-500">Indicator Fill Color</span>
                       <div className="flex items-center gap-2 pt-1">
                         <input
                           type="color"

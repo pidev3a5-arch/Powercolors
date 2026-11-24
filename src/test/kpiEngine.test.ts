@@ -87,4 +87,55 @@ describe('KPI Card Engine & Generator', () => {
     const bulletSvg = generateKpiCardSvg(bulletPreset);
     expect(bulletSvg).toContain('OF GOAL');
   });
+
+  it('renders bar-chart, semi-gauge, stepped-area, lollipop, and waffle micro-charts', () => {
+    // Bar chart
+    const barCard = { ...sampleCard, chartType: 'bar-chart' as const, sparkPoints: [30, 50, 70, 90] };
+    const barSvg = generateKpiCardSvg(barCard);
+    expect(barSvg).toContain('<rect');
+
+    // Semi-gauge (Speedometer)
+    const gaugeCard = { ...sampleCard, chartType: 'semi-gauge' as const, progressValue: 88 };
+    const gaugeSvg = generateKpiCardSvg(gaugeCard);
+    expect(gaugeSvg).toContain('GAUGE');
+    expect(gaugeSvg).toContain('A 24 24');
+
+    // Stepped area
+    const stepCard = { ...sampleCard, chartType: 'stepped-area' as const, sparkPoints: [100, 80, 60, 40] };
+    const stepSvg = generateKpiCardSvg(stepCard);
+    expect(stepSvg).toContain('H ');
+    expect(stepSvg).toContain('V ');
+
+    // Lollipop
+    const lollipopCard = { ...sampleCard, chartType: 'lollipop' as const, sparkPoints: [20, 40, 60] };
+    const lollipopSvg = generateKpiCardSvg(lollipopCard);
+    expect(lollipopSvg).toContain('stroke-dasharray="2 2"');
+
+    // Waffle grid
+    const waffleCard = { ...sampleCard, chartType: 'waffle' as const, progressValue: 70 };
+    const waffleSvg = generateKpiCardSvg(waffleCard);
+    expect(waffleSvg).toContain('70%');
+  });
+
+  it('toggles drop shadow on and off cleanly', () => {
+    // Shadow ON
+    const withShadow = generateKpiCardSvg({ ...sampleCard, showShadow: true, shadowOffset: 4 });
+    expect(withShadow).toContain('viewBox="0 0 294 144"');
+    expect(withShadow).toContain('<rect x="4" y="4"');
+
+    // Shadow OFF
+    const withoutShadow = generateKpiCardSvg({ ...sampleCard, showShadow: false, shadowOffset: 4 });
+    expect(withoutShadow).toContain('viewBox="0 0 290 140"');
+    expect(withoutShadow).not.toContain('<rect x="4" y="4"');
+  });
+
+  it('always places the instruction comment block immediately after the measure name in DAX', () => {
+    const dax = generateKpiDaxMeasure(sampleCard);
+    const measureName = sampleCard.name.replace(/[^a-zA-Z0-9 ]/g, '').trim();
+    // Verify measureName is followed by " = \n/*\n  ============================================================================="
+    expect(dax.startsWith(measureName)).toBe(true);
+    expect(dax).toContain(`${measureName} = \n/*\n  =============================================================================`);
+    expect(dax).toContain('HOW TO USE IN POWER BI DESKTOP:');
+    expect(dax).toContain('Data Category');
+  });
 });

@@ -126,6 +126,44 @@ export function generateSparklinePaths(
 }
 
 /**
+ * Generate stepped staircase path for Stepped-Area micro-chart
+ */
+export function generateSteppedPaths(
+  points: number[],
+  width: number,
+  height: number,
+  padding = 4
+): { linePath: string; areaPath: string; lastPoint: { x: number; y: number } } {
+  if (!points || points.length < 2) {
+    return { linePath: '', areaPath: '', lastPoint: { x: width / 2, y: height / 2 } };
+  }
+
+  const min = Math.min(...points);
+  const max = Math.max(...points);
+  const range = max - min || 1;
+
+  const w = width - padding * 2;
+  const h = height - padding * 2;
+  const stepW = w / (points.length - 1);
+
+  const coords = points.map((p, i) => {
+    const x = padding + i * stepW;
+    const y = padding + h - ((p - min) / range) * h;
+    return { x: Math.round(x * 10) / 10, y: Math.round(y * 10) / 10 };
+  });
+
+  let lineD = `M ${coords[0].x} ${coords[0].y}`;
+  for (let i = 1; i < coords.length; i++) {
+    lineD += ` H ${coords[i].x} V ${coords[i].y}`;
+  }
+
+  const last = coords[coords.length - 1];
+  const areaD = `${lineD} L ${last.x} ${height} L ${coords[0].x} ${height} Z`;
+
+  return { linePath: lineD, areaPath: areaD, lastPoint: last };
+}
+
+/**
  * Pure SVG generator for a single KPI Card
  */
 export function generateKpiCardSvg(config: KpiCardConfig): string {
@@ -136,6 +174,7 @@ export function generateKpiCardSvg(config: KpiCardConfig): string {
     borderWidth,
     borderColor,
     bgColor,
+    showShadow,
     shadowOffset,
     shadowColor,
     styleVariant: _styleVariant,
@@ -191,8 +230,9 @@ export function generateKpiCardSvg(config: KpiCardConfig): string {
     ? `"${fontFamily}", "Plus Jakarta Sans", system-ui, sans-serif`
     : `"Outfit", "Plus Jakarta Sans", system-ui, sans-serif`;
 
-  const totalW = width + (shadowOffset > 0 ? shadowOffset : 0);
-  const totalH = height + (shadowOffset > 0 ? shadowOffset : 0);
+  const hasShadow = showShadow !== false && shadowOffset > 0;
+  const totalW = width + (hasShadow ? shadowOffset : 0);
+  const totalH = height + (hasShadow ? shadowOffset : 0);
 
   const badgeTheme = resolveBadgeColors(trendDirection, polarity, badgeStyle, badgeBgColor, badgeTextColor);
 
@@ -259,7 +299,7 @@ export function generateKpiCardSvg(config: KpiCardConfig): string {
 
   // Shadow element (Neo-Pop hard drop shadow or flat)
   const shadowElement =
-    shadowOffset > 0
+    hasShadow
       ? `<rect x="${shadowOffset}" y="${shadowOffset}" width="${width}" height="${height}" rx="${cornerRadius}" ry="${cornerRadius}" fill="${shadowColor}" />`
       : '';
 
@@ -379,6 +419,134 @@ export function generateKpiCardSvg(config: KpiCardConfig): string {
         }
       </g>
     `;
+  } else if (chartType === 'bar-chart') {
+    const points = sparkPoints && sparkPoints.length > 0 ? sparkPoints : [35, 55, 45, 70, 85, 95];
+    const minVal = Math.min(...points);
+    const maxVal = Math.max(...points) || 1;
+    const range = maxVal - minVal || 1;
+    const count = points.length;
+    const gap = 3;
+    const barW = Math.max(4, Math.floor((sparkW - (count - 1) * gap) / count));
+    const actualTotalW = count * barW + (count - 1) * gap;
+    const offsetX = Math.max(0, Math.round((sparkW - actualTotalW) / 2));
+
+    const bars = points
+      .map((p, idx) => {
+        const norm = (p - minVal) / range;
+        const bH = Math.max(4, Math.round(norm * (sparkH - 6)));
+        const bx = offsetX + idx * (barW + gap);
+        const by = sparkH - bH;
+        const isLast = idx === count - 1;
+        const opacity = isLast ? '1' : '0.45';
+        const fill = isLast ? sparkColor : sparkColor;
+        return `<rect x="${bx}" y="${by}" width="${barW}" height="${bH}" rx="${Math.min(2, barW / 2)}" fill="${fill}" opacity="${opacity}" />`;
+      })
+      .join('\n');
+
+    chartElement = `
+      <g transform="translate(${sparkX}, ${sparkY})">
+        ${bars}
+      </g>
+    `;
+  } else if (chartType === 'stepped-area') {
+    const { linePath: stepLine, areaPath: stepArea, lastPoint: stepLast } =
+      generateSteppedPaths(sparkPoints, sparkW, sparkH, 4);
+    chartElement = `
+      <g transform="translate(${sparkX}, ${sparkY})">
+        <path d="${stepArea}" fill="url(#kpiAreaGrad_${config.id})" />
+        <path d="${stepLine}" fill="none" stroke="${sparkColor}" stroke-width="${sparkStrokeWidth}" stroke-linecap="square" />
+        ${
+          showPulseDot
+            ? `
+          <circle cx="${stepLast.x}" cy="${stepLast.y}" r="3.5" fill="${sparkColor}" stroke="#FFFFFF" stroke-width="1.5" />
+          <circle cx="${stepLast.x}" cy="${stepLast.y}" r="6" fill="${sparkColor}" opacity="0.3" />
+        `
+            : ''
+        }
+      </g>
+    `;
+  } else if (chartType === 'semi-gauge') {
+    const gaugeRadius = 24;
+    const gaugeCx = width - padRight - gaugeRadius - 4;
+    const gaugeCy = height - 16;
+    const arcCircumference = Math.PI * gaugeRadius;
+    const gaugePct = Math.min(100, Math.max(0, (progressValue / (progressMax || 100)) * 100));
+    const gaugeOffset = arcCircumference - (gaugePct / 100) * arcCircumference;
+
+    chartElement = `
+      <g transform="translate(${gaugeCx}, ${gaugeCy})">
+        <!-- Background Track Arc (180 deg) -->
+        <path d="M -${gaugeRadius} 0 A ${gaugeRadius} ${gaugeRadius} 0 0 1 ${gaugeRadius} 0" fill="none" stroke="${borderColor === '#1E293B' ? '#E2E8F0' : 'rgba(255,255,255,0.15)'}" stroke-width="5" stroke-linecap="round" />
+        <!-- Progress Arc -->
+        <path d="M -${gaugeRadius} 0 A ${gaugeRadius} ${gaugeRadius} 0 0 1 ${gaugeRadius} 0" fill="none" stroke="${progressBarColor}" stroke-width="5" stroke-linecap="round" stroke-dasharray="${arcCircumference}" stroke-dashoffset="${gaugeOffset}" />
+        <!-- Center Value -->
+        <text x="0" y="-3" font-family=${fontStack} font-size="10.5" font-weight="800" fill="${valueColor}" text-anchor="middle">
+          ${Math.round(gaugePct)}%
+        </text>
+        <text x="0" y="9" font-family=${fontStack} font-size="7.5" font-weight="700" fill="${categoryColor}" text-anchor="middle" letter-spacing="0.05em">
+          GAUGE
+        </text>
+      </g>
+    `;
+  } else if (chartType === 'lollipop') {
+    const points = sparkPoints && sparkPoints.length > 0 ? sparkPoints : [30, 50, 45, 65, 80, 95];
+    const minVal = Math.min(...points);
+    const maxVal = Math.max(...points) || 1;
+    const range = maxVal - minVal || 1;
+    const count = points.length;
+    const stepX = (sparkW - 8) / (count - 1 || 1);
+
+    const lollipops = points
+      .map((p, idx) => {
+        const norm = (p - minVal) / range;
+        const headY = Math.round(sparkH - 6 - norm * (sparkH - 12));
+        const cx = 4 + idx * stepX;
+        const isLast = idx === count - 1;
+        const opacity = isLast ? '1' : '0.5';
+        return `
+          <line x1="${cx}" y1="${sparkH}" x2="${cx}" y2="${headY}" stroke="${sparkColor}" stroke-width="1.8" opacity="${opacity}" />
+          <circle cx="${cx}" cy="${headY}" r="${isLast ? 3.5 : 2.5}" fill="${sparkColor}" stroke="#FFFFFF" stroke-width="1" opacity="${opacity}" />
+        `;
+      })
+      .join('\n');
+
+    chartElement = `
+      <g transform="translate(${sparkX}, ${sparkY})">
+        <line x1="0" y1="${sparkH}" x2="${sparkW}" y2="${sparkH}" stroke="${borderColor === '#1E293B' ? '#CBD5E1' : 'rgba(255,255,255,0.2)'}" stroke-width="1" stroke-dasharray="2 2" />
+        ${lollipops}
+      </g>
+    `;
+  } else if (chartType === 'waffle') {
+    const wafflePct = Math.min(100, Math.max(0, (progressValue / (progressMax || 100)) * 100));
+    const filledCount = Math.min(10, Math.round((wafflePct / 100) * 10));
+    const dotW = 9;
+    const dotH = 9;
+    const gap = 3;
+    const waffleW = 5 * dotW + 4 * gap;
+    const waffleH = 2 * dotH + 1 * gap;
+    const waffleX = width - padRight - waffleW;
+    const waffleY = height - waffleH - 14;
+
+    const dots: string[] = [];
+    for (let row = 0; row < 2; row++) {
+      for (let col = 0; col < 5; col++) {
+        const idx = row * 5 + col;
+        const isFilled = idx < filledCount;
+        const dx = col * (dotW + gap);
+        const dy = row * (dotH + gap);
+        const fill = isFilled ? progressBarColor : borderColor === '#1E293B' ? '#E2E8F0' : 'rgba(255,255,255,0.15)';
+        dots.push(`<rect x="${dx}" y="${dy}" width="${dotW}" height="${dotH}" rx="2" fill="${fill}" />`);
+      }
+    }
+
+    chartElement = `
+      <g transform="translate(${waffleX}, ${waffleY})">
+        <text x="${waffleW}" y="-4" font-family=${fontStack} font-size="9" font-weight="800" fill="${valueColor}" text-anchor="end">
+          ${Math.round(wafflePct)}%
+        </text>
+        ${dots.join('\n')}
+      </g>
+    `;
   } else if (chartType === 'progress-ring') {
     chartElement = `
       <g transform="translate(${ringCx}, ${ringCy})">
@@ -438,14 +606,28 @@ export function generateKpiCardSvg(config: KpiCardConfig): string {
  */
 export function generateScorecardSvg(cards: KpiCardConfig[], gap = 16): string {
   if (!cards || cards.length === 0) return '';
-  const totalW = cards.reduce((acc, c, idx) => acc + c.width + (idx > 0 ? gap : 0), 0) + 12;
-  const maxH = Math.max(...cards.map((c) => c.height)) + 12;
+  const totalW =
+    cards.reduce(
+      (acc, c, idx) =>
+        acc +
+        c.width +
+        (c.showShadow !== false && c.shadowOffset > 0 ? c.shadowOffset : 0) +
+        (idx > 0 ? gap : 0),
+      0
+    ) + 12;
+  const maxH =
+    Math.max(
+      ...cards.map(
+        (c) => c.height + (c.showShadow !== false && c.shadowOffset > 0 ? c.shadowOffset : 0)
+      )
+    ) + 12;
 
   let currentX = 0;
   const cardSvgs = cards.map((c) => {
     const svgInner = generateKpiCardSvg(c);
+    const cardShadow = c.showShadow !== false && c.shadowOffset > 0 ? c.shadowOffset : 0;
     const g = `<g transform="translate(${currentX}, 0)">${svgInner}</g>`;
-    currentX += c.width + gap;
+    currentX += c.width + cardShadow + gap;
     return g;
   });
 
@@ -468,6 +650,7 @@ export function generateKpiDaxMeasure(config: KpiCardConfig): string {
     .replace(/"/g, "'");
 
   return `
+${measureName} = 
 /*
   =============================================================================
   PowerLab KPI Studio — Production DAX Measure
@@ -481,8 +664,6 @@ export function generateKpiDaxMeasure(config: KpiCardConfig): string {
   4. Add this measure to a Table, Matrix, or the New Card Visual (Image tab).
   =============================================================================
 */
-
-${measureName} = 
 VAR _CurrentValue = 1248500  // Replace with: [Your Actual Measure]
 VAR _TargetValue  = 1150000  // Replace with: [Your Target Measure]
 VAR _VariancePct  = DIVIDE( _CurrentValue - _TargetValue, _TargetValue, 0 )
@@ -570,8 +751,9 @@ export async function downloadKpiPng(config: KpiCardConfig, filename?: string, s
 
   const image = new Image();
   const canvas = document.createElement('canvas');
-  const totalW = (config.width + (config.shadowOffset > 0 ? config.shadowOffset : 0)) * scale;
-  const totalH = (config.height + (config.shadowOffset > 0 ? config.shadowOffset : 0)) * scale;
+  const hasShadow = config.showShadow !== false && config.shadowOffset > 0;
+  const totalW = (config.width + (hasShadow ? config.shadowOffset : 0)) * scale;
+  const totalH = (config.height + (hasShadow ? config.shadowOffset : 0)) * scale;
   canvas.width = totalW;
   canvas.height = totalH;
   const ctx = canvas.getContext('2d');

@@ -13,6 +13,11 @@ export type KpiMicroChartType =
   | 'none'
   | 'sparkline'
   | 'sparkarea'
+  | 'bar-chart'
+  | 'stepped-area'
+  | 'semi-gauge'
+  | 'lollipop'
+  | 'waffle'
   | 'progress-ring'
   | 'progress-bar'
   | 'bullet';
@@ -34,6 +39,7 @@ export interface KpiCardConfig {
   borderWidth: number;
   borderColor: string;
   bgColor: string;
+  showShadow: boolean;
   shadowOffset: number;
   shadowColor: string;
 
