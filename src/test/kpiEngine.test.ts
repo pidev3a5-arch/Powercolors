@@ -150,14 +150,23 @@ describe('KPI Card Engine & Generator', () => {
     expect(svg.endsWith('</svg>')).toBe(true);
   });
 
-  it('encodes hex color hashes as %23 in DAX measures for Power BI image URL compatibility', () => {
+  it('maintains clean hex colors with # in DAX measures (never %23 which breaks SVG color parsing into black shapes)', () => {
     const dax = generateKpiDaxMeasure(sampleCard);
-    // DAX string literal containing data:image/svg+xml;utf8,... must encode # as %23
     const svgDataSection = dax.split('data:image/svg+xml;utf8,')[1];
     expect(svgDataSection).toBeDefined();
-    // In the SVG payload of the DAX measure, verify %23 exists and no unescaped # exists
-    expect(svgDataSection).toContain('%23');
-    expect(svgDataSection).not.toContain('#');
+    // In Power BI DAX SVG measures, hex colors must use # directly (never %23 which causes solid black fallbacks)
+    expect(svgDataSection).toContain('#');
+    expect(svgDataSection).not.toContain('%23');
+
+    // Extract the SVG markup payload
+    const svgPayload = svgDataSection.substring(
+      svgDataSection.indexOf('<svg'),
+      svgDataSection.lastIndexOf('</svg>') + 6
+    );
+    // Verify single quotes are used throughout the SVG payload to prevent DAX string breaking
+    expect(svgPayload).not.toContain('"');
+    // Verify safe XML numeric entities for arrow indicators
+    expect(svgPayload).toContain('&#9650;');
   });
 
   it('applies custom border accent color to card container stroke and icon badge', () => {

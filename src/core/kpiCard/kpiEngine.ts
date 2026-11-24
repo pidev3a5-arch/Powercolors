@@ -290,9 +290,6 @@ export function generateKpiCardSvg(config: KpiCardConfig): string {
         <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.15" />
         <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.03" />
       </linearGradient>
-      <clipPath id="cardClip_${config.id}">
-        <rect x="0" y="0" width="${width}" height="${height}" rx="${cornerRadius}" ry="${cornerRadius}" />
-      </clipPath>
     </defs>
   `;
 
@@ -305,13 +302,17 @@ export function generateKpiCardSvg(config: KpiCardConfig): string {
   // Background rect
   const bgElement = `<rect x="0" y="0" width="${width}" height="${height}" rx="${cornerRadius}" ry="${cornerRadius}" fill="${bgColor}" stroke="${borderColor}" stroke-width="${borderWidth}" />`;
 
-  // Accent bar element
+  // Accent bar element (drawn with precise corner arcs to avoid clipPath dependency)
   let accentBarElement = '';
   if (showAccentBar) {
     if (accentBarPosition === 'top') {
-      accentBarElement = `<rect x="0" y="0" width="${width}" height="${accentBarThickness}" fill="${accentBarColor}" clip-path="url(#cardClip_${config.id})" />`;
+      accentBarElement = cornerRadius > 0
+        ? `<path d="M 0 ${cornerRadius} A ${cornerRadius} ${cornerRadius} 0 0 1 ${cornerRadius} 0 L ${width - cornerRadius} 0 A ${cornerRadius} ${cornerRadius} 0 0 1 ${width} ${cornerRadius} L ${width} ${accentBarThickness} L 0 ${accentBarThickness} Z" fill="${accentBarColor}" />`
+        : `<rect x="0" y="0" width="${width}" height="${accentBarThickness}" fill="${accentBarColor}" />`;
     } else {
-      accentBarElement = `<rect x="0" y="0" width="${accentBarThickness}" height="${height}" fill="${accentBarColor}" clip-path="url(#cardClip_${config.id})" />`;
+      accentBarElement = cornerRadius > 0
+        ? `<path d="M ${cornerRadius} 0 A ${cornerRadius} ${cornerRadius} 0 0 0 0 ${cornerRadius} L 0 ${height - cornerRadius} A ${cornerRadius} ${cornerRadius} 0 0 0 ${cornerRadius} ${height} L ${accentBarThickness} ${height} L ${accentBarThickness} 0 Z" fill="${accentBarColor}" />`
+        : `<rect x="0" y="0" width="${accentBarThickness}" height="${height}" fill="${accentBarColor}" />`;
     }
   }
 
@@ -380,7 +381,7 @@ export function generateKpiCardSvg(config: KpiCardConfig): string {
       <g transform="translate(${badgeX}, ${badgeY})">
         <rect width="${badgeW}" height="${badgeH}" rx="10.5" fill="${badgeTheme.bg}" stroke="${badgeTheme.border}" stroke-width="${badgeStyle === 'outline' ? 1.5 : 1}" />
         <text x="8" y="14" font-family="${fontStack}" font-size="9" fill="${badgeTheme.text}" font-weight="800">
-          ${badgeTheme.arrow}
+          ${badgeTheme.arrow === '▲' ? '&#9650;' : badgeTheme.arrow === '▼' ? '&#9660;' : badgeTheme.arrow}
         </text>
         <text x="22" y="14" font-family="${fontStack}" font-size="10.5" font-weight="800" fill="${badgeTheme.text}">
           ${escapeXml(badgeText)}
@@ -646,11 +647,10 @@ export function generateKpiDaxMeasure(config: KpiCardConfig): string {
   // Encode SVG for Power BI DAX Image URL
   // 1. Minify whitespace
   // 2. Replace double quotes with single quotes so DAX string literal doesn't break
-  // 3. Replace '#' with '%23' so Power BI URL parser doesn't truncate at hex color hashes
+  // 3. Keep standard '#' for hex colors and url(#id) — never use '%23' which causes Power BI SVG color parsing to fail and render solid black
   const cleanSvg = svg
     .replace(/\r?\n\s*/g, ' ')
-    .replace(/"/g, "'")
-    .replace(/#/g, '%23');
+    .replace(/"/g, "'");
 
   return `
 ${measureName} = 
@@ -671,11 +671,11 @@ VAR _CurrentValue = 1248500  // Replace with: [Your Actual Measure]
 VAR _TargetValue  = 1150000  // Replace with: [Your Target Measure]
 VAR _VariancePct  = DIVIDE( _CurrentValue - _TargetValue, _TargetValue, 0 )
 
-// Dynamic variance badge color determination (using %23 for Power BI URL compatibility)
+// Dynamic variance badge color determination
 VAR _IsPositive = _VariancePct >= 0
-VAR _BadgeBg    = IF( _IsPositive, "%23DCFCE7", "%23FEE2E2" )
-VAR _BadgeText  = IF( _IsPositive, "%2315803D", "%23B91C1C" )
-VAR _Arrow      = IF( _IsPositive, "▲", "▼" )
+VAR _BadgeBg    = IF( _IsPositive, "#DCFCE7", "#FEE2E2" )
+VAR _BadgeText  = IF( _IsPositive, "#15803D", "#B91C1C" )
+VAR _Arrow      = IF( _IsPositive, "&#9650;", "&#9660;" )
 VAR _DeltaStr   = FORMAT( _VariancePct, "+0.0%;-0.0%;0.0%" )
 
 // Formatted KPI Callout string
