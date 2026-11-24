@@ -14,6 +14,7 @@ import { LinkedInIcon, FacebookIcon, YouTubeIcon, GitHubIcon } from './component
 import { extractThemeFromImage } from './core/colorEngine';
 import { createColorSwatch, deriveStructuralColors } from './core/colorHarmonics';
 import { buildPowerBITheme, serializePowerBITheme } from './core/powerBiTheme';
+import { copyToClipboard } from './core/clipboard';
 import { SAMPLE_PRESETS } from './data/samplePresets';
 
 // Initial default corporate palette
@@ -350,11 +351,13 @@ export default function App() {
     URL.revokeObjectURL(url);
   };
 
-  const handleCopyJson = () => {
+  const handleCopyJson = async () => {
     const jsonString = serializePowerBITheme(currentTheme);
-    navigator.clipboard.writeText(jsonString);
-    setJsonCopied(true);
-    setTimeout(() => setJsonCopied(false), 2000);
+    const success = await copyToClipboard(jsonString);
+    if (success) {
+      setJsonCopied(true);
+      setTimeout(() => setJsonCopied(false), 2000);
+    }
   };
 
   // Dash Canvas actions from top navigation header

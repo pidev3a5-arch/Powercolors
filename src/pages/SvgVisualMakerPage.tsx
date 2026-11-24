@@ -19,6 +19,7 @@ import {
   Filter,
 } from 'lucide-react';
 import { AppPage } from '../core/types';
+import { copyToClipboard } from '../core/clipboard';
 import { VisualCategory, SvgVisualDefinition } from '../core/svgVisuals/types';
 import { SVG_VISUALS_CATALOG, SVG_CATEGORIES } from '../core/svgVisuals/catalog';
 import { convertRawSvgToDax } from '../core/svgVisuals/svgToDaxConverter';
@@ -173,21 +174,25 @@ export const SvgVisualMakerPage: React.FC<SvgVisualMakerPageProps> = ({ onNaviga
   }, [selectedVisual, customParams, measureNameInput]);
 
   // Copy DAX to clipboard
-  const handleCopyDax = (dax: string, id: string) => {
-    navigator.clipboard.writeText(dax);
-    setCopiedDaxId(id);
-    setTimeout(() => {
-      setCopiedDaxId(null);
-    }, 2500);
+  const handleCopyDax = async (dax: string, id: string) => {
+    const success = await copyToClipboard(dax);
+    if (success) {
+      setCopiedDaxId(id);
+      setTimeout(() => {
+        setCopiedDaxId(null);
+      }, 2500);
+    }
   };
 
   // Copy raw SVG to clipboard
-  const handleCopySvg = (svg: string, id: string) => {
-    navigator.clipboard.writeText(svg);
-    setCopiedSvgId(id);
-    setTimeout(() => {
-      setCopiedSvgId(null);
-    }, 2500);
+  const handleCopySvg = async (svg: string, id: string) => {
+    const success = await copyToClipboard(svg);
+    if (success) {
+      setCopiedSvgId(id);
+      setTimeout(() => {
+        setCopiedSvgId(null);
+      }, 2500);
+    }
   };
 
   // Download SVG file
@@ -833,10 +838,12 @@ export const SvgVisualMakerPage: React.FC<SvgVisualMakerPageProps> = ({ onNaviga
                       <div className="flex items-center gap-1.5">
                         <button
                           type="button"
-                          onClick={() => {
-                            navigator.clipboard.writeText(converterResult.daxCode);
-                            setConverterCopiedDax(true);
-                            setTimeout(() => setConverterCopiedDax(false), 2500);
+                          onClick={async () => {
+                            const success = await copyToClipboard(converterResult.daxCode);
+                            if (success) {
+                              setConverterCopiedDax(true);
+                              setTimeout(() => setConverterCopiedDax(false), 2500);
+                            }
                           }}
                           className={`pop-btn inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-white text-xs font-heading font-black cursor-pointer border-2 border-[#1E293B] shadow-[1.5px_1.5px_0px_0px_#1E293B] ${
                             converterCopiedDax

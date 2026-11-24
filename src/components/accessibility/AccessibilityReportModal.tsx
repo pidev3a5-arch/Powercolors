@@ -4,6 +4,7 @@ import { BackgroundPreset, AccessibilityAuditSummary } from '../../core/accessib
 import { evaluateContrast } from '../../core/accessibility/contrastEngine';
 import { detectCvdConflicts } from '../../core/accessibility/cvdSimulator';
 import { buildPowerBITheme } from '../../core/powerBiTheme';
+import { copyToClipboard } from '../../core/clipboard';
 
 interface AccessibilityReportModalProps {
   isOpen: boolean;
@@ -72,9 +73,11 @@ export const AccessibilityReportModal: React.FC<AccessibilityReportModalProps> =
   };
 
   const handleCopyMarkdown = async () => {
-    await navigator.clipboard.writeText(generateMarkdownReport());
-    setCopiedType('md');
-    setTimeout(() => setCopiedType(null), 2000);
+    const success = await copyToClipboard(generateMarkdownReport());
+    if (success) {
+      setCopiedType('md');
+      setTimeout(() => setCopiedType(null), 2000);
+    }
   };
 
   const handleDownloadThemeJson = () => {

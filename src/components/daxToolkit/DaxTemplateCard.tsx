@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Copy, Check, Download, ArrowRight } from 'lucide-react';
 import { DaxTemplate } from '../../core/daxToolkit/types';
 import { interpolateDax, downloadDaxFile } from '../../core/daxToolkit/daxEngine';
+import { copyToClipboard } from '../../core/clipboard';
 
 interface DaxTemplateCardProps {
   template: DaxTemplate;
@@ -18,9 +19,11 @@ export const DaxTemplateCard: React.FC<DaxTemplateCardProps> = ({
 
   const handleCopy = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    await navigator.clipboard.writeText(defaultDax);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    const success = await copyToClipboard(defaultDax);
+    if (success) {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
   const handleDownload = (e: React.MouseEvent) => {

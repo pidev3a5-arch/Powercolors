@@ -14,6 +14,7 @@ import {
   generatePbirPositionsJson,
   exportLayoutStateToJson,
 } from '../../core/layoutExport';
+import { copyToClipboard } from '../../core/clipboard';
 
 interface LayoutExportModalProps {
   isOpen: boolean;
@@ -61,12 +62,10 @@ export const LayoutExportModal: React.FC<LayoutExportModalProps> = ({
   }
 
   const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(currentContent);
+    const success = await copyToClipboard(currentContent);
+    if (success) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch {
-      // Fallback
     }
   };
 

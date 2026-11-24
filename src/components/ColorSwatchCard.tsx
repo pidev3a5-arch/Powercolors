@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Lock, Unlock, ChevronLeft, ChevronRight, Copy, Check, Pipette } from 'lucide-react';
 import { ColorSwatch } from '../core/types';
 import { ContrastBadge } from './ContrastBadge';
+import { copyToClipboard } from '../core/clipboard';
 import chroma from 'chroma-js';
 
 interface ColorSwatchCardProps {
@@ -37,10 +38,12 @@ export const ColorSwatchCard: React.FC<ColorSwatchCardProps> = ({
     setHexInput(swatch.hex);
   }
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(swatch.hex);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
+  const handleCopy = async () => {
+    const success = await copyToClipboard(swatch.hex);
+    if (success) {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    }
   };
 
   const handleHexBlur = () => {

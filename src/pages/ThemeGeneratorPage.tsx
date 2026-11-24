@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Sparkles, Download, Code2, Copy, Check, Wand2, Palette } from 'lucide-react';
 import { ColorSwatch, StructuralColors, PowerBITheme, ThemeCustomizationOptions, AppPage } from '../core/types';
 import { serializePowerBITheme } from '../core/powerBiTheme';
+import { copyToClipboard } from '../core/clipboard';
 import { ImageUploader } from '../components/ImageUploader';
 import { PaletteStrip } from '../components/PaletteStrip';
 import { ThemeControls } from '../components/ThemeControls';
@@ -89,14 +90,16 @@ export const ThemeGeneratorPage: React.FC<ThemeGeneratorPageProps> = ({
   const [localCopied, setLocalCopied] = useState(false);
   const isCopied = jsonCopied !== undefined ? jsonCopied : localCopied;
 
-  const onCopy = () => {
+  const onCopy = async () => {
     if (handleCopyJson) {
       handleCopyJson();
     } else {
       const jsonString = serializePowerBITheme(currentTheme);
-      navigator.clipboard.writeText(jsonString);
-      setLocalCopied(true);
-      setTimeout(() => setLocalCopied(false), 2000);
+      const success = await copyToClipboard(jsonString);
+      if (success) {
+        setLocalCopied(true);
+        setTimeout(() => setLocalCopied(false), 2000);
+      }
     }
   };
 

@@ -18,6 +18,7 @@ import {
   Moon,
 } from 'lucide-react';
 import { AppPage } from '../core/types';
+import { copyToClipboard as universalCopy } from '../core/clipboard';
 import {
   KpiCardConfig,
   KpiCardStyle,
@@ -79,12 +80,12 @@ export const KpiStudioPage: React.FC<KpiStudioPageProps> = ({
   };
 
   const copyToClipboard = async (text: string, key: string, label: string) => {
-    try {
-      await navigator.clipboard.writeText(text);
+    const success = await universalCopy(text);
+    if (success) {
       setCopiedKey(key);
       showNotification(`${label} copied to clipboard!`);
       setTimeout(() => setCopiedKey(null), 2000);
-    } catch {
+    } else {
       showNotification('Failed to copy to clipboard.');
     }
   };

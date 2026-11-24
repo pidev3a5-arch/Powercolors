@@ -15,6 +15,7 @@ import {
   Filter,
 } from 'lucide-react';
 import { AppPage } from '../core/types';
+import { copyToClipboard } from '../core/clipboard';
 import { DenebCategory, DenebSpecTemplate } from '../core/deneb/types';
 import { DENEB_CATALOG, DENEB_CATEGORIES } from '../core/deneb/catalog';
 import {
@@ -96,30 +97,34 @@ export const DenebStudioPage: React.FC<DenebStudioPageProps> = ({
     });
   }, [searchQuery, selectedCategory]);
 
-  const handleCopySpec = (template: DenebSpecTemplate, e?: React.MouseEvent) => {
+  const handleCopySpec = async (template: DenebSpecTemplate, e?: React.MouseEvent) => {
     e?.stopPropagation();
     const finalSpec = injectThemePaletteIntoSpec(template.spec, paletteHexes);
-    navigator.clipboard.writeText(JSON.stringify(finalSpec, null, 2));
-    setCopiedId(template.id);
-    setCopiedType('spec');
-    setTimeout(() => {
-      setCopiedId(null);
-      setCopiedType(null);
-    }, 2000);
+    const success = await copyToClipboard(JSON.stringify(finalSpec, null, 2));
+    if (success) {
+      setCopiedId(template.id);
+      setCopiedType('spec');
+      setTimeout(() => {
+        setCopiedId(null);
+        setCopiedType(null);
+      }, 2000);
+    }
   };
 
-  const handleCopyPbirJson = (template: DenebSpecTemplate, e?: React.MouseEvent) => {
+  const handleCopyPbirJson = async (template: DenebSpecTemplate, e?: React.MouseEvent) => {
     e?.stopPropagation();
     const pbirJson = generatePbirDenebVisualJson(template, {
       palette: paletteHexes,
     });
-    navigator.clipboard.writeText(pbirJson);
-    setCopiedId(template.id);
-    setCopiedType('pbir');
-    setTimeout(() => {
-      setCopiedId(null);
-      setCopiedType(null);
-    }, 2000);
+    const success = await copyToClipboard(pbirJson);
+    if (success) {
+      setCopiedId(template.id);
+      setCopiedType('pbir');
+      setTimeout(() => {
+        setCopiedId(null);
+        setCopiedType(null);
+      }, 2000);
+    }
   };
 
   const handleOpenCustomizer = (template: DenebSpecTemplate) => {

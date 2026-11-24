@@ -49,6 +49,7 @@ import { LayoutCanvas } from '../components/layout/LayoutCanvas';
 import { LayoutSidebar } from '../components/layout/LayoutSidebar';
 import { LayoutExportModal } from '../components/layout/LayoutExportModal';
 import { AppPage } from '../core/types';
+import { copyToClipboard } from '../core/clipboard';
 
 interface DashGeneratorPageProps {
   onNavigate: (page: AppPage) => void;
@@ -590,13 +591,13 @@ export const DashGeneratorPage: React.FC<DashGeneratorPageProps> = ({ onNavigate
 
   // Copy SVG Code
   const handleCopySvg = useCallback(async () => {
-    try {
-      const markup = generateDashSvg(dashState, false);
-      await navigator.clipboard.writeText(markup);
+    const markup = generateDashSvg(dashState, false);
+    const success = await copyToClipboard(markup);
+    if (success) {
       setCopied(true);
       window.dispatchEvent(new CustomEvent('powerlab:dash-svg-copied'));
       setTimeout(() => setCopied(false), 2000);
-    } catch {
+    } else {
       alert('Could not copy to clipboard.');
     }
   }, [dashState]);

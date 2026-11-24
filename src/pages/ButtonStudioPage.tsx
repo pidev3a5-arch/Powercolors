@@ -18,6 +18,7 @@ import {
   RotateCcw,
 } from 'lucide-react';
 import { AppPage } from '../core/types';
+import { copyToClipboard } from '../core/clipboard';
 import {
   ButtonConfig,
   ButtonState,
@@ -197,17 +198,21 @@ export const ButtonStudioPage: React.FC<ButtonStudioPageProps> = ({
     setButtonConfig((prev) => ({ ...prev, ...updates }));
   };
 
-  const handleCopySvg = () => {
-    navigator.clipboard.writeText(activeSvg);
-    setCopiedSvg(true);
-    setTimeout(() => setCopiedSvg(false), 2000);
+  const handleCopySvg = async () => {
+    const success = await copyToClipboard(activeSvg);
+    if (success) {
+      setCopiedSvg(true);
+      setTimeout(() => setCopiedSvg(false), 2000);
+    }
   };
 
-  const handleCopyDax = () => {
+  const handleCopyDax = async () => {
     const dax = generateButtonDaxExpression(buttonConfig, activeState);
-    navigator.clipboard.writeText(dax);
-    setCopiedDax(true);
-    setTimeout(() => setCopiedDax(false), 2000);
+    const success = await copyToClipboard(dax);
+    if (success) {
+      setCopiedDax(true);
+      setTimeout(() => setCopiedDax(false), 2000);
+    }
   };
 
   const handleDownloadActiveSvg = () => {

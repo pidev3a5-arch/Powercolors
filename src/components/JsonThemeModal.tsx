@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Copy, Check, Download, Code2, BookOpen, FileCode } from 'lucide-react';
 import { PowerBITheme } from '../core/types';
 import { serializePowerBITheme } from '../core/powerBiTheme';
+import { copyToClipboard } from '../core/clipboard';
 import { SchemaValidationCard } from './SchemaValidationCard';
 
 interface JsonThemeModalProps {
@@ -44,10 +45,12 @@ export const JsonThemeModal: React.FC<JsonThemeModalProps> = ({
   const fileName = `${slug}.json`;
   const fileSizeKb = (new Blob([jsonString]).size / 1024).toFixed(1);
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(jsonString);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const handleCopy = async () => {
+    const success = await copyToClipboard(jsonString);
+    if (success) {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
   const handleDownload = () => {

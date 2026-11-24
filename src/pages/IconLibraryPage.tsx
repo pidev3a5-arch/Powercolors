@@ -10,6 +10,7 @@ import {
   X,
 } from 'lucide-react';
 import { AppPage } from '../core/types';
+import { copyToClipboard } from '../core/clipboard';
 import { IconCategory, SvgIconItem, IconCustomization, IconBadgeStyle } from '../core/iconLibrary/types';
 import { SVG_ICONS_COLLECTION, ICON_CATEGORIES } from '../core/iconLibrary/icons';
 import {
@@ -50,28 +51,32 @@ export const IconLibraryPage: React.FC<IconLibraryPageProps> = () => {
     });
   }, [searchQuery, selectedCategory]);
 
-  const handleCopyDax = (icon: SvgIconItem, e?: React.MouseEvent) => {
+  const handleCopyDax = async (icon: SvgIconItem, e?: React.MouseEvent) => {
     e?.stopPropagation();
     const dax = generateDaxIconMeasure(icon, customization);
-    navigator.clipboard.writeText(dax);
-    setCopiedId(icon.id);
-    setCopiedType('dax');
-    setTimeout(() => {
-      setCopiedId(null);
-      setCopiedType(null);
-    }, 2000);
+    const success = await copyToClipboard(dax);
+    if (success) {
+      setCopiedId(icon.id);
+      setCopiedType('dax');
+      setTimeout(() => {
+        setCopiedId(null);
+        setCopiedType(null);
+      }, 2000);
+    }
   };
 
-  const handleCopyRawSvg = (icon: SvgIconItem, e?: React.MouseEvent) => {
+  const handleCopyRawSvg = async (icon: SvgIconItem, e?: React.MouseEvent) => {
     e?.stopPropagation();
     const svg = generateRawSvg(icon, customization);
-    navigator.clipboard.writeText(svg);
-    setCopiedId(icon.id);
-    setCopiedType('raw');
-    setTimeout(() => {
-      setCopiedId(null);
-      setCopiedType(null);
-    }, 2000);
+    const success = await copyToClipboard(svg);
+    if (success) {
+      setCopiedId(icon.id);
+      setCopiedType('raw');
+      setTimeout(() => {
+        setCopiedId(null);
+        setCopiedType(null);
+      }, 2000);
+    }
   };
 
   const handleDownload = (icon: SvgIconItem, e?: React.MouseEvent) => {

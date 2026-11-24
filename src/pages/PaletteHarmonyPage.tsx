@@ -10,6 +10,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { AppPage, StructuralColors } from '../core/types';
+import { copyToClipboard as universalCopy } from '../core/clipboard';
 import { HarmonyMode, HarmonyPalette } from '../core/paletteHarmony/types';
 import {
   generateHarmonyPalette,
@@ -43,17 +44,19 @@ export const PaletteHarmonyPage: React.FC<PaletteHarmonyPageProps> = ({
     return generateHarmonyPalette(baseHex, activeMode);
   }, [baseHex, activeMode]);
 
-  const copyToClipboard = (text: string, type: 'hex' | 'json' | 'hexlist', key?: string) => {
-    navigator.clipboard.writeText(text);
-    if (type === 'hex') {
-      setCopiedHex(key || text);
-      setTimeout(() => setCopiedHex(null), 1800);
-    } else if (type === 'json') {
-      setJsonCopied(true);
-      setTimeout(() => setJsonCopied(false), 2000);
-    } else if (type === 'hexlist') {
-      setHexListCopied(true);
-      setTimeout(() => setHexListCopied(false), 2000);
+  const copyToClipboard = async (text: string, type: 'hex' | 'json' | 'hexlist', key?: string) => {
+    const success = await universalCopy(text);
+    if (success) {
+      if (type === 'hex') {
+        setCopiedHex(key || text);
+        setTimeout(() => setCopiedHex(null), 1800);
+      } else if (type === 'json') {
+        setJsonCopied(true);
+        setTimeout(() => setJsonCopied(false), 2000);
+      } else if (type === 'hexlist') {
+        setHexListCopied(true);
+        setTimeout(() => setHexListCopied(false), 2000);
+      }
     }
   };
 

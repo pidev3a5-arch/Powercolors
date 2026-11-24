@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, Copy, Check, Download, RotateCcw, Lightbulb, Zap } from 'lucide-react';
 import { DaxTemplate } from '../../core/daxToolkit/types';
 import { interpolateDax, downloadDaxFile } from '../../core/daxToolkit/daxEngine';
+import { copyToClipboard } from '../../core/clipboard';
 
 interface DaxDetailModalProps {
   template: DaxTemplate | null;
@@ -29,9 +30,11 @@ export const DaxDetailModal: React.FC<DaxDetailModalProps> = ({
   };
 
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(currentDax);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    const success = await copyToClipboard(currentDax);
+    if (success) {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
   const handleDownload = () => {
